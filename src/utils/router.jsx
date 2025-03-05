@@ -1,22 +1,65 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
+// Public Pages
 import Home from "../pages/Home";
 import About from "../pages/About";
 import Contact from "../pages/Contact";
 import Products from "../pages/Products";
 import ProductDetail from "../pages/ProductDetail";
+import FAQ from "../pages/FAQ";
+import Terms from "../pages/Terms";
+import Privacy from "../pages/Privacy";
+
+// Auth Pages
+import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
+
+// User Pages
 import Profile from "../pages/Profile";
 import Message from "../pages/Message";
 import Cart from "../pages/Cart";
 import Exchange from "../pages/Exchange";
-import LoginForm from "../components/auth/LoginForm";
-import RegisterForm from "../components/auth/RegisterForm";
-import ProductForm from "../components/product/ProductForm";
-import AdminDashboard from "../pages/admin/Dashboard";
+import Settings from "../pages/Settings";
+
+// Admin Pages
+import AdminLayout from "../components/admin/AdminLayout";
+import Dashboard from "../pages/admin/Dashboard";
+import Users from "../pages/admin/Users";
 import AdminProducts from "../pages/admin/Products";
-import AdminUsers from "../pages/admin/Users";
-import AdminExchanges from "../pages/admin/Exchanges";
+import Exchanges from "../pages/admin/Exchanges";
 import AdminSettings from "../pages/admin/Settings";
+
+// Auth Guard Component
+const ProtectedRoute = ({ children }) => {
+  // Replace with actual auth check
+  const isAuthenticated = true;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+// Admin Guard Component
+const AdminRoute = ({ children }) => {
+  // Replace with actual auth and admin check
+  const isAuthenticated = true;
+  const isAdmin = true;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
 
 const AppRouter = () => {
   return (
@@ -25,33 +68,77 @@ const AppRouter = () => {
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
-
-      {/* Authentication Routes */}
-      <Route path="/login" element={<LoginForm />} />
-      <Route path="/register" element={<RegisterForm />} />
-
-      {/* Product Routes */}
       <Route path="/products" element={<Products />} />
       <Route path="/products/:id" element={<ProductDetail />} />
-      <Route path="/products/new" element={<ProductForm />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
+
+      {/* Auth Routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+      {/* Protected User Routes */}
       <Route
-        path="/products/edit/:id"
-        element={<ProductForm editMode={true} />}
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/messages"
+        element={
+          <ProtectedRoute>
+            <Message />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cart"
+        element={
+          <ProtectedRoute>
+            <Cart />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/exchange"
+        element={
+          <ProtectedRoute>
+            <Exchange />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        }
       />
 
-      {/* User Routes */}
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/messages" element={<Message />} />
-      <Route path="/cart" element={<Cart />} />
-      <Route path="/exchange" element={<Exchange />} />
-      <Route path="/exchange/:id" element={<Exchange />} />
-
       {/* Admin Routes */}
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/admin/products" element={<AdminProducts />} />
-      <Route path="/admin/users" element={<AdminUsers />} />
-      <Route path="/admin/exchanges" element={<AdminExchanges />} />
-      <Route path="/admin/settings" element={<AdminSettings />} />
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="users" element={<Users />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="exchanges" element={<Exchanges />} />
+        <Route path="settings" element={<AdminSettings />} />
+      </Route>
+
+      
     </Routes>
   );
 };

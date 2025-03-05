@@ -1,10 +1,8 @@
 import React from "react";
-import { BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import AppRouter from "./router";
+import AppRouter from "./utils/router";
 
-// Tạo theme cho ứng dụng
 const theme = createTheme({
   palette: {
     primary: {
@@ -35,9 +33,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <AppRouter />
-      </Router>
+      <AppRouter />
     </ThemeProvider>
   );
 }

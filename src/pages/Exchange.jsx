@@ -5,1088 +5,817 @@ import {
   Box,
   Grid,
   Paper,
-  Tabs,
-  Tab,
   Button,
+  TextField,
   Divider,
-  Avatar,
+  Card,
+  CardMedia,
+  CardContent,
+  CardActions,
   Chip,
+  Rating,
+  Stepper,
+  Step,
+  StepLabel,
+  CircularProgress,
   List,
   ListItem,
   ListItemText,
   ListItemAvatar,
-  ListItemSecondaryAction,
+  Avatar,
   IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
-  CircularProgress,
+  Snackbar,
   Alert,
+  FormControlLabel,
+  Checkbox,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   CompareArrows,
+  Search,
+  Add,
+  Delete,
+  ArrowForward,
   Check,
   Close,
   Message,
-  Delete,
   Info,
-  ArrowForward,
-  Search,
 } from "@mui/icons-material";
-import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Layout from "../components/layout/Layout";
 
 const Exchange = () => {
-  const [activeTab, setActiveTab] = useState(0);
-  const [exchanges, setExchanges] = useState([]);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const location = useLocation();
+  const navigate = useNavigate();
+  const queryParams = new URLSearchParams(location.search);
+  const initialProductId = queryParams.get("product");
+
+  const [activeStep, setActiveStep] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const [selectedExchange, setSelectedExchange] = useState(null);
-  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [targetProduct, setTargetProduct] = useState(null);
+  const [myProducts, setMyProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [additionalCash, setAdditionalCash] = useState(0);
+  const [cashOption, setCashOption] = useState(false);
   const [message, setMessage] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const steps = [
+    "Select Target Product",
+    "Choose Your Offer",
+    "Review & Submit",
+  ];
 
   useEffect(() => {
-    const fetchExchanges = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        // Here you would fetch exchanges from your API
+        // Here you would fetch data from your API
         // For now, we'll use mock data
         setTimeout(() => {
-          const mockExchanges = [
-            {
-              id: 1,
-              status: "pending",
-              createdAt: "2023-07-15",
-              updatedAt: "2023-07-15",
-              initiator: {
-                id: 1,
-                name: "John Doe",
-                avatar: "https://via.placeholder.com/40",
-                rating: 4.8,
-              },
-              receiver: {
-                id: 2,
-                name: "Jane Smith",
-                avatar: "https://via.placeholder.com/40",
-                rating: 4.5,
-              },
-              initiatorItem: {
-                id: 101,
-                name: "iPhone 13 Pro",
-                image: "https://via.placeholder.com/100",
-                condition: "Like New",
-                estimatedValue: 699.99,
-              },
-              receiverItem: {
-                id: 201,
-                name: "Samsung Galaxy S21",
-                image: "https://via.placeholder.com/100",
-                condition: "Good",
-                estimatedValue: 599.99,
-              },
-              messages: [
-                {
-                  id: 1,
-                  sender: "John Doe",
-                  text: "I would like to exchange my iPhone for your Samsung. It's in great condition with no scratches.",
-                  timestamp: "2023-07-15T10:30:00Z",
-                },
+          // Generate target product if ID is provided
+          if (initialProductId) {
+            const mockTargetProduct = {
+              id: parseInt(initialProductId),
+              name: `Product ${initialProductId}`,
+              description: `This is a detailed description for Product ${initialProductId}. It includes information about the features, specifications, and condition of the product.`,
+              price: Math.floor(Math.random() * 1000) + 100,
+              image: `https://via.placeholder.com/300x200?text=Product${initialProductId}`,
+              category: [
+                "Smartphones",
+                "Laptops",
+                "Tablets",
+                "Audio",
+                "Cameras",
+                "Accessories",
+              ][Math.floor(Math.random() * 6)],
+              brand: ["Apple", "Samsung", "Sony", "Dell", "HP", "Lenovo"][
+                Math.floor(Math.random() * 6)
               ],
-            },
-            {
-              id: 2,
-              status: "accepted",
-              createdAt: "2023-07-10",
-              updatedAt: "2023-07-12",
-              initiator: {
-                id: 1,
-                name: "John Doe",
-                avatar: "https://via.placeholder.com/40",
-                rating: 4.8,
+              rating: (Math.random() * 2 + 3).toFixed(1), // Between 3 and 5
+              reviews: Math.floor(Math.random() * 100),
+              seller: {
+                id: Math.floor(Math.random() * 100) + 1,
+                name: `Seller ${Math.floor(Math.random() * 100) + 1}`,
+                rating: (Math.random() * 2 + 3).toFixed(1), // Between 3 and 5
               },
-              receiver: {
-                id: 3,
-                name: "Mike Johnson",
-                avatar: "https://via.placeholder.com/40",
-                rating: 4.2,
-              },
-              initiatorItem: {
-                id: 102,
-                name: "Sony WH-1000XM4",
-                image: "https://via.placeholder.com/100",
-                condition: "Good",
-                estimatedValue: 249.99,
-              },
-              receiverItem: {
-                id: 202,
-                name: "Bose QuietComfort 45",
-                image: "https://via.placeholder.com/100",
-                condition: "Like New",
-                estimatedValue: 279.99,
-              },
-              messages: [
-                {
-                  id: 1,
-                  sender: "John Doe",
-                  text: "Would you be interested in exchanging your Bose headphones for my Sony ones?",
-                  timestamp: "2023-07-10T14:20:00Z",
-                },
-                {
-                  id: 2,
-                  sender: "Mike Johnson",
-                  text: "Yes, I'm interested. Can you tell me more about the condition?",
-                  timestamp: "2023-07-11T09:15:00Z",
-                },
-                {
-                  id: 3,
-                  sender: "John Doe",
-                  text: "They're in good condition, only used for a few months. Battery life is still excellent.",
-                  timestamp: "2023-07-11T10:30:00Z",
-                },
-                {
-                  id: 4,
-                  sender: "Mike Johnson",
-                  text: "Sounds good. I accept the exchange.",
-                  timestamp: "2023-07-12T11:45:00Z",
-                },
+              condition: ["New", "Like New", "Good", "Fair"][
+                Math.floor(Math.random() * 4)
               ],
-            },
-            {
-              id: 3,
-              status: "completed",
-              createdAt: "2023-06-20",
-              updatedAt: "2023-06-25",
-              initiator: {
-                id: 4,
-                name: "Sarah Williams",
-                avatar: "https://via.placeholder.com/40",
-                rating: 4.9,
-              },
-              receiver: {
-                id: 1,
-                name: "John Doe",
-                avatar: "https://via.placeholder.com/40",
-                rating: 4.8,
-              },
-              initiatorItem: {
-                id: 103,
-                name: 'iPad Pro 11"',
-                image: "https://via.placeholder.com/100",
-                condition: "Like New",
-                estimatedValue: 699.99,
-              },
-              receiverItem: {
-                id: 203,
-                name: "MacBook Air M1",
-                image: "https://via.placeholder.com/100",
-                condition: "Good",
-                estimatedValue: 799.99,
-              },
-              messages: [
-                {
-                  id: 1,
-                  sender: "Sarah Williams",
-                  text: "Hi, I'm interested in exchanging my iPad Pro for your MacBook Air.",
-                  timestamp: "2023-06-20T15:30:00Z",
-                },
-                {
-                  id: 2,
-                  sender: "John Doe",
-                  text: "I might be interested. Can you add some cash on top since my MacBook is worth more?",
-                  timestamp: "2023-06-21T10:15:00Z",
-                },
-                {
-                  id: 3,
-                  sender: "Sarah Williams",
-                  text: "I can add $100. Would that work?",
-                  timestamp: "2023-06-21T11:20:00Z",
-                },
-                {
-                  id: 4,
-                  sender: "John Doe",
-                  text: "That works for me. Let's proceed with the exchange.",
-                  timestamp: "2023-06-22T09:45:00Z",
-                },
-              ],
-              reviews: [
-                {
-                  id: 1,
-                  reviewer: "John Doe",
-                  rating: 5,
-                  comment:
-                    "Great exchange! The iPad was in perfect condition as described.",
-                  timestamp: "2023-06-25T14:30:00Z",
-                },
-                {
-                  id: 2,
-                  reviewer: "Sarah Williams",
-                  rating: 5,
-                  comment: "Smooth transaction. The MacBook works perfectly!",
-                  timestamp: "2023-06-25T15:45:00Z",
-                },
-              ],
-            },
-            {
-              id: 4,
-              status: "rejected",
-              createdAt: "2023-07-05",
-              updatedAt: "2023-07-06",
-              initiator: {
-                id: 1,
-                name: "John Doe",
-                avatar: "https://via.placeholder.com/40",
-                rating: 4.8,
-              },
-              receiver: {
-                id: 5,
-                name: "David Brown",
-                avatar: "https://via.placeholder.com/40",
-                rating: 4.6,
-              },
-              initiatorItem: {
-                id: 104,
-                name: "Nintendo Switch",
-                image: "https://via.placeholder.com/100",
-                condition: "Good",
-                estimatedValue: 249.99,
-              },
-              receiverItem: {
-                id: 204,
-                name: "PlayStation 5 Controller",
-                image: "https://via.placeholder.com/100",
-                condition: "Like New",
-                estimatedValue: 69.99,
-              },
-              messages: [
-                {
-                  id: 1,
-                  sender: "John Doe",
-                  text: "Would you consider exchanging your PS5 controller for my Nintendo Switch?",
-                  timestamp: "2023-07-05T16:20:00Z",
-                },
-                {
-                  id: 2,
-                  sender: "David Brown",
-                  text: "Sorry, that doesn't seem like a fair exchange. Your Switch is worth much more than my controller.",
-                  timestamp: "2023-07-06T09:30:00Z",
-                },
-              ],
-            },
-          ];
+            };
+            setTargetProduct(mockTargetProduct);
+            setActiveStep(1); // Skip to step 2 if product is provided
+          }
 
-          setExchanges(mockExchanges);
+          // Generate my products
+          const mockMyProducts = Array(8)
+            .fill()
+            .map((_, index) => ({
+              id: index + 1,
+              name: `My Product ${index + 1}`,
+              description: `This is a description for My Product ${index + 1}.`,
+              price: Math.floor(Math.random() * 1000) + 100,
+              image: `https://via.placeholder.com/300x200?text=MyProduct${
+                index + 1
+              }`,
+              category: [
+                "Smartphones",
+                "Laptops",
+                "Tablets",
+                "Audio",
+                "Cameras",
+                "Accessories",
+              ][Math.floor(Math.random() * 6)],
+              brand: ["Apple", "Samsung", "Sony", "Dell", "HP", "Lenovo"][
+                Math.floor(Math.random() * 6)
+              ],
+              rating: (Math.random() * 5).toFixed(1),
+              reviews: Math.floor(Math.random() * 100),
+              condition: ["New", "Like New", "Good", "Fair"][
+                Math.floor(Math.random() * 4)
+              ],
+            }));
+
+          setMyProducts(mockMyProducts);
+          setFilteredProducts(mockMyProducts);
           setLoading(false);
         }, 1000);
       } catch (error) {
-        console.error("Error fetching exchanges:", error);
-        setError("Failed to load exchanges. Please try again.");
+        console.error("Error fetching exchange data:", error);
+        setError("Failed to load exchange data. Please try again.");
         setLoading(false);
       }
     };
 
-    fetchExchanges();
-  }, []);
+    fetchData();
+  }, [initialProductId]);
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
+  useEffect(() => {
+    // Filter my products based on search query
+    if (searchQuery.trim() === "") {
+      setFilteredProducts(myProducts);
+    } else {
+      const filtered = myProducts.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.description
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    }
+  }, [searchQuery, myProducts]);
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
-  const handleOpenDetailDialog = (exchange) => {
-    setSelectedExchange(exchange);
-    setDetailDialogOpen(true);
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleCloseDetailDialog = () => {
-    setDetailDialogOpen(false);
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
   };
 
-  const handleOpenMessageDialog = () => {
-    setMessageDialogOpen(true);
+  const handleSelectProduct = (product) => {
+    setSelectedProduct(product);
   };
 
-  const handleCloseMessageDialog = () => {
-    setMessageDialogOpen(false);
-    setMessage("");
-  };
-
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
-
-    // Here you would send the message to your API
-    console.log("Sending message:", message);
-
-    // Update the local state with the new message
-    const updatedExchanges = exchanges.map((exchange) => {
-      if (exchange.id === selectedExchange.id) {
-        return {
-          ...exchange,
-          messages: [
-            ...exchange.messages,
-            {
-              id: Date.now(),
-              sender: "John Doe", // Current user
-              text: message,
-              timestamp: new Date().toISOString(),
-            },
-          ],
-        };
-      }
-      return exchange;
-    });
-
-    setExchanges(updatedExchanges);
-    setSelectedExchange({
-      ...selectedExchange,
-      messages: [
-        ...selectedExchange.messages,
-        {
-          id: Date.now(),
-          sender: "John Doe", // Current user
-          text: message,
-          timestamp: new Date().toISOString(),
-        },
-      ],
-    });
-
-    setMessage("");
-    setMessageDialogOpen(false);
-  };
-
-  const handleAcceptExchange = () => {
-    // Here you would send the acceptance to your API
-    console.log("Accepting exchange:", selectedExchange.id);
-
-    // Update the local state
-    const updatedExchanges = exchanges.map((exchange) => {
-      if (exchange.id === selectedExchange.id) {
-        return {
-          ...exchange,
-          status: "accepted",
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return exchange;
-    });
-
-    setExchanges(updatedExchanges);
-    setSelectedExchange({
-      ...selectedExchange,
-      status: "accepted",
-      updatedAt: new Date().toISOString(),
-    });
-  };
-
-  const handleRejectExchange = () => {
-    // Here you would send the rejection to your API
-    console.log("Rejecting exchange:", selectedExchange.id);
-
-    // Update the local state
-    const updatedExchanges = exchanges.map((exchange) => {
-      if (exchange.id === selectedExchange.id) {
-        return {
-          ...exchange,
-          status: "rejected",
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return exchange;
-    });
-
-    setExchanges(updatedExchanges);
-    setSelectedExchange({
-      ...selectedExchange,
-      status: "rejected",
-      updatedAt: new Date().toISOString(),
-    });
-  };
-
-  const handleCompleteExchange = () => {
-    // Here you would send the completion to your API
-    console.log("Completing exchange:", selectedExchange.id);
-
-    // Update the local state
-    const updatedExchanges = exchanges.map((exchange) => {
-      if (exchange.id === selectedExchange.id) {
-        return {
-          ...exchange,
-          status: "completed",
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return exchange;
-    });
-
-    setExchanges(updatedExchanges);
-    setSelectedExchange({
-      ...selectedExchange,
-      status: "completed",
-      updatedAt: new Date().toISOString(),
-    });
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "pending":
-        return "warning";
-      case "accepted":
-        return "info";
-      case "completed":
-        return "success";
-      case "rejected":
-        return "error";
-      default:
-        return "default";
+  const handleAdditionalCashChange = (event) => {
+    const value = event.target.value;
+    if (value === "" || /^\d+$/.test(value)) {
+      setAdditionalCash(value === "" ? 0 : parseInt(value));
     }
   };
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case "pending":
-        return "Pending";
-      case "accepted":
-        return "Accepted";
-      case "completed":
-        return "Completed";
-      case "rejected":
-        return "Rejected";
-      default:
-        return status;
+  const handleCashOptionChange = (event) => {
+    setCashOption(event.target.checked);
+    if (!event.target.checked) {
+      setAdditionalCash(0);
     }
   };
 
-  const filteredExchanges = exchanges.filter((exchange) => {
-    if (activeTab === 0) return true; // All exchanges
-    if (activeTab === 1) return exchange.status === "pending";
-    if (activeTab === 2) return exchange.status === "accepted";
-    if (activeTab === 3) return exchange.status === "completed";
-    if (activeTab === 4) return exchange.status === "rejected";
-    return false;
-  });
+  const handleMessageChange = (event) => {
+    setMessage(event.target.value);
+  };
 
-  return (
-    <>
-      <Header />
-      <Container sx={{ py: 4, minHeight: "70vh" }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          My Exchanges
-        </Typography>
+  const handleSubmitExchange = () => {
+    // Here you would submit the exchange proposal to your API
+    setDialogOpen(true);
+  };
 
-        <Paper sx={{ mb: 4 }}>
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            variant="scrollable"
-            scrollButtons="auto"
-            indicatorColor="primary"
-            textColor="primary"
-          >
-            <Tab label="All" />
-            <Tab label="Pending" />
-            <Tab label="Accepted" />
-            <Tab label="Completed" />
-            <Tab label="Rejected" />
-          </Tabs>
-        </Paper>
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
 
-        {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Alert severity="error" sx={{ mb: 4 }}>
-            {error}
-          </Alert>
-        ) : filteredExchanges.length === 0 ? (
-          <Paper sx={{ p: 4, textAlign: "center" }}>
+  const handleConfirmExchange = () => {
+    setDialogOpen(false);
+    setSnackbar({
+      open: true,
+      message: "Exchange proposal submitted successfully!",
+      severity: "success",
+    });
+    // Redirect to exchanges page after a delay
+    setTimeout(() => {
+      navigate("/profile?tab=exchanges");
+    }, 2000);
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({
+      ...snackbar,
+      open: false,
+    });
+  };
+
+  const renderStepContent = (step) => {
+    switch (step) {
+      case 0:
+        return (
+          <Box>
             <Typography variant="h6" gutterBottom>
-              No exchanges found
+              Select a Product to Exchange For
             </Typography>
-            <Typography variant="body1" color="text.secondary" paragraph>
-              {activeTab === 0
-                ? "You haven't participated in any exchanges yet."
-                : `You don't have any ${
-                    activeTab === 1
-                      ? "pending"
-                      : activeTab === 2
-                      ? "accepted"
-                      : activeTab === 3
-                      ? "completed"
-                      : "rejected"
-                  } exchanges.`}
+            <Typography variant="body1" paragraph>
+              Browse products and select one that you'd like to propose an
+              exchange for.
             </Typography>
             <Button
               variant="contained"
-              color="primary"
-              href="/products"
-              startIcon={<Search />}
+              component={Link}
+              to="/products"
+              sx={{ mb: 3 }}
             >
               Browse Products
             </Button>
-          </Paper>
-        ) : (
-          <List>
-            {filteredExchanges.map((exchange) => (
-              <Paper key={exchange.id} sx={{ mb: 2 }}>
-                <ListItem
-                  alignItems="flex-start"
-                  sx={{ p: 2 }}
-                  secondaryAction={
+            <Typography variant="body2" color="text.secondary">
+              Or, if you already know which product you want to exchange for,
+              enter its ID below:
+            </Typography>
+            <Box sx={{ display: "flex", mt: 2 }}>
+              <TextField
+                label="Product ID"
+                variant="outlined"
+                size="small"
+                sx={{ mr: 2 }}
+              />
+              <Button variant="outlined">Find Product</Button>
+            </Box>
+          </Box>
+        );
+
+      case 1:
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Choose Your Offer
+            </Typography>
+
+            {targetProduct && (
+              <Paper sx={{ p: 3, mb: 4 }}>
+                <Typography variant="subtitle1" gutterBottom>
+                  You want to exchange for:
+                </Typography>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} sm={4}>
+                    <img
+                      src={targetProduct.image}
+                      alt={targetProduct.name}
+                      style={{ width: "100%", borderRadius: 8 }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={8}>
+                    <Typography variant="h6">{targetProduct.name}</Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      paragraph
+                    >
+                      {targetProduct.category} • {targetProduct.brand} •{" "}
+                      {targetProduct.condition}
+                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                      <Rating
+                        value={parseFloat(targetProduct.rating)}
+                        precision={0.5}
+                        size="small"
+                        readOnly
+                      />
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ ml: 1 }}
+                      >
+                        ({targetProduct.reviews} reviews)
+                      </Typography>
+                    </Box>
+                    <Typography variant="h6" color="primary" gutterBottom>
+                      ${targetProduct.price.toFixed(2)}
+                    </Typography>
+                    <Typography variant="body2">
+                      Seller: {targetProduct.seller.name}
+                    </Typography>
                     <Button
                       variant="outlined"
                       size="small"
-                      onClick={() => handleOpenDetailDialog(exchange)}
+                      component={Link}
+                      to={`/products/${targetProduct.id}`}
+                      sx={{ mt: 2 }}
                     >
                       View Details
                     </Button>
-                  }
-                >
-                  <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} sm={3}>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <ListItemAvatar>
-                          <Avatar src={exchange.initiator.avatar} />
-                        </ListItemAvatar>
-                        <ListItemText
-                          primary={exchange.initiator.name}
-                          secondary={`Initiated on ${new Date(
-                            exchange.createdAt
-                          ).toLocaleDateString()}`}
-                        />
-                      </Box>
-                    </Grid>
-
-                    <Grid item xs={12} sm={3}>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Box
-                          component="img"
-                          src={exchange.initiatorItem.image}
-                          alt={exchange.initiatorItem.name}
-                          sx={{
-                            width: 50,
-                            height: 50,
-                            mr: 2,
-                            objectFit: "cover",
-                          }}
-                        />
-                        <Box>
-                          <Typography variant="body2" noWrap>
-                            {exchange.initiatorItem.name}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            ${exchange.initiatorItem.estimatedValue.toFixed(2)}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-
-                    <Grid
-                      item
-                      xs={12}
-                      sm={1}
-                      sx={{ display: "flex", justifyContent: "center" }}
-                    >
-                      <CompareArrows color="action" />
-                    </Grid>
-
-                    <Grid item xs={12} sm={3}>
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Box
-                          component="img"
-                          src={exchange.receiverItem.image}
-                          alt={exchange.receiverItem.name}
-                          sx={{
-                            width: 50,
-                            height: 50,
-                            mr: 2,
-                            objectFit: "cover",
-                          }}
-                        />
-                        <Box>
-                          <Typography variant="body2" noWrap>
-                            {exchange.receiverItem.name}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            ${exchange.receiverItem.estimatedValue.toFixed(2)}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-
-                    <Grid item xs={12} sm={2}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "flex-end",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Chip
-                          label={getStatusText(exchange.status)}
-                          color={getStatusColor(exchange.status)}
-                          size="small"
-                        />
-                      </Box>
-                    </Grid>
                   </Grid>
-                </ListItem>
+                </Grid>
               </Paper>
-            ))}
-          </List>
-        )}
+            )}
 
-        {/* Exchange Detail Dialog */}
-        <Dialog
-          open={detailDialogOpen}
-          onClose={handleCloseDetailDialog}
-          maxWidth="md"
-          fullWidth
-        >
-          {selectedExchange && (
-            <>
-              <DialogTitle>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
+            <Typography variant="subtitle1" gutterBottom>
+              Select one of your products to offer in exchange:
+            </Typography>
+
+            <TextField
+              fullWidth
+              placeholder="Search your products..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              sx={{ mb: 3 }}
+              InputProps={{
+                startAdornment: (
+                  <Search sx={{ color: "action.active", mr: 1 }} />
+                ),
+              }}
+            />
+
+            {filteredProducts.length === 0 ? (
+              <Paper sx={{ p: 3, textAlign: "center" }}>
+                <Typography variant="body1" paragraph>
+                  No products found matching your search.
+                </Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<Add />}
+                  component={Link}
+                  to="/products/new"
                 >
-                  Exchange Details
-                  <Chip
-                    label={getStatusText(selectedExchange.status)}
-                    color={getStatusColor(selectedExchange.status)}
-                  />
-                </Box>
-              </DialogTitle>
-
-              <DialogContent dividers>
-                <Grid container spacing={3}>
-                  {/* Exchange Items */}
-                  <Grid item xs={12}>
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} sm={5}>
-                          <Box sx={{ textAlign: "center" }}>
-                            <Avatar
-                              src={selectedExchange.initiator.avatar}
-                              sx={{ width: 40, height: 40, mx: "auto", mb: 1 }}
-                            />
-                            <Typography variant="subtitle2">
-                              {selectedExchange.initiator.name}
-                            </Typography>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
-                            >
-                              <Box
-                                component="img"
-                                src={selectedExchange.initiatorItem.image}
-                                alt={selectedExchange.initiatorItem.name}
-                                sx={{
-                                  width: 120,
-                                  height: 120,
-                                  my: 2,
-                                  objectFit: "contain",
-                                }}
-                              />
-                            </Box>
-                            <Typography variant="body1" fontWeight="bold">
-                              {selectedExchange.initiatorItem.name}
-                            </Typography>
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              gutterBottom
-                            >
-                              Condition:{" "}
-                              {selectedExchange.initiatorItem.condition}
-                            </Typography>
-                            <Typography
-                              variant="body2"
-                              color="primary"
-                              fontWeight="bold"
-                            >
-                              $
-                              {selectedExchange.initiatorItem.estimatedValue.toFixed(
-                                2
-                              )}
-                            </Typography>
-                          </Box>
-                        </Grid>
-
-                        <Grid item xs={12} sm={2}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              height: "100%",
-                            }}
-                          >
-                            <ArrowForward
-                              sx={{ fontSize: 40, color: "text.secondary" }}
-                            />
-                          </Box>
-                        </Grid>
-
-                        <Grid item xs={12} sm={5}>
-                          <Box sx={{ textAlign: "center" }}>
-                            <Avatar
-                              src={selectedExchange.receiver.avatar}
-                              sx={{ width: 40, height: 40, mx: "auto", mb: 1 }}
-                            />
-                            <Typography variant="subtitle2">
-                              {selectedExchange.receiver.name}
-                            </Typography>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
-                            >
-                              <Box
-                                component="img"
-                                src={selectedExchange.receiverItem.image}
-                                alt={selectedExchange.receiverItem.name}
-                                sx={{
-                                  width: 120,
-                                  height: 120,
-                                  my: 2,
-                                  objectFit: "contain",
-                                }}
-                              />
-                            </Box>
-                            <Typography variant="body1" fontWeight="bold">
-                              {selectedExchange.receiverItem.name}
-                            </Typography>
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              gutterBottom
-                            >
-                              Condition:{" "}
-                              {selectedExchange.receiverItem.condition}
-                            </Typography>
-                            <Typography
-                              variant="body2"
-                              color="primary"
-                              fontWeight="bold"
-                            >
-                              $
-                              {selectedExchange.receiverItem.estimatedValue.toFixed(
-                                2
-                              )}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </Paper>
-                  </Grid>
-
-                  {/* Exchange Timeline */}
-                  <Grid item xs={12}>
-                    <Typography variant="h6" gutterBottom>
-                      Exchange Timeline
-                    </Typography>
-
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 2,
-                        }}
-                      >
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          <Chip
-                            label="Created"
-                            color="primary"
-                            size="small"
-                            sx={{ mr: 2, minWidth: 80 }}
-                          />
-                          <Typography variant="body2">
-                            Exchange initiated on{" "}
-                            {new Date(
-                              selectedExchange.createdAt
-                            ).toLocaleString()}
-                          </Typography>
-                        </Box>
-
-                        {selectedExchange.status !== "pending" && (
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <Chip
-                              label={
-                                selectedExchange.status === "rejected"
-                                  ? "Rejected"
-                                  : "Accepted"
-                              }
-                              color={
-                                selectedExchange.status === "rejected"
-                                  ? "error"
-                                  : "success"
-                              }
-                              size="small"
-                              sx={{ mr: 2, minWidth: 80 }}
-                            />
-                            <Typography variant="body2">
-                              Exchange{" "}
-                              {selectedExchange.status === "rejected"
-                                ? "rejected"
-                                : "accepted"}{" "}
-                              on{" "}
-                              {new Date(
-                                selectedExchange.updatedAt
-                              ).toLocaleString()}
-                            </Typography>
-                          </Box>
-                        )}
-
-                        {selectedExchange.status === "completed" &&
-                          selectedExchange.reviews && (
-                            <Box sx={{ display: "flex", alignItems: "center" }}>
-                              <Chip
-                                label="Completed"
-                                color="success"
-                                size="small"
-                                sx={{ mr: 2, minWidth: 80 }}
-                              />
-                              <Typography variant="body2">
-                                Exchange completed and reviewed on{" "}
-                                {new Date(
-                                  selectedExchange.reviews[0].timestamp
-                                ).toLocaleString()}
-                              </Typography>
-                            </Box>
-                          )}
-                      </Box>
-                    </Paper>
-                  </Grid>
-
-                  {/* Exchange Messages */}
-                  <Grid item xs={12}>
-                    <Box
+                  Add New Product
+                </Button>
+              </Paper>
+            ) : (
+              <Grid container spacing={3}>
+                {filteredProducts.map((product) => (
+                  <Grid item xs={12} sm={6} md={4} key={product.id}>
+                    <Card
                       sx={{
+                        height: "100%",
                         display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 2,
+                        flexDirection: "column",
+                        border:
+                          selectedProduct?.id === product.id
+                            ? "2px solid"
+                            : "none",
+                        borderColor: "primary.main",
+                        transition: "transform 0.2s",
+                        "&:hover": {
+                          transform: "translateY(-5px)",
+                          boxShadow: 3,
+                        },
                       }}
+                      onClick={() => handleSelectProduct(product)}
                     >
-                      <Typography variant="h6">Messages</Typography>
-
-                      {selectedExchange.status !== "rejected" &&
-                        selectedExchange.status !== "completed" && (
-                          <Button
-                            variant="outlined"
-                            startIcon={<Message />}
-                            onClick={handleOpenMessageDialog}
-                          >
-                            Send Message
-                          </Button>
-                        )}
-                    </Box>
-
-                    <Paper
-                      variant="outlined"
-                      sx={{ p: 2, maxHeight: 300, overflow: "auto" }}
-                    >
-                      {selectedExchange.messages.length === 0 ? (
+                      <CardMedia
+                        component="img"
+                        height="140"
+                        image={product.image}
+                        alt={product.name}
+                      />
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Typography variant="h6" component="div" noWrap>
+                          {product.name}
+                        </Typography>
                         <Typography
                           variant="body2"
                           color="text.secondary"
-                          sx={{ textAlign: "center", py: 2 }}
+                          gutterBottom
                         >
-                          No messages yet
+                          {product.category} • {product.condition}
                         </Typography>
-                      ) : (
-                        <List>
-                          {selectedExchange.messages.map((msg) => (
-                            <ListItem
-                              key={msg.id}
-                              alignItems="flex-start"
-                              sx={{ px: 1 }}
-                            >
-                              <ListItemText
-                                primary={
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                    }}
-                                  >
-                                    <Typography variant="subtitle2">
-                                      {msg.sender}
-                                    </Typography>
-                                    <Typography
-                                      variant="caption"
-                                      color="text.secondary"
-                                    >
-                                      {new Date(msg.timestamp).toLocaleString()}
-                                    </Typography>
-                                  </Box>
-                                }
-                                secondary={
-                                  <Typography
-                                    variant="body2"
-                                    color="text.primary"
-                                    sx={{ mt: 1, whiteSpace: "pre-wrap" }}
-                                  >
-                                    {msg.text}
-                                  </Typography>
-                                }
-                              />
-                            </ListItem>
-                          ))}
-                        </List>
-                      )}
-                    </Paper>
+                        <Typography variant="h6" color="primary" gutterBottom>
+                          ${product.price.toFixed(2)}
+                        </Typography>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                        >
+                          <Rating
+                            value={parseFloat(product.rating)}
+                            precision={0.5}
+                            size="small"
+                            readOnly
+                          />
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ ml: 1 }}
+                          >
+                            ({product.reviews})
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                      <CardActions>
+                        <Button
+                          size="small"
+                          variant={
+                            selectedProduct?.id === product.id
+                              ? "contained"
+                              : "outlined"
+                          }
+                          fullWidth
+                          onClick={() => handleSelectProduct(product)}
+                        >
+                          {selectedProduct?.id === product.id
+                            ? "Selected"
+                            : "Select"}
+                        </Button>
+                      </CardActions>
+                    </Card>
                   </Grid>
+                ))}
+              </Grid>
+            )}
 
-                  {/* Reviews (if completed) */}
-                  {selectedExchange.status === "completed" &&
-                    selectedExchange.reviews && (
-                      <Grid item xs={12}>
-                        <Typography variant="h6" gutterBottom>
-                          Reviews
+            <Box sx={{ mt: 4 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={cashOption}
+                    onChange={handleCashOptionChange}
+                  />
+                }
+                label="Add cash to your offer"
+              />
+
+              {cashOption && (
+                <TextField
+                  label="Additional Cash Amount ($)"
+                  type="number"
+                  value={additionalCash}
+                  onChange={handleAdditionalCashChange}
+                  fullWidth
+                  sx={{ mt: 2 }}
+                  InputProps={{
+                    inputProps: { min: 0 },
+                  }}
+                />
+              )}
+            </Box>
+          </Box>
+        );
+
+      case 2:
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Review & Submit Your Exchange Proposal
+            </Typography>
+
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={5}>
+                <Paper sx={{ p: 3, height: "100%" }}>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Your Offer:
+                  </Typography>
+                  {selectedProduct ? (
+                    <Box>
+                      <img
+                        src={selectedProduct.image}
+                        alt={selectedProduct.name}
+                        style={{
+                          width: "100%",
+                          borderRadius: 8,
+                          marginBottom: 16,
+                        }}
+                      />
+                      <Typography variant="h6">
+                        {selectedProduct.name}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        paragraph
+                      >
+                        {selectedProduct.category} • {selectedProduct.brand} •{" "}
+                        {selectedProduct.condition}
+                      </Typography>
+                      <Typography variant="h6" color="primary" gutterBottom>
+                        ${selectedProduct.price.toFixed(2)}
+                      </Typography>
+
+                      {cashOption && additionalCash > 0 && (
+                        <Box
+                          sx={{
+                            mt: 2,
+                            p: 2,
+                            bgcolor: "background.default",
+                            borderRadius: 1,
+                          }}
+                        >
+                          <Typography variant="subtitle2">
+                            Additional Cash:
+                          </Typography>
+                          <Typography variant="h6" color="primary">
+                            ${additionalCash.toFixed(2)}
+                          </Typography>
+                        </Box>
+                      )}
+
+                      <Box
+                        sx={{
+                          mt: 2,
+                          p: 2,
+                          bgcolor: "background.default",
+                          borderRadius: 1,
+                        }}
+                      >
+                        <Typography variant="subtitle2">
+                          Total Offer Value:
                         </Typography>
+                        <Typography variant="h6" color="primary">
+                          ${(selectedProduct.price + additionalCash).toFixed(2)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Typography variant="body1" color="error">
+                      Please go back and select a product to offer.
+                    </Typography>
+                  )}
+                </Paper>
+              </Grid>
 
-                        <Paper variant="outlined" sx={{ p: 2 }}>
-                          {selectedExchange.reviews.map((review) => (
-                            <Box key={review.id} sx={{ mb: 2 }}>
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "center",
-                                  mb: 1,
-                                }}
-                              >
-                                <Typography variant="subtitle2">
-                                  {review.reviewer}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
-                                  {new Date(review.timestamp).toLocaleString()}
-                                </Typography>
-                              </Box>
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  mb: 1,
-                                }}
-                              >
-                                <Rating
-                                  value={review.rating}
-                                  readOnly
-                                  size="small"
-                                />
-                                <Typography variant="body2" sx={{ ml: 1 }}>
-                                  {review.rating}/5
-                                </Typography>
-                              </Box>
-                              <Typography variant="body2">
-                                {review.comment}
-                              </Typography>
-                              {selectedExchange.reviews.indexOf(review) <
-                                selectedExchange.reviews.length - 1 && (
-                                <Divider sx={{ my: 2 }} />
-                              )}
-                            </Box>
-                          ))}
-                        </Paper>
-                      </Grid>
-                    )}
-                </Grid>
-              </DialogContent>
+              <Grid
+                item
+                xs={12}
+                md={2}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: isMobile ? "row" : "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <CompareArrows
+                    sx={{
+                      fontSize: 40,
+                      transform: isMobile ? "none" : "rotate(90deg)",
+                      my: 2,
+                      mx: isMobile ? 2 : 0,
+                    }}
+                  />
+                </Box>
+              </Grid>
 
-              <DialogActions>
-                {selectedExchange.status === "pending" && (
-                  <>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={handleRejectExchange}
-                      startIcon={<Close />}
-                    >
-                      Reject
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="success"
-                      onClick={handleAcceptExchange}
-                      startIcon={<Check />}
-                    >
-                      Accept
-                    </Button>
-                  </>
-                )}
+              <Grid item xs={12} md={5}>
+                <Paper sx={{ p: 3, height: "100%" }}>
+                  <Typography variant="subtitle1" gutterBottom>
+                    In Exchange For:
+                  </Typography>
+                  {targetProduct ? (
+                    <Box>
+                      <img
+                        src={targetProduct.image}
+                        alt={targetProduct.name}
+                        style={{
+                          width: "100%",
+                          borderRadius: 8,
+                          marginBottom: 16,
+                        }}
+                      />
+                      <Typography variant="h6">{targetProduct.name}</Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        paragraph
+                      >
+                        {targetProduct.category} • {targetProduct.brand} •{" "}
+                        {targetProduct.condition}
+                      </Typography>
+                      <Typography variant="h6" color="primary" gutterBottom>
+                        ${targetProduct.price.toFixed(2)}
+                      </Typography>
+                      <Typography variant="body2">
+                        Seller: {targetProduct.seller.name}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Typography variant="body1" color="error">
+                      Please go back and select a target product.
+                    </Typography>
+                  )}
+                </Paper>
+              </Grid>
+            </Grid>
 
-                {selectedExchange.status === "accepted" && (
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={handleCompleteExchange}
-                    startIcon={<Check />}
-                  >
-                    Mark as Completed
-                  </Button>
-                )}
+            <Paper sx={{ p: 3, mt: 4 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Add a Message (Optional):
+              </Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                placeholder="Explain why you think this is a fair exchange, or provide additional details about your offer..."
+                value={message}
+                onChange={handleMessageChange}
+              />
+            </Paper>
 
-                <Button onClick={handleCloseDetailDialog}>Close</Button>
-              </DialogActions>
-            </>
-          )}
-        </Dialog>
+            <Box sx={{ mt: 4, bgcolor: "info.light", p: 2, borderRadius: 1 }}>
+              <Typography variant="body2">
+                <Info sx={{ verticalAlign: "middle", mr: 1 }} />
+                By submitting this proposal, you agree to our exchange terms and
+                conditions. The other party will have 7 days to respond to your
+                offer.
+              </Typography>
+            </Box>
+          </Box>
+        );
 
-        {/* Message Dialog */}
-        <Dialog
-          open={messageDialogOpen}
-          onClose={handleCloseMessageDialog}
-          maxWidth="sm"
-          fullWidth
-        >
-          <DialogTitle>Send Message</DialogTitle>
+      default:
+        return null;
+    }
+  };
 
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="message"
-              label="Your Message"
-              type="text"
-              fullWidth
-              multiline
-              rows={4}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-          </DialogContent>
+  if (loading) {
+    return (
+      <Layout>
+        <Container sx={{ py: 8, display: "flex", justifyContent: "center" }}>
+          <CircularProgress />
+        </Container>
+      </Layout>
+    );
+  }
 
-          <DialogActions>
-            <Button onClick={handleCloseMessageDialog}>Cancel</Button>
-            <Button
-              onClick={handleSendMessage}
-              variant="contained"
-              color="primary"
-              disabled={!message.trim()}
-            >
-              Send
+  if (error) {
+    return (
+      <Layout>
+        <Container sx={{ py: 8 }}>
+          <Typography color="error" sx={{ textAlign: "center" }}>
+            {error}
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <Button component={Link} to="/products" variant="contained">
+              Back to Products
             </Button>
-          </DialogActions>
-        </Dialog>
+          </Box>
+        </Container>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Propose an Exchange
+        </Typography>
+
+        <Stepper activeStep={activeStep} sx={{ mb: 4 }} alternativeLabel>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+
+        <Paper sx={{ p: 3 }}>
+          {renderStepContent(activeStep)}
+
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
+            <Button disabled={activeStep === 0} onClick={handleBack}>
+              Back
+            </Button>
+            <Box>
+              {activeStep === steps.length - 1 ? (
+                <Button
+                  variant="contained"
+                  onClick={handleSubmitExchange}
+                  disabled={!selectedProduct || !targetProduct}
+                >
+                  Submit Proposal
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  onClick={handleNext}
+                  disabled={activeStep === 1 && !selectedProduct}
+                >
+                  Next
+                </Button>
+              )}
+            </Box>
+          </Box>
+        </Paper>
       </Container>
-      <Footer />
-    </>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle>Confirm Exchange Proposal</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" paragraph>
+            Are you sure you want to submit this exchange proposal?
+          </Typography>
+          <Typography variant="body2" paragraph>
+            You are offering:
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemAvatar>
+                <Avatar src={selectedProduct?.image} variant="rounded" />
+              </ListItemAvatar>
+              <ListItemText
+                primary={selectedProduct?.name}
+                secondary={`$${selectedProduct?.price.toFixed(2)}`}
+              />
+            </ListItem>
+            {cashOption && additionalCash > 0 && (
+              <ListItem>
+                <ListItemAvatar>
+                  <Avatar>$</Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary="Additional Cash"
+                  secondary={`$${additionalCash.toFixed(2)}`}
+                />
+              </ListItem>
+            )}
+          </List>
+          <Typography variant="body2" paragraph>
+            In exchange for:
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemAvatar>
+                <Avatar src={targetProduct?.image} variant="rounded" />
+              </ListItemAvatar>
+              <ListItemText
+                primary={targetProduct?.name}
+                secondary={`$${targetProduct?.price.toFixed(2)}`}
+              />
+            </ListItem>
+          </List>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} startIcon={<Close />}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmExchange}
+            variant="contained"
+            startIcon={<Check />}
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Layout>
   );
 };
 

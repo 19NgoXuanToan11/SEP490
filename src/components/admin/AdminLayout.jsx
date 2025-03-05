@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 import {
+  Outlet,
+  Link as RouterLink,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import {
   Box,
   Drawer,
   AppBar,
@@ -9,38 +15,45 @@ import {
   Divider,
   IconButton,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Avatar,
   Menu,
   MenuItem,
-  Badge,
+  Tooltip,
   useMediaQuery,
   useTheme,
+  Badge,
+  Breadcrumbs,
+  Link,
+  Paper,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
-  Dashboard,
-  People,
-  ShoppingBag,
-  CompareArrows,
-  Settings,
-  Notifications,
-  AccountCircle,
-  ChevronLeft,
-  Logout,
+  ChevronLeft as ChevronLeftIcon,
+  Dashboard as DashboardIcon,
+  People as PeopleIcon,
+  Inventory as InventoryIcon,
+  CompareArrows as ExchangesIcon,
+  Settings as SettingsIcon,
+  Notifications as NotificationsIcon,
+  Logout as LogoutIcon,
+  Person as PersonIcon,
+  Home as HomeIcon,
 } from "@mui/icons-material";
-import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [open, setOpen] = useState(!isMobile);
-  const [anchorEl, setAnchorEl] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [open, setOpen] = useState(!isMobile);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [notificationsAnchorEl, setNotificationsAnchorEl] = useState(null);
 
   const handleDrawerToggle = () => {
     setOpen(!open);
@@ -50,35 +63,126 @@ const AdminLayout = ({ children }) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMenuClose = () => {
+  const handleProfileMenuClose = () => {
     setAnchorEl(null);
   };
 
+  const handleNotificationsOpen = (event) => {
+    setNotificationsAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationsClose = () => {
+    setNotificationsAnchorEl(null);
+  };
+
   const handleLogout = () => {
-    // Here you would implement logout logic
-    console.log("Logging out...");
-    handleMenuClose();
+    // Handle logout logic
+    handleProfileMenuClose();
     navigate("/login");
   };
 
   const menuItems = [
-    { text: "Dashboard", icon: <Dashboard />, path: "/admin" },
-    { text: "Users", icon: <People />, path: "/admin/users" },
-    { text: "Products", icon: <ShoppingBag />, path: "/admin/products" },
-    { text: "Exchanges", icon: <CompareArrows />, path: "/admin/exchanges" },
-    { text: "Settings", icon: <Settings />, path: "/admin/settings" },
+    { text: "Dashboard", path: "/admin", icon: <DashboardIcon /> },
+    { text: "Users", path: "/admin/users", icon: <PeopleIcon /> },
+    { text: "Products", path: "/admin/products", icon: <InventoryIcon /> },
+    { text: "Exchanges", path: "/admin/exchanges", icon: <ExchangesIcon /> },
+    { text: "Settings", path: "/admin/settings", icon: <SettingsIcon /> },
   ];
+
+  // Generate breadcrumbs based on current path
+  const generateBreadcrumbs = () => {
+    const pathnames = location.pathname.split("/").filter((x) => x);
+
+    return (
+      <Breadcrumbs aria-label="breadcrumb">
+        <Link component={RouterLink} to="/" color="inherit">
+          <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
+          Home
+        </Link>
+        {pathnames.map((name, index) => {
+          const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
+          const isLast = index === pathnames.length - 1;
+
+          // Format the breadcrumb text
+          const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+
+          return isLast ? (
+            <Typography key={name} color="text.primary">
+              {formattedName}
+            </Typography>
+          ) : (
+            <Link
+              key={name}
+              component={RouterLink}
+              to={routeTo}
+              color="inherit"
+            >
+              {formattedName}
+            </Link>
+          );
+        })}
+      </Breadcrumbs>
+    );
+  };
+
+  const drawer = (
+    <>
+      <Toolbar
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          px: [1],
+        }}
+      >
+        <Typography variant="h6" noWrap component="div">
+          ReTech Admin
+        </Typography>
+        <IconButton onClick={handleDrawerToggle}>
+          <ChevronLeftIcon />
+        </IconButton>
+      </Toolbar>
+      <Divider />
+      <List>
+        {menuItems.map((item) => (
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton
+              component={RouterLink}
+              to={item.path}
+              selected={location.pathname === item.path}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+      <Divider />
+      <Box sx={{ p: 2, mt: "auto" }}>
+        <Typography variant="body2" color="text.secondary" align="center">
+          Admin Panel v1.0
+        </Typography>
+      </Box>
+    </>
+  );
 
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar
         position="fixed"
         sx={{
-          width: { md: open ? `calc(100% - ${drawerWidth}px)` : "100%" },
-          ml: { md: open ? `${drawerWidth}px` : 0 },
+          zIndex: theme.zIndex.drawer + 1,
           transition: theme.transitions.create(["width", "margin"], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
+          }),
+          ...(open && {
+            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`,
+            transition: theme.transitions.create(["width", "margin"], {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.enteringScreen,
+            }),
           }),
         }}
       >
@@ -93,131 +197,164 @@ const AdminLayout = ({ children }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            ReTech Admin
+            Admin Dashboard
           </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="error">
-              <Notifications />
-            </Badge>
-          </IconButton>
-          <IconButton
-            edge="end"
-            aria-label="account of current user"
-            aria-haspopup="true"
-            onClick={handleProfileMenuOpen}
-            color="inherit"
-          >
-            <Avatar sx={{ width: 32, height: 32 }}>A</Avatar>
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-          >
-            <MenuItem onClick={handleMenuClose} component={Link} to="/profile">
-              <ListItemIcon>
-                <AccountCircle fontSize="small" />
-              </ListItemIcon>
-              Profile
-            </MenuItem>
-            <MenuItem onClick={handleLogout}>
-              <ListItemIcon>
-                <Logout fontSize="small" />
-              </ListItemIcon>
-              Logout
-            </MenuItem>
-          </Menu>
+
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Tooltip title="Notifications">
+              <IconButton
+                color="inherit"
+                aria-label="show notifications"
+                onClick={handleNotificationsOpen}
+              >
+                <Badge badgeContent={4} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Account">
+              <IconButton
+                color="inherit"
+                aria-label="account"
+                onClick={handleProfileMenuOpen}
+                sx={{ ml: 1 }}
+              >
+                <Avatar
+                  sx={{ width: 32, height: 32, bgcolor: "secondary.main" }}
+                >
+                  A
+                </Avatar>
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Toolbar>
       </AppBar>
+
       <Drawer
         variant={isMobile ? "temporary" : "permanent"}
-        open={open}
+        open={isMobile ? open : true}
         onClose={isMobile ? handleDrawerToggle : undefined}
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          "& .MuiDrawer-paper": {
+          [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
             boxSizing: "border-box",
           },
         }}
       >
-        <Toolbar
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: [1],
-          }}
-        >
-          <Typography
-            variant="h6"
-            component={Link}
-            to="/admin"
-            sx={{ textDecoration: "none", color: "inherit" }}
-          >
-            ReTech Admin
-          </Typography>
-          {isMobile && (
-            <IconButton onClick={handleDrawerToggle}>
-              <ChevronLeft />
-            </IconButton>
-          )}
-        </Toolbar>
-        <Divider />
-        <List>
-          {menuItems.map((item) => (
-            <ListItem
-              button
-              key={item.text}
-              component={Link}
-              to={item.path}
-              selected={location.pathname === item.path}
-              sx={{
-                "&.Mui-selected": {
-                  backgroundColor: "primary.light",
-                  "&:hover": {
-                    backgroundColor: "primary.light",
-                  },
-                },
-              }}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <Box sx={{ p: 2, mt: "auto" }}>
-          <Typography variant="body2" color="text.secondary" align="center">
-            © {new Date().getFullYear()} ReTech
-          </Typography>
-        </Box>
+        {drawer}
       </Drawer>
+
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { md: open ? `calc(100% - ${drawerWidth}px)` : "100%" },
-          transition: theme.transitions.create("width", {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-          }),
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          mt: 8,
         }}
       >
-        <Toolbar />
-        {children}
+        <Paper sx={{ p: 2, mb: 3 }}>{generateBreadcrumbs()}</Paper>
+        <Outlet />
       </Box>
+
+      {/* Profile Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleProfileMenuClose}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+      >
+        <MenuItem
+          component={RouterLink}
+          to="/profile"
+          onClick={handleProfileMenuClose}
+        >
+          <ListItemIcon>
+            <PersonIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Profile</ListItemText>
+        </MenuItem>
+        <MenuItem
+          component={RouterLink}
+          to="/admin/settings"
+          onClick={handleProfileMenuClose}
+        >
+          <ListItemIcon>
+            <SettingsIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Settings</ListItemText>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Logout</ListItemText>
+        </MenuItem>
+      </Menu>
+
+      {/* Notifications Menu */}
+      <Menu
+        anchorEl={notificationsAnchorEl}
+        open={Boolean(notificationsAnchorEl)}
+        onClose={handleNotificationsClose}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        PaperProps={{
+          sx: { width: 320, maxHeight: 400 },
+        }}
+      >
+        <MenuItem>
+          <Typography variant="subtitle1" fontWeight="bold">
+            Notifications
+          </Typography>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleNotificationsClose}>
+          <ListItemText
+            primary="New user registration"
+            secondary="John Doe just signed up"
+            primaryTypographyProps={{ variant: "body2" }}
+            secondaryTypographyProps={{ variant: "body2" }}
+          />
+        </MenuItem>
+        <MenuItem onClick={handleNotificationsClose}>
+          <ListItemText
+            primary="New exchange proposal"
+            secondary="Exchange #123 needs approval"
+            primaryTypographyProps={{ variant: "body2" }}
+            secondaryTypographyProps={{ variant: "body2" }}
+          />
+        </MenuItem>
+        <MenuItem onClick={handleNotificationsClose}>
+          <ListItemText
+            primary="System alert"
+            secondary="Disk space is running low"
+            primaryTypographyProps={{ variant: "body2" }}
+            secondaryTypographyProps={{ variant: "body2" }}
+          />
+        </MenuItem>
+        <MenuItem onClick={handleNotificationsClose}>
+          <ListItemText
+            primary="New product added"
+            secondary="iPhone 13 Pro was added by User #42"
+            primaryTypographyProps={{ variant: "body2" }}
+            secondaryTypographyProps={{ variant: "body2" }}
+          />
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          onClick={handleNotificationsClose}
+          sx={{ justifyContent: "center" }}
+        >
+          <Typography variant="body2" color="primary">
+            View All Notifications
+          </Typography>
+        </MenuItem>
+      </Menu>
     </Box>
   );
 };

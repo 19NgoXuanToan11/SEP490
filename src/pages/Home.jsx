@@ -17,7 +17,7 @@ import {
   Tab,
   useTheme,
   useMediaQuery,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import {
   ArrowForward,
@@ -29,7 +29,7 @@ import {
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import Layout from "../components/layout/Layout";
-import heroImage from "../assets/pictures/hero-bg.jpg"; 
+import heroImage from "../assets/pictures/hero-bg.jpg";
 
 const Home = () => {
   const theme = useTheme();

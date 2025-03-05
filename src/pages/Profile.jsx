@@ -22,7 +22,7 @@ import {
 import { Avatar, Rating, Divider } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { Footer } from "../components/Footer";
+import Footer from "../components/layout/Footer";
 import { CompareArrows } from "@mui/icons-material";
 
 const Profile = () => {

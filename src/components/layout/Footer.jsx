@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -13,6 +13,10 @@ import {
   ListItem,
   ListItemText,
   Paper,
+  useTheme,
+  useMediaQuery,
+  Tooltip,
+  Zoom,
 } from "@mui/material";
 import {
   Facebook,
@@ -25,11 +29,31 @@ import {
   Email,
   LocationOn,
   KeyboardArrowUp,
+  KeyboardDoubleArrowUp,
+  ArrowForward,
 } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import logo from "../../assets/pictures/logo/original.png";
 
 const Footer = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Kiểm tra vị trí scroll để hiển thị nút scroll to top
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -37,244 +61,767 @@ const Footer = () => {
     });
   };
 
+  const handleEmailChange = (e) => {
+    setEmailValue(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (emailValue.trim() !== "") {
+      // Xử lý logic đăng ký newsletter ở đây
+      setIsSubmitted(true);
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setEmailValue("");
+      }, 3000);
+    }
+  };
+
+  // Animation variants cho các phần tử
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 10,
+      },
+    },
+  };
+
+  const socialIcons = [
+    { icon: <Facebook />, label: "Facebook", color: "#1877F2" },
+    { icon: <Twitter />, label: "Twitter", color: "#1DA1F2" },
+    { icon: <Instagram />, label: "Instagram", color: "#E4405F" },
+    { icon: <LinkedIn />, label: "LinkedIn", color: "#0A66C2" },
+    { icon: <YouTube />, label: "YouTube", color: "#FF0000" },
+  ];
+
+  const quickLinks = [
+    { text: "Home", path: "/" },
+    { text: "Products", path: "/products" },
+    { text: "Exchange", path: "/exchange" },
+    { text: "About Us", path: "/about" },
+    { text: "Contact", path: "/contact" },
+    { text: "FAQ", path: "/faq" },
+  ];
+
+  const categories = [
+    { text: "Smartphones", path: "/products?category=Smartphones" },
+    { text: "Laptops", path: "/products?category=Laptops" },
+    { text: "Tablets", path: "/products?category=Tablets" },
+    { text: "Audio", path: "/products?category=Audio" },
+    { text: "Cameras", path: "/products?category=Cameras" },
+    { text: "Accessories", path: "/products?category=Accessories" },
+  ];
+
   return (
     <Box
       component="footer"
       sx={{
-        bgcolor: "primary.dark",
+        background: "#0f172a",
         color: "white",
-        pt: 6,
-        pb: 3,
+        pt: 8,
+        pb: 4,
         mt: "auto",
+        position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "4px",
+          background: "linear-gradient(90deg, #3f51b5, #9c27b0, #3f51b5)",
+          backgroundSize: "200% 100%",
+          animation: "gradient 3s linear infinite",
+        },
       }}
     >
-      <Container maxWidth="lg">
-        <Grid container spacing={4}>
-          {/* Logo and About */}
-          <Grid item xs={12} md={4}>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <img
-                src={logo || "https://via.placeholder.com/40?text=RT"}
-                alt="ReTech Logo"
-                style={{ height: 40, marginRight: 10 }}
-              />
-              <Typography variant="h5" component="div">
-                ReTech
-              </Typography>
-            </Box>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              ReTech is a platform for buying, selling, and exchanging used
-              electronics. Our mission is to reduce electronic waste and make
-              technology more accessible to everyone.
-            </Typography>
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <IconButton color="inherit" aria-label="Facebook">
-                <Facebook />
-              </IconButton>
-              <IconButton color="inherit" aria-label="Twitter">
-                <Twitter />
-              </IconButton>
-              <IconButton color="inherit" aria-label="Instagram">
-                <Instagram />
-              </IconButton>
-              <IconButton color="inherit" aria-label="LinkedIn">
-                <LinkedIn />
-              </IconButton>
-              <IconButton color="inherit" aria-label="YouTube">
-                <YouTube />
-              </IconButton>
-            </Box>
-          </Grid>
+      {/* Animated background elements */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          overflow: "hidden",
+          zIndex: 0,
+        }}
+      >
+        {[...Array(6)].map((_, index) => (
+          <motion.div
+            key={index}
+            initial={{
+              x: Math.random() * 100 - 50,
+              y: Math.random() * 100 - 50,
+              opacity: 0.02 + Math.random() * 0.03,
+            }}
+            animate={{
+              x: Math.random() * 100 - 50,
+              y: Math.random() * 100 - 50,
+              opacity: 0.02 + Math.random() * 0.03,
+            }}
+            transition={{
+              duration: 15 + Math.random() * 10,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+            style={{
+              position: "absolute",
+              width: 100 + Math.random() * 200,
+              height: 100 + Math.random() * 200,
+              borderRadius: "50%",
+              background: "white",
+              filter: "blur(60px)",
+            }}
+          />
+        ))}
+      </Box>
 
-          {/* Quick Links */}
-          <Grid item xs={12} sm={6} md={2}>
-            <Typography variant="h6" gutterBottom>
-              Quick Links
-            </Typography>
-            <List dense>
-              {[
-                { text: "Home", path: "/" },
-                { text: "Products", path: "/products" },
-                { text: "Exchange", path: "/exchange" },
-                { text: "About Us", path: "/about" },
-                { text: "Contact", path: "/contact" },
-                { text: "FAQ", path: "/faq" },
-              ].map((item) => (
-                <ListItem key={item.text} disableGutters>
-                  <ListItemText>
-                    <Link
-                      component={RouterLink}
-                      to={item.path}
-                      color="inherit"
-                      underline="hover"
+      <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <Grid container spacing={4}>
+            {/* Logo and About */}
+            <Grid item xs={12} md={4}>
+              <motion.div variants={itemVariants}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    mb: 2,
+                    transition: "transform 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-5px)",
+                    },
+                  }}
+                >
+                  <img
+                    src={logo || "https://via.placeholder.com/40?text=RT"}
+                    alt="ReTech Logo"
+                    style={{ height: 50, marginRight: 10 }}
+                  />
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      fontWeight: "bold",
+                    }}
+                  >
+                    <span
+                      style={{
+                        background: "linear-gradient(45deg, #9c27b0, #3f51b5)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                      }}
                     >
-                      {item.text}
-                    </Link>
-                  </ListItemText>
-                </ListItem>
-              ))}
-            </List>
-          </Grid>
+                      Re
+                    </span>
+                    <span style={{ color: "white" }}>Tech</span>
+                  </Typography>
+                </Box>
+              </motion.div>
 
-          {/* Categories */}
-          <Grid item xs={12} sm={6} md={2}>
-            <Typography variant="h6" gutterBottom>
-              Categories
-            </Typography>
-            <List dense>
-              {[
-                { text: "Smartphones", path: "/products?category=Smartphones" },
-                { text: "Laptops", path: "/products?category=Laptops" },
-                { text: "Tablets", path: "/products?category=Tablets" },
-                { text: "Audio", path: "/products?category=Audio" },
-                { text: "Cameras", path: "/products?category=Cameras" },
-                { text: "Accessories", path: "/products?category=Accessories" },
-              ].map((item) => (
-                <ListItem key={item.text} disableGutters>
-                  <ListItemText>
-                    <Link
-                      component={RouterLink}
-                      to={item.path}
-                      color="inherit"
-                      underline="hover"
+              <motion.div variants={itemVariants}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    mb: 3,
+                    lineHeight: 1.7,
+                    color: "rgba(255, 255, 255, 0.8)",
+                    maxWidth: "90%",
+                  }}
+                >
+                  ReTech is a platform for buying, selling, and exchanging used
+                  electronics. Our mission is to reduce electronic waste and make
+                  technology more accessible to everyone.
+                </Typography>
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
+                  {socialIcons.map((social, index) => (
+                    <Tooltip
+                      key={index}
+                      title={social.label}
+                      TransitionComponent={Zoom}
+                      arrow
                     >
-                      {item.text}
-                    </Link>
-                  </ListItemText>
-                </ListItem>
-              ))}
-            </List>
-          </Grid>
+                      <IconButton
+                        color="inherit"
+                        aria-label={social.label}
+                        sx={{
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            backgroundColor: social.color,
+                            transform: "translateY(-3px)",
+                            boxShadow: "0 5px 15px rgba(0,0,0,0.2)",
+                          },
+                        }}
+                      >
+                        {social.icon}
+                      </IconButton>
+                    </Tooltip>
+                  ))}
+                </Box>
+              </motion.div>
+            </Grid>
 
-          {/* Contact & Newsletter */}
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom>
-              Stay Updated
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              Subscribe to our newsletter for the latest products and deals.
-            </Typography>
-            <Box sx={{ display: "flex", mb: 3 }}>
-              <TextField
-                variant="outlined"
-                placeholder="Your Email"
-                size="small"
-                fullWidth
-                sx={{
-                  bgcolor: "rgba(255, 255, 255, 0.1)",
-                  borderRadius: 1,
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "rgba(255, 255, 255, 0.3)",
+            {/* Quick Links */}
+            <Grid item xs={12} sm={6} md={2}>
+              <motion.div variants={itemVariants}>
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{
+                    position: "relative",
+                    display: "inline-block",
+                    pb: 1,
+                    "&:after": {
+                      content: '""',
+                      position: "absolute",
+                      width: "60%",
+                      height: "2px",
+                      bottom: 0,
+                      left: 0,
+                      backgroundColor: "#6366f1",
+                      transition: "width 0.3s ease",
                     },
-                    "&:hover fieldset": {
-                      borderColor: "rgba(255, 255, 255, 0.5)",
+                    "&:hover:after": {
+                      width: "100%",
                     },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "white",
-                    },
-                  },
-                  "& .MuiInputBase-input": {
-                    color: "white",
-                  },
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <Button
-                      variant="contained"
+                  }}
+                >
+                  Quick Links
+                </Typography>
+              </motion.div>
+
+              <List dense>
+                {quickLinks.map((item, index) => (
+                  <motion.div
+                    key={item.text}
+                    variants={itemVariants}
+                    custom={index}
+                  >
+                    <ListItem
+                      disableGutters
                       sx={{
-                        bgcolor: "primary.main",
+                        transition: "transform 0.2s ease",
                         "&:hover": {
-                          bgcolor: "primary.light",
+                          transform: "translateX(5px)",
                         },
                       }}
                     >
-                      <Send />
-                    </Button>
-                  ),
-                }}
-              />
-            </Box>
-            <Typography variant="h6" gutterBottom>
-              Contact Us
-            </Typography>
-            <List dense>
-              <ListItem disableGutters>
-                <Phone sx={{ mr: 1, fontSize: 20 }} />
-                <ListItemText primary="+1 (555) 123-4567" />
-              </ListItem>
-              <ListItem disableGutters>
-                <Email sx={{ mr: 1, fontSize: 20 }} />
-                <ListItemText primary="support@retech.com" />
-              </ListItem>
-              <ListItem disableGutters>
-                <LocationOn sx={{ mr: 1, fontSize: 20 }} />
-                <ListItemText primary="123 Tech Street, San Francisco, CA 94107" />
-              </ListItem>
-            </List>
-          </Grid>
-        </Grid>
+                      <ListItemText>
+                        <Link
+                          component={RouterLink}
+                          to={item.path}
+                          color="inherit"
+                          underline="none"
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            transition: "all 0.2s ease",
+                            "&:hover": {
+                              color: "#6366f1",
+                            },
+                          }}
+                        >
+                          <ArrowForward
+                            sx={{
+                              fontSize: 14,
+                              mr: 1,
+                              opacity: 0,
+                              transition: "all 0.2s ease",
+                              transform: "translateX(-5px)",
+                            }}
+                            className="link-arrow"
+                          />
+                          {item.text}
+                        </Link>
+                      </ListItemText>
+                    </ListItem>
+                  </motion.div>
+                ))}
+              </List>
+            </Grid>
 
-        <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.2)", my: 3 }} />
+            {/* Categories */}
+            <Grid item xs={12} sm={6} md={2}>
+              <motion.div variants={itemVariants}>
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{
+                    position: "relative",
+                    display: "inline-block",
+                    pb: 1,
+                    "&:after": {
+                      content: '""',
+                      position: "absolute",
+                      width: "60%",
+                      height: "2px",
+                      bottom: 0,
+                      left: 0,
+                      backgroundColor: "#6366f1",
+                      transition: "width 0.3s ease",
+                    },
+                    "&:hover:after": {
+                      width: "100%",
+                    },
+                  }}
+                >
+                  Categories
+                </Typography>
+              </motion.div>
+
+              <List dense>
+                {categories.map((item, index) => (
+                  <motion.div
+                    key={item.text}
+                    variants={itemVariants}
+                    custom={index}
+                  >
+                    <ListItem
+                      disableGutters
+                      sx={{
+                        transition: "transform 0.2s ease",
+                        "&:hover": {
+                          transform: "translateX(5px)",
+                        },
+                      }}
+                    >
+                      <ListItemText>
+                        <Link
+                          component={RouterLink}
+                          to={item.path}
+                          color="inherit"
+                          underline="none"
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            transition: "all 0.2s ease",
+                            "&:hover": {
+                              color: "#6366f1",
+                            },
+                          }}
+                        >
+                          <ArrowForward
+                            sx={{
+                              fontSize: 14,
+                              mr: 1,
+                              opacity: 0,
+                              transition: "all 0.2s ease",
+                              transform: "translateX(-5px)",
+                            }}
+                            className="link-arrow"
+                          />
+                          {item.text}
+                        </Link>
+                      </ListItemText>
+                    </ListItem>
+                  </motion.div>
+                ))}
+              </List>
+            </Grid>
+
+            {/* Contact & Newsletter */}
+            <Grid item xs={12} md={4}>
+              <motion.div variants={itemVariants}>
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{
+                    position: "relative",
+                    display: "inline-block",
+                    pb: 1,
+                    "&:after": {
+                      content: '""',
+                      position: "absolute",
+                      width: "60%",
+                      height: "2px",
+                      bottom: 0,
+                      left: 0,
+                      backgroundColor: "#6366f1",
+                      transition: "width 0.3s ease",
+                    },
+                    "&:hover:after": {
+                      width: "100%",
+                    },
+                  }}
+                >
+                  Stay Updated
+                </Typography>
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <Typography
+                  variant="body2"
+                  sx={{ mb: 2, color: "rgba(255, 255, 255, 0.8)" }}
+                >
+                  Subscribe to our newsletter for the latest products and deals.
+                </Typography>
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <Box
+                  component="form"
+                  onSubmit={handleSubmit}
+                  sx={{
+                    display: "flex",
+                    mb: 3,
+                    position: "relative",
+                    overflow: "hidden",
+                    borderRadius: 2,
+                    transition: "all 0.3s ease",
+                    boxShadow: isEmailFocused
+                      ? "0 0 0 2px #6366f1"
+                      : "0 0 0 1px rgba(255, 255, 255, 0.3)",
+                  }}
+                >
+                  <AnimatePresence>
+                    {isSubmitted ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "#4caf50",
+                          color: "white",
+                          zIndex: 2,
+                        }}
+                      >
+                        <Typography variant="body2" fontWeight="medium">
+                          Thank you for subscribing!
+                        </Typography>
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+
+                  <TextField
+                    variant="outlined"
+                    placeholder="Your Email"
+                    size="small"
+                    fullWidth
+                    value={emailValue}
+                    onChange={handleEmailChange}
+                    onFocus={() => setIsEmailFocused(true)}
+                    onBlur={() => setIsEmailFocused(false)}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        height: "48px",
+                        "& fieldset": {
+                          border: "none",
+                        },
+                      },
+                      "& .MuiInputBase-input": {
+                        color: "white",
+                        pl: 2,
+                        "&::placeholder": {
+                          color: "rgba(255, 255, 255, 0.6)",
+                          opacity: 1,
+                        },
+                      },
+                      bgcolor: "rgba(255, 255, 255, 0.1)",
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          sx={{
+                            height: "100%",
+                            borderRadius: "0 8px 8px 0",
+                            px: 2,
+                            background:
+                              "linear-gradient(45deg, #3f51b5, #9c27b0)",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              background:
+                                "linear-gradient(45deg, #303f9f, #7b1fa2)",
+                              transform: "translateX(2px)",
+                            },
+                          }}
+                        >
+                          <Send
+                            sx={{
+                              transition: "transform 0.3s ease",
+                              "&:hover": {
+                                transform: "translateX(2px)",
+                              },
+                            }}
+                          />
+                        </Button>
+                      ),
+                    }}
+                  />
+                </Box>
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{
+                    position: "relative",
+                    display: "inline-block",
+                    pb: 1,
+                    "&:after": {
+                      content: '""',
+                      position: "absolute",
+                      width: "60%",
+                      height: "2px",
+                      bottom: 0,
+                      left: 0,
+                      backgroundColor: "#6366f1",
+                      transition: "width 0.3s ease",
+                    },
+                    "&:hover:after": {
+                      width: "100%",
+                    },
+                  }}
+                >
+                  Contact Us
+                </Typography>
+              </motion.div>
+
+              <List dense>
+                {[
+                  {
+                    icon: <Phone sx={{ fontSize: 20 }} />,
+                    text: "+1 (555) 123-4567",
+                    animation: "wave",
+                  },
+                  {
+                    icon: <Email sx={{ fontSize: 20 }} />,
+                    text: "support@retech.com",
+                    animation: "pulse",
+                  },
+                  {
+                    icon: <LocationOn sx={{ fontSize: 20 }} />,
+                    text: "123 Tech Street, San Francisco, CA 94107",
+                    animation: "bounce",
+                  },
+                ].map((item, index) => (
+                  <motion.div key={index} variants={itemVariants}>
+                    <ListItem
+                      disableGutters
+                      sx={{
+                        py: 1,
+                        transition: "transform 0.2s ease",
+                        "&:hover": {
+                          transform: "translateX(5px)",
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          mr: 2,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: 32,
+                          height: 32,
+                          borderRadius: "50%",
+                          backgroundColor: "rgba(255, 255, 255, 0.1)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            backgroundColor: "rgba(255, 255, 255, 0.2)",
+                            transform:
+                              item.animation === "wave"
+                                ? "rotate(15deg)"
+                                : item.animation === "pulse"
+                                ? "scale(1.1)"
+                                : "translateY(-3px)",
+                          },
+                        }}
+                      >
+                        {item.icon}
+                      </Box>
+                      <ListItemText
+                        primary={item.text}
+                        primaryTypographyProps={{
+                          variant: "body2",
+                          sx: { color: "rgba(255, 255, 255, 0.8)" },
+                        }}
+                      />
+                    </ListItem>
+                  </motion.div>
+                ))}
+              </List>
+            </Grid>
+          </Grid>
+        </motion.div>
+
+        <Divider
+          sx={{
+            borderColor: "rgba(255, 255, 255, 0.2)",
+            my: 4,
+            position: "relative",
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              top: 0,
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: "50px",
+              height: "3px",
+              background: "linear-gradient(90deg, transparent, #6366f1, transparent)",
+              borderRadius: "3px",
+            },
+          }}
+        />
 
         {/* Bottom Footer */}
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
-            <Typography variant="body2">
-              © {new Date().getFullYear()} ReTech. All rights reserved.
-            </Typography>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          viewport={{ once: true }}
+        >
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={6}>
+              <Typography
+                variant="body2"
+                sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+              >
+                © {new Date().getFullYear()} ReTech. All rights reserved.
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  justifyContent: { xs: "flex-start", md: "flex-end" },
+                  gap: { xs: 2, md: 3 },
+                }}
+              >
+                {["Terms of Service", "Privacy Policy", "Cookie Policy"].map(
+                  (text, index) => (
+                    <Link
+                      key={index}
+                      color="inherit"
+                      underline="none"
+                      component={RouterLink}
+                      to={`/${text.toLowerCase().replace(/\s+/g, "-")}`}
+                      sx={{
+                        fontSize: "0.875rem",
+                        color: "rgba(255, 255, 255, 0.7)",
+                        transition: "all 0.2s ease",
+                        position: "relative",
+                        "&:hover": {
+                          color: "#6366f1",
+                        },
+                        "&::after": {
+                          content: '""',
+                          position: "absolute",
+                          width: "0%",
+                          height: "1px",
+                          bottom: -1,
+                          left: 0,
+                          backgroundColor: "#6366f1",
+                          transition: "width 0.3s ease",
+                        },
+                        "&:hover::after": {
+                          width: "100%",
+                        },
+                      }}
+                    >
+                      {text}
+                    </Link>
+                  )
+                )}
+              </Box>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: { xs: "flex-start", md: "flex-end" },
-                gap: 2,
-              }}
-            >
-              <Link
-                color="inherit"
-                underline="hover"
-                component={RouterLink}
-                to="/terms"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                color="inherit"
-                underline="hover"
-                component={RouterLink}
-                to="/privacy"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                color="inherit"
-                underline="hover"
-                component={RouterLink}
-                to="/cookies"
-              >
-                Cookie Policy
-              </Link>
-            </Box>
-          </Grid>
-        </Grid>
+        </motion.div>
+      </Container>
 
-        {/* Scroll to Top Button */}
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-          <IconButton
-            onClick={scrollToTop}
-            sx={{
-              bgcolor: "rgba(255, 255, 255, 0.1)",
-              "&:hover": {
-                bgcolor: "rgba(255, 255, 255, 0.2)",
-              },
+      {/* Scroll to Top Button */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: "fixed",
+              bottom: "20px",
+              right: "20px",
+              zIndex: 100,
             }}
           >
-            <KeyboardArrowUp />
-          </IconButton>
-        </Box>
-      </Container>
+            <Tooltip title="Scroll to top" placement="left" arrow>
+              <IconButton
+                onClick={scrollToTop}
+                sx={{
+                  bgcolor: "rgba(99, 102, 241, 0.8)",
+                  color: "white",
+                  boxShadow: "0 4px 14px rgba(0, 0, 0, 0.25)",
+                  "&:hover": {
+                    bgcolor: "rgba(99, 102, 241, 1)",
+                    transform: "translateY(-5px)",
+                  },
+                  transition: "all 0.3s ease",
+                  width: 48,
+                  height: 48,
+                }}
+              >
+                <KeyboardDoubleArrowUp />
+              </IconButton>
+            </Tooltip>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* CSS for animations */}
+      <style jsx global>{`
+        @keyframes gradient {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+
+        a:hover .link-arrow {
+          opacity: 1 !important;
+          transform: translateX(0) !important;
+        }
+      `}</style>
     </Box>
   );
 };

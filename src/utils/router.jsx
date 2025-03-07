@@ -10,6 +10,8 @@ import ProductDetail from "../pages/ProductDetail";
 import FAQ from "../pages/FAQ";
 import Terms from "../pages/Terms";
 import Privacy from "../pages/Privacy";
+import Wishlist from "../pages/Wishlist";
+import Compare from "../pages/Compare";
 
 // Auth Pages
 import Login from "../pages/auth/Login";
@@ -73,6 +75,8 @@ const AppRouter = () => {
       <Route path="/faq" element={<FAQ />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
+      <Route path="/wishlist" element={<Wishlist />} />
+      <Route path="/compare" element={<Compare />} />
 
       {/* Auth Routes */}
       <Route path="/login" element={<Login />} />
@@ -137,8 +141,6 @@ const AppRouter = () => {
         <Route path="exchanges" element={<Exchanges />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>
-
-      
     </Routes>
   );
 };

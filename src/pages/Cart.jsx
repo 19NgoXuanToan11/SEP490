@@ -27,6 +27,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Chip,
+  Rating,
 } from "@mui/material";
 import {
   Delete,
@@ -50,10 +52,6 @@ const Cart = () => {
   const [shippingInfo, setShippingInfo] = useState({
     fullName: "",
     address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "",
     phone: "",
   });
   const [shippingMethod, setShippingMethod] = useState("standard");
@@ -220,14 +218,48 @@ const Cart = () => {
   return (
     <>
       <Header />
-      <Container sx={{ py: 4, minHeight: "70vh" }}>
-        <Typography variant="h4" component="h1" gutterBottom>
+      <Container
+        sx={{
+          py: 6,
+          minHeight: "70vh",
+          backgroundColor: "#f5f5f5",
+          borderRadius: 2,
+          boxShadow: "0 0 20px rgba(0,0,0,0.05)",
+        }}
+      >
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{
+            textAlign: "center",
+            fontWeight: 600,
+            background: "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
+            backgroundClip: "text",
+            textFillColor: "transparent",
+            mb: 4,
+          }}
+        >
           {activeStep === 3 && orderPlaced
             ? "Order Confirmation"
             : "Shopping Cart"}
         </Typography>
 
-        <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+        <Stepper
+          activeStep={activeStep}
+          sx={{
+            mb: 6,
+            "& .MuiStepLabel-root .Mui-completed": {
+              color: "success.main",
+            },
+            "& .MuiStepLabel-root .Mui-active": {
+              color: "primary.main",
+            },
+            "& .MuiStepConnector-line": {
+              borderColor: "rgba(0,0,0,0.1)",
+            },
+          }}
+        >
           {steps.map((label) => (
             <Step key={label}>
               <StepLabel>{label}</StepLabel>
@@ -268,54 +300,100 @@ const Cart = () => {
             <Grid item xs={12} md={8}>
               {/* Step 1: Cart Items */}
               {activeStep === 0 && (
-                <Paper sx={{ p: 3 }}>
-                  <Typography variant="h6" gutterBottom>
+                <Paper
+                  sx={{
+                    p: 4,
+                    borderRadius: 2,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                    transition: "transform 0.2s ease-in-out",
+                    "&:hover": {
+                      transform: "translateY(-4px)",
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    sx={{
+                      fontWeight: 600,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <ShoppingCart sx={{ color: "primary.main" }} />
                     Cart Items ({cartItems.length})
                   </Typography>
 
                   <List>
                     {cartItems.map((item) => (
                       <React.Fragment key={item.id}>
-                        <ListItem sx={{ py: 2, px: 0 }}>
-                          <ListItemAvatar sx={{ mr: 2 }}>
+                        <ListItem
+                          sx={{
+                            py: 3,
+                            px: 2,
+                            transition: "all 0.2s",
+                            "&:hover": {
+                              backgroundColor: "rgba(0,0,0,0.02)",
+                              transform: "scale(1.01)",
+                            },
+                          }}
+                        >
+                          <ListItemAvatar sx={{ mr: 3 }}>
                             <Box
                               component="img"
                               src={item.image}
                               alt={item.name}
-                              sx={{ width: 80, height: 80, objectFit: "cover" }}
+                              sx={{
+                                width: 100,
+                                height: 100,
+                                objectFit: "cover",
+                                borderRadius: 2,
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                              }}
                             />
                           </ListItemAvatar>
 
                           <ListItemText
                             primary={
                               <Typography
-                                variant="subtitle1"
+                                variant="h6"
                                 component={Link}
                                 to={`/products/${item.id}`}
                                 sx={{
                                   textDecoration: "none",
                                   color: "inherit",
+                                  fontWeight: 500,
+                                  "&:hover": {
+                                    color: "primary.main",
+                                  },
                                 }}
                               >
                                 {item.name}
                               </Typography>
                             }
                             secondary={
-                              <>
+                              <Box sx={{ mt: 1 }}>
                                 <Typography
                                   variant="body2"
                                   color="text.secondary"
                                 >
-                                  Condition: {item.condition}
+                                  Condition:{" "}
+                                  <Chip label={item.condition} size="small" />
                                 </Typography>
                                 <Typography
                                   variant="body2"
                                   color="text.secondary"
                                 >
-                                  Seller: {item.seller.name} (
-                                  {item.seller.rating} ★)
+                                  Seller: {item.seller.name}
+                                  <Rating
+                                    value={item.seller.rating}
+                                    size="small"
+                                    readOnly
+                                    sx={{ ml: 1 }}
+                                  />
                                 </Typography>
-                              </>
+                              </Box>
                             }
                           />
 
@@ -327,7 +405,17 @@ const Cart = () => {
                               ml: 2,
                             }}
                           >
-                            <Typography variant="h6" color="primary">
+                            <Typography
+                              variant="h6"
+                              color="primary"
+                              sx={{
+                                fontWeight: 600,
+                                background:
+                                  "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
+                                backgroundClip: "text",
+                                textFillColor: "transparent",
+                              }}
+                            >
                               ${(item.price * item.quantity).toFixed(2)}
                             </Typography>
 
@@ -335,7 +423,10 @@ const Cart = () => {
                               sx={{
                                 display: "flex",
                                 alignItems: "center",
-                                mt: 1,
+                                mt: 2,
+                                backgroundColor: "rgba(0,0,0,0.03)",
+                                borderRadius: 2,
+                                p: 0.5,
                               }}
                             >
                               <IconButton
@@ -344,15 +435,22 @@ const Cart = () => {
                                   handleQuantityChange(item.id, -1)
                                 }
                                 disabled={item.quantity <= 1}
+                                sx={{
+                                  "&:hover": {
+                                    backgroundColor: "primary.light",
+                                  },
+                                  color: "primary.main",
+                                }}
                               >
                                 <Remove fontSize="small" />
                               </IconButton>
 
                               <Typography
                                 sx={{
-                                  mx: 1,
+                                  mx: 2,
                                   minWidth: 20,
                                   textAlign: "center",
+                                  fontWeight: 600,
                                 }}
                               >
                                 {item.quantity}
@@ -362,6 +460,12 @@ const Cart = () => {
                                 size="small"
                                 onClick={() => handleQuantityChange(item.id, 1)}
                                 disabled={item.quantity >= item.maxQuantity}
+                                sx={{
+                                  "&:hover": {
+                                    backgroundColor: "primary.light",
+                                  },
+                                  color: "primary.main",
+                                }}
                               >
                                 <Add fontSize="small" />
                               </IconButton>
@@ -373,13 +477,19 @@ const Cart = () => {
                               size="small"
                               startIcon={<Delete />}
                               onClick={() => handleRemoveItem(item)}
-                              sx={{ mt: 1 }}
+                              sx={{
+                                mt: 2,
+                                "&:hover": {
+                                  backgroundColor: "error.light",
+                                  color: "error.main",
+                                },
+                              }}
                             >
                               Remove
                             </Button>
                           </Box>
                         </ListItem>
-                        <Divider />
+                        <Divider variant="inset" component="li" />
                       </React.Fragment>
                     ))}
                   </List>
@@ -412,50 +522,6 @@ const Cart = () => {
                         label="Address"
                         name="address"
                         value={shippingInfo.address}
-                        onChange={handleShippingInfoChange}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        required
-                        fullWidth
-                        label="City"
-                        name="city"
-                        value={shippingInfo.city}
-                        onChange={handleShippingInfoChange}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        required
-                        fullWidth
-                        label="State/Province"
-                        name="state"
-                        value={shippingInfo.state}
-                        onChange={handleShippingInfoChange}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        required
-                        fullWidth
-                        label="ZIP/Postal Code"
-                        name="zipCode"
-                        value={shippingInfo.zipCode}
-                        onChange={handleShippingInfoChange}
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        required
-                        fullWidth
-                        label="Country"
-                        name="country"
-                        value={shippingInfo.country}
                         onChange={handleShippingInfoChange}
                       />
                     </Grid>
@@ -527,73 +593,234 @@ const Cart = () => {
                     Payment Method
                   </Typography>
 
-                  <FormControl component="fieldset">
+                  <FormControl component="fieldset" sx={{ width: "100%" }}>
                     <RadioGroup
                       name="paymentMethod"
                       value={paymentMethod}
                       onChange={handlePaymentMethodChange}
                     >
-                      <FormControlLabel
-                        value="creditCard"
-                        control={<Radio />}
-                        label="Credit/Debit Card"
-                      />
-                      <FormControlLabel
-                        value="paypal"
-                        control={<Radio />}
-                        label="PayPal"
-                      />
-                      <FormControlLabel
-                        value="applePay"
-                        control={<Radio />}
-                        label="Apple Pay"
-                      />
-                      <FormControlLabel
-                        value="googlePay"
-                        control={<Radio />}
-                        label="Google Pay"
-                      />
+                      <Grid container spacing={2}>
+                        {/* QR Code Payment */}
+                        <Grid item xs={12} sm={6}>
+                          <Paper
+                            variant="outlined"
+                            sx={{
+                              p: 2,
+                              border: paymentMethod === "QR" ? 2 : 1,
+                              borderColor:
+                                paymentMethod === "QR"
+                                  ? "primary.main"
+                                  : "grey.300",
+                            }}
+                          >
+                            <FormControlLabel
+                              value="QR"
+                              control={<Radio />}
+                              label={
+                                <Box
+                                  sx={{ display: "flex", alignItems: "center" }}
+                                >
+                                  <img
+                                    src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
+                                    alt="QR Code"
+                                    style={{
+                                      width: 40,
+                                      height: 40,
+                                      marginRight: 10,
+                                    }}
+                                  />
+                                  <Box>
+                                    <Typography variant="subtitle1">
+                                      QR Code
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                    >
+                                      Scan QR to pay
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                              }
+                            />
+                          </Paper>
+                        </Grid>
+
+                        {/* MoMo */}
+                        <Grid item xs={12} sm={6}>
+                          <Paper
+                            variant="outlined"
+                            sx={{
+                              p: 2,
+                              border: paymentMethod === "momo" ? 2 : 1,
+                              borderColor:
+                                paymentMethod === "momo"
+                                  ? "primary.main"
+                                  : "grey.300",
+                            }}
+                          >
+                            <FormControlLabel
+                              value="momo"
+                              control={<Radio />}
+                              label={
+                                <Box
+                                  sx={{ display: "flex", alignItems: "center" }}
+                                >
+                                  <img
+                                    src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png"
+                                    alt="MoMo"
+                                    style={{
+                                      width: 40,
+                                      height: 40,
+                                      marginRight: 10,
+                                    }}
+                                  />
+                                  <Box>
+                                    <Typography variant="subtitle1">
+                                      MoMo
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                    >
+                                      Pay with MoMo wallet
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                              }
+                            />
+                          </Paper>
+                        </Grid>
+
+                        {/* ZaloPay */}
+                        <Grid item xs={12} sm={6}>
+                          <Paper
+                            variant="outlined"
+                            sx={{
+                              p: 2,
+                              border: paymentMethod === "zalopay" ? 2 : 1,
+                              borderColor:
+                                paymentMethod === "zalopay"
+                                  ? "primary.main"
+                                  : "grey.300",
+                            }}
+                          >
+                            <FormControlLabel
+                              value="zalopay"
+                              control={<Radio />}
+                              label={
+                                <Box
+                                  sx={{ display: "flex", alignItems: "center" }}
+                                >
+                                  <img
+                                    src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay-Square.png"
+                                    alt="ZaloPay"
+                                    style={{
+                                      width: 40,
+                                      height: 40,
+                                      marginRight: 10,
+                                    }}
+                                  />
+                                  <Box>
+                                    <Typography variant="subtitle1">
+                                      ZaloPay
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                    >
+                                      Pay with ZaloPay wallet
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                              }
+                            />
+                          </Paper>
+                        </Grid>
+
+                        {/* VNPay */}
+                        <Grid item xs={12} sm={6}>
+                          <Paper
+                            variant="outlined"
+                            sx={{
+                              p: 2,
+                              border: paymentMethod === "vnpay" ? 2 : 1,
+                              borderColor:
+                                paymentMethod === "vnpay"
+                                  ? "primary.main"
+                                  : "grey.300",
+                            }}
+                          >
+                            <FormControlLabel
+                              value="vnpay"
+                              control={<Radio />}
+                              label={
+                                <Box
+                                  sx={{ display: "flex", alignItems: "center" }}
+                                >
+                                  <img
+                                    src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Icon-VNPAY-QR.png"
+                                    alt="VNPay"
+                                    style={{
+                                      width: 40,
+                                      height: 40,
+                                      marginRight: 10,
+                                    }}
+                                  />
+                                  <Box>
+                                    <Typography variant="subtitle1">
+                                      VNPay
+                                    </Typography>
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                    >
+                                      Pay with VNPay wallet
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                              }
+                            />
+                          </Paper>
+                        </Grid>
+                      </Grid>
                     </RadioGroup>
                   </FormControl>
 
-                  {paymentMethod === "creditCard" && (
+                  {/* Hiển thị thông tin thanh toán tương ứng */}
+                  {paymentMethod === "QR" && (
+                    <Box sx={{ mt: 3, textAlign: "center" }}>
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
+                        alt="QR Code Payment"
+                        style={{ width: 200, height: 200 }}
+                      />
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 2 }}
+                      >
+                        Scan QR code to complete payment
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {(paymentMethod === "momo" ||
+                    paymentMethod === "zalopay" ||
+                    paymentMethod === "vnpay") && (
                     <Box sx={{ mt: 3 }}>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <TextField
-                            required
-                            fullWidth
-                            label="Card Number"
-                            placeholder="1234 5678 9012 3456"
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            required
-                            fullWidth
-                            label="Expiration Date"
-                            placeholder="MM/YY"
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            required
-                            fullWidth
-                            label="CVV"
-                            placeholder="123"
-                          />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <TextField
-                            required
-                            fullWidth
-                            label="Cardholder Name"
-                          />
-                        </Grid>
-                      </Grid>
+                      <Typography variant="body1" gutterBottom>
+                        You will be redirected to{" "}
+                        {paymentMethod === "momo"
+                          ? "MoMo"
+                          : paymentMethod === "zalopay"
+                          ? "ZaloPay"
+                          : "VNPay"}{" "}
+                        to complete your payment
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Total amount: ${calculateTotal().toFixed(2)}
+                      </Typography>
                     </Box>
                   )}
                 </Paper>
@@ -642,44 +869,90 @@ const Cart = () => {
 
             {/* Order Summary */}
             <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
+              <Paper
+                sx={{
+                  p: 4,
+                  borderRadius: 2,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  backgroundColor: "#fff",
+                  position: "sticky",
+                  top: 20,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{
+                    fontWeight: 600,
+                    borderBottom: "2px solid",
+                    borderColor: "primary.main",
+                    pb: 1,
+                  }}
+                >
                   Order Summary
                 </Typography>
 
                 <List dense>
                   <ListItem sx={{ px: 0 }}>
-                    <ListItemText primary="Subtotal" />
-                    <Typography variant="body1">
+                    <ListItemText
+                      primary={
+                        <Typography variant="subtitle1" color="text.secondary">
+                          Subtotal
+                        </Typography>
+                      }
+                    />
+                    <Typography variant="h6">
                       ${calculateSubtotal().toFixed(2)}
                     </Typography>
                   </ListItem>
 
                   <ListItem sx={{ px: 0 }}>
                     <ListItemText
-                      primary="Shipping"
+                      primary={
+                        <Typography variant="subtitle1" color="text.secondary">
+                          Shipping
+                        </Typography>
+                      }
                       secondary={
                         shippingMethod === "express"
                           ? "Express Shipping (1-2 business days)"
                           : "Standard Shipping (3-5 business days)"
                       }
                     />
-                    <Typography variant="body1">
+                    <Typography
+                      variant="h6"
+                      color={
+                        calculateShippingCost() === 0
+                          ? "success.main"
+                          : "inherit"
+                      }
+                    >
                       {calculateShippingCost() === 0
                         ? "Free"
                         : `$${calculateShippingCost().toFixed(2)}`}
                     </Typography>
                   </ListItem>
 
-                  <Divider sx={{ my: 1 }} />
+                  <Divider sx={{ my: 2 }} />
 
                   <ListItem sx={{ px: 0 }}>
                     <ListItemText
                       primary={
-                        <Typography variant="subtitle1">Total</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                          Total
+                        </Typography>
                       }
                     />
-                    <Typography variant="subtitle1" fontWeight="bold">
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontWeight: 600,
+                        background:
+                          "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
+                        backgroundClip: "text",
+                        textFillColor: "transparent",
+                      }}
+                    >
                       ${calculateTotal().toFixed(2)}
                     </Typography>
                   </ListItem>
@@ -688,46 +961,56 @@ const Cart = () => {
                 {activeStep < 3 && (
                   <Box
                     sx={{
-                      mt: 3,
+                      mt: 4,
                       display: "flex",
                       justifyContent: "space-between",
+                      gap: 2,
                     }}
                   >
-                    <Button disabled={activeStep === 0} onClick={handleBack}>
+                    <Button
+                      disabled={activeStep === 0}
+                      onClick={handleBack}
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: "none",
+                        "&:not(:disabled)": {
+                          "&:hover": {
+                            transform: "translateX(-4px)",
+                            transition: "transform 0.2s",
+                          },
+                        },
+                      }}
+                    >
                       Back
                     </Button>
 
-                    {activeStep === 0 && (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleNext}
-                        disabled={cartItems.length === 0}
-                      >
-                        Proceed to Shipping
-                      </Button>
-                    )}
-
-                    {activeStep === 1 && (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleNext}
-                        disabled={!isShippingInfoComplete()}
-                      >
-                        Proceed to Payment
-                      </Button>
-                    )}
-
-                    {activeStep === 2 && (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handlePlaceOrder}
-                      >
-                        Place Order
-                      </Button>
-                    )}
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={activeStep === 2 ? handlePlaceOrder : handleNext}
+                      disabled={
+                        (activeStep === 0 && cartItems.length === 0) ||
+                        (activeStep === 1 && !isShippingInfoComplete())
+                      }
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: "none",
+                        background:
+                          "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
+                        boxShadow: "0 3px 5px 2px rgba(33, 203, 243, .3)",
+                        "&:hover": {
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 6px 10px 4px rgba(33, 203, 243, .3)",
+                        },
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {activeStep === 2
+                        ? "Place Order"
+                        : activeStep === 1
+                        ? "Proceed to Payment"
+                        : "Proceed to Shipping"}
+                    </Button>
                   </Box>
                 )}
               </Paper>

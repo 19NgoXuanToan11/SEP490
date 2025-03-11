@@ -34,6 +34,9 @@ import {
   Checkbox,
   useMediaQuery,
   useTheme,
+  Breadcrumbs,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import {
   CompareArrows,
@@ -46,13 +49,22 @@ import {
   Message,
   Info,
   Star,
+  ArrowBack,
+  AttachMoney,
+  Send,
+  ShoppingCart,
+  Favorite,
+  FavoriteBorder,
+  Share,
+  LocalShipping,
+  Remove,
+  Description,
+  Person,
 } from "@mui/icons-material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import { alpha } from "@mui/material/styles";
-import { motion } from "framer-motion";
-import { ArrowBack, AttachMoney } from "@mui/icons-material";
-import { Send } from "@mui/icons-material";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Exchange = () => {
   const theme = useTheme();
@@ -83,6 +95,9 @@ const Exchange = () => {
     fair: false,
     difference: 0,
   });
+  const [tabValue, setTabValue] = useState(0);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewText, setReviewText] = useState("");
 
   const steps = [
     "Select Target Product",
@@ -278,6 +293,32 @@ const Exchange = () => {
     });
   };
 
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    if (reviewText.trim() === "") {
+      setSnackbar({
+        open: true,
+        message: "Please enter a review text",
+        severity: "error",
+      });
+      return;
+    }
+
+    // In a real app, you would submit the review to your API
+    // For now, we'll just show a snackbar and clear the form
+    setSnackbar({
+      open: true,
+      message: "Your review has been submitted",
+      severity: "success",
+    });
+    setReviewText("");
+    setReviewRating(5);
+  };
+
   const renderStepContent = (step) => {
     switch (step) {
       case 0:
@@ -414,79 +455,152 @@ const Exchange = () => {
               <Grid container spacing={3}>
                 {filteredProducts.map((product) => (
                   <Grid item xs={12} sm={6} md={4} key={product.id}>
-                    <Card
-                      sx={{
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        border:
-                          selectedProduct?.id === product.id
-                            ? "2px solid"
-                            : "none",
-                        borderColor: "primary.main",
-                        transition: "transform 0.2s",
-                        "&:hover": {
-                          transform: "translateY(-5px)",
-                          boxShadow: 3,
-                        },
-                      }}
-                      onClick={() => handleSelectProduct(product)}
+                    <motion.div
+                      whileHover={{ y: -10 }}
+                      transition={{ type: "spring", stiffness: 300 }}
                     >
-                      <CardMedia
-                        component="img"
-                        height="140"
-                        image={product.image}
-                        alt={product.name}
-                      />
-                      <CardContent sx={{ flexGrow: 1 }}>
-                        <Typography variant="h6" component="div" noWrap>
-                          {product.name}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          gutterBottom
-                        >
-                          {product.category} • {product.condition}
-                        </Typography>
-                        <Typography variant="h6" color="primary" gutterBottom>
-                          ${product.price.toFixed(2)}
-                        </Typography>
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", mb: 1 }}
-                        >
-                          <Rating
-                            value={parseFloat(product.rating)}
-                            precision={0.5}
-                            size="small"
-                            readOnly
+                      <Card
+                        sx={{
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          border:
+                            selectedProduct?.id === product.id
+                              ? "2px solid"
+                              : "none",
+                          borderColor: "primary.main",
+                          borderRadius: 3,
+                          overflow: "hidden",
+                          boxShadow:
+                            selectedProduct?.id === product.id
+                              ? `0 8px 24px ${alpha(
+                                  theme.palette.primary.main,
+                                  0.4
+                                )}`
+                              : "0 4px 12px rgba(0,0,0,0.05)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            boxShadow: "0 12px 28px rgba(0,0,0,0.15)",
+                          },
+                        }}
+                        onClick={() => handleSelectProduct(product)}
+                      >
+                        <Box sx={{ position: "relative" }}>
+                          <CardMedia
+                            component="img"
+                            height="160"
+                            image={product.image}
+                            alt={product.name}
+                            sx={{
+                              objectFit: "cover",
+                              transition: "transform 0.5s ease",
+                              "&:hover": {
+                                transform: "scale(1.05)",
+                              },
+                            }}
                           />
+                          <Chip
+                            label={product.condition}
+                            size="small"
+                            color={
+                              product.condition === "New"
+                                ? "success"
+                                : product.condition === "Like New"
+                                ? "info"
+                                : product.condition === "Good"
+                                ? "primary"
+                                : "warning"
+                            }
+                            sx={{
+                              position: "absolute",
+                              top: 10,
+                              right: 10,
+                              fontWeight: 500,
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                            }}
+                          />
+                        </Box>
+                        <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
+                          <Typography
+                            variant="h6"
+                            component="div"
+                            noWrap
+                            sx={{
+                              fontWeight: 600,
+                              fontSize: "1rem",
+                              mb: 0.5,
+                            }}
+                          >
+                            {product.name}
+                          </Typography>
                           <Typography
                             variant="body2"
                             color="text.secondary"
-                            sx={{ ml: 1 }}
+                            gutterBottom
+                            sx={{ mb: 1.5 }}
                           >
-                            ({product.reviews})
+                            {product.category} • {product.brand}
                           </Typography>
-                        </Box>
-                      </CardContent>
-                      <CardActions>
-                        <Button
-                          size="small"
-                          variant={
-                            selectedProduct?.id === product.id
-                              ? "contained"
-                              : "outlined"
-                          }
-                          fullWidth
-                          onClick={() => handleSelectProduct(product)}
-                        >
-                          {selectedProduct?.id === product.id
-                            ? "Selected"
-                            : "Select"}
-                        </Button>
-                      </CardActions>
-                    </Card>
+                          <Typography
+                            variant="h6"
+                            color="primary"
+                            gutterBottom
+                            sx={{
+                              fontWeight: 700,
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 0.5,
+                            }}
+                          >
+                            <AttachMoney sx={{ fontSize: 20 }} />
+                            {product.price.toFixed(2)}
+                          </Typography>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              mb: 1,
+                            }}
+                          >
+                            <Rating
+                              value={parseFloat(product.rating)}
+                              precision={0.5}
+                              size="small"
+                              readOnly
+                            />
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ ml: 1 }}
+                            >
+                              ({product.reviews})
+                            </Typography>
+                          </Box>
+                        </CardContent>
+                        <CardActions sx={{ p: 2, pt: 0 }}>
+                          <Button
+                            size="medium"
+                            variant={
+                              selectedProduct?.id === product.id
+                                ? "contained"
+                                : "outlined"
+                            }
+                            fullWidth
+                            onClick={() => handleSelectProduct(product)}
+                            sx={{
+                              borderRadius: 2,
+                              py: 1,
+                              textTransform: "none",
+                              fontWeight: 600,
+                            }}
+                          >
+                            {selectedProduct?.id === product.id
+                              ? "Selected"
+                              : "Select"}
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    </motion.div>
                   </Grid>
                 ))}
               </Grid>
@@ -539,8 +653,14 @@ const Exchange = () => {
                       theme.palette.background.paper,
                       0.9
                     )}, ${alpha(theme.palette.background.paper, 0.7)})`,
-                    backdropFilter: "blur(10px)",
+                    backdropFilter: "blur(20px)",
                     border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    boxShadow: "0 10px 40px rgba(0,0,0,0.08)",
+                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-5px)",
+                      boxShadow: "0 15px 50px rgba(0,0,0,0.12)",
+                    },
                   }}
                 >
                   <Typography
@@ -729,7 +849,7 @@ const Exchange = () => {
                     </Box>
                   ) : (
                     <Typography variant="body1" color="error" sx={{ mt: 2 }}>
-                      Vui lòng quay lại và chọn một sản phẩm để đề xuất.
+                      Please go back and select a product to recommend.
                     </Typography>
                   )}
                 </Paper>
@@ -840,7 +960,7 @@ const Exchange = () => {
                     fontWeight="600"
                     color="secondary.main"
                   >
-                    Đổi lấy:
+                    In exchange:
                   </Typography>
                   {targetProduct ? (
                     <Box>
@@ -993,7 +1113,7 @@ const Exchange = () => {
                     </Box>
                   ) : (
                     <Typography variant="body1" color="error" sx={{ mt: 2 }}>
-                      Vui lòng quay lại và chọn một sản phẩm mục tiêu.
+                      Please go back and select a target product.
                     </Typography>
                   )}
                 </Paper>
@@ -1015,17 +1135,17 @@ const Exchange = () => {
               }}
             >
               <Typography variant="subtitle1" gutterBottom fontWeight="600">
-                Thêm lời nhắn (Tùy chọn):
+                Add message (Optional):
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph>
-                Giải thích lý do bạn nghĩ đây là một trao đổi công bằng, hoặc
-                cung cấp thêm thông tin về đề xuất của bạn.
+                Explain why you think this is a fair exchange, or provide more
+                information about your proposal.
               </Typography>
               <TextField
                 fullWidth
                 multiline
                 rows={4}
-                placeholder="Ví dụ: Tôi đề xuất MacBook Air M2 của tôi để đổi lấy iPhone 13 Pro Max của bạn. Máy tính của tôi mới mua 3 tháng, còn bảo hành đầy đủ và tình trạng như mới. Tôi sẵn sàng thêm $50 để cân bằng giá trị trao đổi..."
+                placeholder="For example: I am offering my MacBook Air M2 in exchange for your iPhone 13 Pro Max. My computer is 3 months old, under full warranty, and in like-new condition. I am willing to add $50 to balance the trade-in value..."
                 value={message}
                 onChange={handleMessageChange}
                 sx={{
@@ -1049,13 +1169,13 @@ const Exchange = () => {
                 <Info sx={{ color: "info.main", mr: 2, mt: 0.5 }} />
                 <Box>
                   <Typography variant="subtitle2" fontWeight="600" gutterBottom>
-                    Điều khoản trao đổi
+                    Terms of exchange
                   </Typography>
                   <Typography variant="body2">
-                    Khi gửi đề xuất này, bạn đồng ý với các điều khoản và điều
-                    kiện trao đổi của chúng tôi. Bên kia sẽ có 7 ngày để phản
-                    hồi đề xuất của bạn. Nếu được chấp nhận, bạn sẽ được hướng
-                    dẫn về các bước tiếp theo để hoàn tất trao đổi.
+                    By submitting this proposal, you agree to our terms and
+                    conditions of exchange. The other party will have 7 days to
+                    respond to your proposal. If accepted, you will be guided on
+                    the next steps to complete the exchange.
                   </Typography>
                 </Box>
               </Box>
@@ -1083,10 +1203,10 @@ const Exchange = () => {
           >
             <CircularProgress size={60} thickness={4} />
             <Typography variant="h6" sx={{ mt: 3, fontWeight: 500 }}>
-              Đang tải dữ liệu trao đổi...
+              Loading exchange data...
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Vui lòng đợi trong giây lát
+              Please wait a moment
             </Typography>
           </Box>
         </Container>
@@ -1146,11 +1266,16 @@ const Exchange = () => {
             left: 0,
             right: 0,
             height: "100%",
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1557821552-17105176677c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2532&q=80)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            opacity: 0.03,
+            backgroundImage: `radial-gradient(circle at 30% 20%, ${alpha(
+              theme.palette.primary.main,
+              0.15
+            )}, transparent 25%), 
+                          radial-gradient(circle at 70% 60%, ${alpha(
+                            theme.palette.secondary.main,
+                            0.1
+                          )}, transparent 25%)`,
+            backgroundSize: "100% 100%",
+            opacity: 0.8,
             zIndex: -1,
           },
         }}
@@ -1168,26 +1293,33 @@ const Exchange = () => {
               variant="h3"
               component="h1"
               align="center"
-              fontWeight="700"
+              fontWeight="800"
               sx={{
                 mb: 2,
-                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
                 backgroundClip: "text",
                 textFillColor: "transparent",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
+                letterSpacing: "-0.5px",
+                textShadow: "0 2px 10px rgba(0,0,0,0.08)",
               }}
             >
-              Đề xuất trao đổi
+              Proposed Exchange
             </Typography>
             <Typography
               variant="subtitle1"
               color="text.secondary"
               align="center"
-              sx={{ maxWidth: 600, mb: 4 }}
+              sx={{
+                maxWidth: 600,
+                mb: 4,
+                lineHeight: 1.6,
+                fontSize: "1.1rem",
+              }}
             >
-              Trao đổi sản phẩm của bạn với người khác một cách dễ dàng và an
-              toàn. Hãy tạo đề xuất hấp dẫn để tăng cơ hội thành công.
+              Trade your products with others easily and securely. Create
+              compelling offers to increase your chances of success.
             </Typography>
 
             <Stepper
@@ -1198,18 +1330,30 @@ const Exchange = () => {
                 maxWidth: 800,
                 "& .MuiStepLabel-label": {
                   mt: 1,
+                  fontWeight: 500,
                 },
                 "& .MuiStepIcon-root": {
-                  fontSize: 32,
+                  fontSize: 36,
+                  filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.1))",
+                  transition: "all 0.3s ease",
+                  "&.Mui-active": {
+                    transform: "scale(1.2)",
+                  },
                 },
                 "& .MuiStepIcon-text": {
                   fill: "#fff",
                   fontWeight: "bold",
+                  fontSize: "0.8rem",
                 },
                 "& .MuiStepConnector-line": {
                   borderTopWidth: 3,
                   borderRadius: 1,
+                  borderColor: alpha(theme.palette.primary.main, 0.3),
                 },
+                "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line, & .MuiStepConnector-root.Mui-completed .MuiStepConnector-line":
+                  {
+                    borderColor: theme.palette.primary.main,
+                  },
               }}
             >
               {steps.map((label, index) => (
@@ -1241,68 +1385,92 @@ const Exchange = () => {
               boxShadow: "0 10px 40px rgba(0,0,0,0.07)",
             }}
           >
-            {renderStepContent(activeStep)}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeStep}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {renderStepContent(activeStep)}
+              </motion.div>
+            </AnimatePresence>
 
             <Box
-              sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                mt: 5,
+                gap: 2,
+              }}
             >
               <Button
                 disabled={activeStep === 0}
                 onClick={handleBack}
                 startIcon={<ArrowBack />}
+                variant="outlined"
                 sx={{
                   borderRadius: 2,
                   px: 3,
-                  py: 1,
+                  py: 1.2,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  boxShadow: "none",
+                  borderWidth: "1.5px",
+                  "&:hover": {
+                    borderWidth: "1.5px",
+                  },
                 }}
               >
-                Quay lại
+                Back
               </Button>
-              <Box>
-                {activeStep === steps.length - 1 ? (
-                  <Button
-                    variant="contained"
-                    onClick={handleSubmitExchange}
-                    disabled={!selectedProduct || !targetProduct}
-                    endIcon={<Send />}
-                    sx={{
-                      borderRadius: 2,
-                      px: 4,
-                      py: 1.5,
-                      boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
-                      background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                      "&:hover": {
-                        background: `linear-gradient(45deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
-                        transform: "translateY(-2px)",
-                        boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
-                      },
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    Gửi đề xuất
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    onClick={handleNext}
-                    disabled={activeStep === 1 && !selectedProduct}
-                    endIcon={<ArrowForward />}
-                    sx={{
-                      borderRadius: 2,
-                      px: 3,
-                      py: 1.5,
-                      boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
-                      "&:hover": {
-                        transform: "translateY(-2px)",
-                        boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
-                      },
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    Tiếp theo
-                  </Button>
-                )}
-              </Box>
+
+              {activeStep === steps.length - 1 ? (
+                <Button
+                  variant="contained"
+                  onClick={handleSubmitExchange}
+                  endIcon={<Send />}
+                  sx={{
+                    borderRadius: 2,
+                    px: 4,
+                    py: 1.2,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
+                      transform: "translateY(-2px)",
+                    },
+                  }}
+                >
+                  Submit Exchange Proposal
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  onClick={handleNext}
+                  endIcon={<ArrowForward />}
+                  sx={{
+                    borderRadius: 2,
+                    px: 3,
+                    py: 1.2,
+                    textTransform: "none",
+                    fontWeight: 600,
+                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
+                      transform: "translateY(-2px)",
+                    },
+                  }}
+                >
+                  Continue
+                </Button>
+              )}
             </Box>
           </Paper>
         </Container>
@@ -1312,166 +1480,133 @@ const Exchange = () => {
       <Dialog
         open={dialogOpen}
         onClose={handleCloseDialog}
+        maxWidth="sm"
+        fullWidth
         PaperProps={{
           sx: {
             borderRadius: 3,
-            maxWidth: 500,
+            boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
+            background: `linear-gradient(135deg, ${alpha(
+              theme.palette.background.paper,
+              0.95
+            )}, ${alpha(theme.palette.background.paper, 0.9)})`,
+            backdropFilter: "blur(10px)",
           },
         }}
       >
-        <DialogTitle sx={{ pb: 1 }}>
-          <Typography variant="h5" fontWeight="600">
-            Xác nhận đề xuất trao đổi
-          </Typography>
+        <DialogTitle
+          sx={{
+            pb: 1,
+            pt: 3,
+            textAlign: "center",
+            fontWeight: 700,
+            fontSize: "1.5rem",
+          }}
+        >
+          Confirm Exchange Proposal
         </DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" paragraph>
-            Bạn có chắc chắn muốn gửi đề xuất trao đổi này không?
+        <DialogContent sx={{ px: 4 }}>
+          <Typography variant="body1" align="center" paragraph>
+            Are you sure you want to submit this exchange proposal? Once
+            submitted, the other party will be notified and can accept or
+            decline your offer.
           </Typography>
 
           <Box
             sx={{
-              bgcolor: alpha(theme.palette.background.default, 0.5),
-              p: 2,
-              borderRadius: 2,
-              mb: 2,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              my: 3,
+              gap: 3,
             }}
           >
-            <Typography variant="subtitle2" gutterBottom>
-              Bạn đang đề xuất:
-            </Typography>
-            <List disablePadding>
-              <ListItem sx={{ px: 0, py: 1 }}>
-                <ListItemAvatar>
-                  <Avatar
-                    src={selectedProduct?.image}
-                    variant="rounded"
-                    sx={{ borderRadius: 2 }}
-                  />
-                </ListItemAvatar>
-                <ListItemText
-                  primary={selectedProduct?.name}
-                  secondary={`$${selectedProduct?.price.toFixed(2)}`}
-                  primaryTypographyProps={{ fontWeight: 500 }}
-                />
-              </ListItem>
-              {cashOption && additionalCash > 0 && (
-                <ListItem sx={{ px: 0, py: 1 }}>
-                  <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: "success.light", borderRadius: 2 }}>
-                      <AttachMoney />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary="Tiền mặt bổ sung"
-                    secondary={`$${additionalCash.toFixed(2)}`}
-                    primaryTypographyProps={{ fontWeight: 500 }}
-                  />
-                </ListItem>
-              )}
-              <Divider sx={{ my: 1 }} />
-              <ListItem sx={{ px: 0, py: 1 }}>
-                <ListItemText
-                  primary="Tổng giá trị đề xuất"
-                  secondary={`$${(
-                    selectedProduct?.price + additionalCash
-                  ).toFixed(2)}`}
-                  primaryTypographyProps={{ fontWeight: 600 }}
-                  secondaryTypographyProps={{
-                    color: "primary.main",
-                    fontWeight: 600,
-                    fontSize: "1.1rem",
-                  }}
-                />
-              </ListItem>
-            </List>
-          </Box>
-
-          <Box
-            sx={{
-              bgcolor: alpha(theme.palette.background.default, 0.5),
-              p: 2,
-              borderRadius: 2,
-            }}
-          >
-            <Typography variant="subtitle2" gutterBottom>
-              Để đổi lấy:
-            </Typography>
-            <List disablePadding>
-              <ListItem sx={{ px: 0, py: 1 }}>
-                <ListItemAvatar>
-                  <Avatar
-                    src={targetProduct?.image}
-                    variant="rounded"
-                    sx={{ borderRadius: 2 }}
-                  />
-                </ListItemAvatar>
-                <ListItemText
-                  primary={targetProduct?.name}
-                  secondary={`$${targetProduct?.price.toFixed(2)}`}
-                  primaryTypographyProps={{ fontWeight: 500 }}
-                />
-              </ListItem>
-              <ListItem sx={{ px: 0, py: 0 }}>
-                <ListItemText
-                  primary={
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Avatar
-                        src={targetProduct?.seller.avatar}
-                        sx={{ width: 24, height: 24, mr: 1 }}
-                      />
-                      <Typography variant="body2">
-                        {targetProduct?.seller.name}
-                      </Typography>
-                    </Box>
-                  }
-                />
-              </ListItem>
-            </List>
-          </Box>
-
-          {message && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="subtitle2" gutterBottom>
-                Lời nhắn của bạn:
-              </Typography>
-              <Paper
-                variant="outlined"
+            <Box sx={{ textAlign: "center" }}>
+              <Avatar
+                src={selectedProduct?.image}
+                variant="rounded"
                 sx={{
-                  p: 2,
+                  width: 80,
+                  height: 80,
+                  mx: "auto",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                   borderRadius: 2,
-                  bgcolor: alpha(theme.palette.background.default, 0.5),
                 }}
-              >
-                <Typography variant="body2">{message}</Typography>
-              </Paper>
+              />
+              <Typography variant="body2" sx={{ mt: 1, fontWeight: 500 }}>
+                Your Product
+              </Typography>
+            </Box>
+
+            <CompareArrows sx={{ fontSize: 30, color: "text.secondary" }} />
+
+            <Box sx={{ textAlign: "center" }}>
+              <Avatar
+                src={targetProduct?.image}
+                variant="rounded"
+                sx={{
+                  width: 80,
+                  height: 80,
+                  mx: "auto",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                  borderRadius: 2,
+                }}
+              />
+              <Typography variant="body2" sx={{ mt: 1, fontWeight: 500 }}>
+                Their Product
+              </Typography>
+            </Box>
+          </Box>
+
+          {cashOption && additionalCash > 0 && (
+            <Box
+              sx={{
+                textAlign: "center",
+                p: 2,
+                bgcolor: alpha(theme.palette.success.main, 0.1),
+                borderRadius: 2,
+                mb: 2,
+              }}
+            >
+              <Typography variant="body2" fontWeight={500}>
+                Plus additional cash:
+              </Typography>
+              <Typography variant="h6" color="success.main" fontWeight={700}>
+                ${additionalCash.toFixed(2)}
+              </Typography>
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 3 }}>
+        <DialogActions sx={{ px: 4, pb: 3, justifyContent: "center", gap: 2 }}>
           <Button
             onClick={handleCloseDialog}
+            variant="outlined"
             startIcon={<Close />}
-            sx={{ borderRadius: 2 }}
+            sx={{
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 600,
+            }}
           >
-            Hủy bỏ
+            Cancel
           </Button>
           <Button
             onClick={handleConfirmExchange}
             variant="contained"
+            color="primary"
             startIcon={<Check />}
             sx={{
               borderRadius: 2,
               px: 3,
               py: 1,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              "&:hover": {
-                background: `linear-gradient(45deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
-              },
+              textTransform: "none",
+              fontWeight: 600,
+              boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
             }}
           >
-            Xác nhận
+            Confirm
           </Button>
         </DialogActions>
       </Dialog>
@@ -1481,12 +1616,24 @@ const Exchange = () => {
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        sx={{ mb: 2, mr: 2 }}
       >
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbar.severity}
           variant="filled"
-          sx={{ width: "100%", borderRadius: 2 }}
+          sx={{
+            width: "100%",
+            borderRadius: 2,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+            "& .MuiAlert-icon": {
+              fontSize: "1.5rem",
+            },
+            "& .MuiAlert-message": {
+              fontSize: "0.95rem",
+              fontWeight: 500,
+            },
+          }}
         >
           {snackbar.message}
         </Alert>

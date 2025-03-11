@@ -31,6 +31,7 @@ import {
   DialogActions,
   useMediaQuery,
   useTheme,
+  CardActions,
 } from "@mui/material";
 import {
   ShoppingCart,
@@ -53,6 +54,7 @@ import {
 } from "@mui/icons-material";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
+import { alpha } from "@mui/material/styles";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -82,37 +84,24 @@ const ProductDetail = () => {
       setLoading(true);
       try {
         // Here you would fetch data from your API
-        // For now, we'll use mock data
+        // For now, we'll use mock data with more realistic images
         setTimeout(() => {
           const mockProduct = {
             id: parseInt(id),
             name: `Product ${id}`,
             description: `This is a detailed description for Product ${id}. It includes information about the features, specifications, and condition of the product. The product is in good working condition with minor signs of use.`,
             price: Math.floor(Math.random() * 1000) + 100,
-            images: [
-              `https://via.placeholder.com/600x400?text=Product${id}_Image1`,
-              `https://via.placeholder.com/600x400?text=Product${id}_Image2`,
-              `https://via.placeholder.com/600x400?text=Product${id}_Image3`,
-              `https://via.placeholder.com/600x400?text=Product${id}_Image4`,
-            ],
-            category: [
-              "Smartphones",
-              "Laptops",
-              "Tablets",
-              "Audio",
-              "Cameras",
-              "Accessories",
-            ][Math.floor(Math.random() * 6)],
-            brand: ["Apple", "Samsung", "Sony", "Dell", "HP", "Lenovo"][
-              Math.floor(Math.random() * 6)
-            ],
+            // Use more realistic images based on category
+            images: getProductImages(id),
+            category: getRandomCategory(),
+            brand: getRandomBrand(),
             rating: (Math.random() * 2 + 3).toFixed(1), // Between 3 and 5
             reviews: Array(Math.floor(Math.random() * 10) + 5)
               .fill()
               .map((_, index) => ({
                 id: index + 1,
                 user: `User ${Math.floor(Math.random() * 100) + 1}`,
-                avatar: `https://via.placeholder.com/40?text=U${index + 1}`,
+                avatar: `https://i.pravatar.cc/40?img=${index + 10}`, // More realistic avatars
                 rating: Math.floor(Math.random() * 3) + 3, // Between 3 and 5
                 date: new Date(
                   2023,
@@ -178,23 +167,17 @@ const ProductDetail = () => {
             },
           };
 
-          // Generate related products
-          const mockRelatedProducts = Array(4)
+          // Generate related products based on the same category
+          const mockRelatedProducts = Array(6)
             .fill()
             .map((_, index) => ({
               id: parseInt(id) + 100 + index,
-              name: `Related Product ${index + 1}`,
-              description: `This is a description for Related Product ${
-                index + 1
-              }.`,
+              name: getProductNameByCategory(mockProduct.category, index),
+              description: `This is a description for a related ${mockProduct.category} product.`,
               price: Math.floor(Math.random() * 1000) + 100,
-              image: `https://via.placeholder.com/300x200?text=Related${
-                index + 1
-              }`,
+              image: getRelatedProductImage(mockProduct.category, index),
               category: mockProduct.category,
-              brand: ["Apple", "Samsung", "Sony", "Dell", "HP", "Lenovo"][
-                Math.floor(Math.random() * 6)
-              ],
+              brand: getRandomBrandByCategory(mockProduct.category),
               rating: (Math.random() * 5).toFixed(1),
               reviews: Math.floor(Math.random() * 100),
               condition: ["New", "Like New", "Good", "Fair"][
@@ -233,7 +216,7 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    // Here you would add the product to the cart
+    // Hiển thị thông báo thành công
     setSnackbar({
       open: true,
       message: `${quantity} ${
@@ -241,6 +224,11 @@ const ProductDetail = () => {
       } added to your cart`,
       severity: "success",
     });
+
+    // Chuyển hướng đến trang cart sau 1 giây để người dùng kịp thấy thông báo
+    setTimeout(() => {
+      navigate("/cart");
+    }, 1000);
   };
 
   const toggleFavorite = () => {
@@ -306,6 +294,132 @@ const ProductDetail = () => {
       ...snackbar,
       open: false,
     });
+  };
+
+  // Helper functions for more realistic data
+  const getRandomCategory = () => {
+    const categories = [
+      "Smartphones",
+      "Laptops",
+      "Tablets",
+      "Audio",
+      "Cameras",
+      "Accessories",
+    ];
+    return categories[Math.floor(Math.random() * categories.length)];
+  };
+
+  const getRandomBrand = () => {
+    const brands = ["Apple", "Samsung", "Sony", "Dell", "HP", "Lenovo"];
+    return brands[Math.floor(Math.random() * brands.length)];
+  };
+
+  const getRandomBrandByCategory = (category) => {
+    switch (category) {
+      case "Smartphones":
+        return ["Apple", "Samsung", "Google", "Xiaomi", "OnePlus"][
+          Math.floor(Math.random() * 5)
+        ];
+      case "Laptops":
+        return ["Apple", "Dell", "HP", "Lenovo", "Asus"][
+          Math.floor(Math.random() * 5)
+        ];
+      case "Tablets":
+        return ["Apple", "Samsung", "Microsoft", "Lenovo", "Huawei"][
+          Math.floor(Math.random() * 5)
+        ];
+      case "Audio":
+        return ["Sony", "Bose", "JBL", "Sennheiser", "Apple"][
+          Math.floor(Math.random() * 5)
+        ];
+      case "Cameras":
+        return ["Canon", "Nikon", "Sony", "Fujifilm", "Panasonic"][
+          Math.floor(Math.random() * 5)
+        ];
+      default:
+        return ["Apple", "Samsung", "Sony", "Anker", "Belkin"][
+          Math.floor(Math.random() * 5)
+        ];
+    }
+  };
+
+  const getProductNameByCategory = (category, index) => {
+    switch (category) {
+      case "Smartphones":
+        return [
+          "iPhone 13 Pro",
+          "Galaxy S22 Ultra",
+          "Pixel 6 Pro",
+          "OnePlus 10",
+          "Xiaomi Mi 12",
+        ][index % 5];
+      case "Laptops":
+        return [
+          'MacBook Pro 16"',
+          "Dell XPS 15",
+          "HP Spectre x360",
+          "ThinkPad X1 Carbon",
+          "Asus ZenBook Pro",
+        ][index % 5];
+      case "Tablets":
+        return [
+          'iPad Pro 12.9"',
+          "Galaxy Tab S8",
+          "Surface Pro 8",
+          "Lenovo Tab P12 Pro",
+          "Huawei MatePad Pro",
+        ][index % 5];
+      case "Audio":
+        return [
+          "Sony WH-1000XM4",
+          "Bose QuietComfort 45",
+          "AirPods Pro",
+          "JBL Flip 6",
+          "Sennheiser Momentum 3",
+        ][index % 5];
+      case "Cameras":
+        return [
+          "Canon EOS R5",
+          "Sony A7 IV",
+          "Nikon Z6 II",
+          "Fujifilm X-T4",
+          "Panasonic Lumix GH6",
+        ][index % 5];
+      default:
+        return [
+          "AirTag",
+          "Galaxy SmartTag",
+          "Anker PowerBank",
+          "Belkin Charger",
+          "Sony Portable SSD",
+        ][index % 5];
+    }
+  };
+
+  const getProductImages = (id) => {
+    // Return realistic product images based on ID
+    // In a real app, you would use actual product images
+    return [
+      `https://source.unsplash.com/500x400/?electronics&sig=${id}1`,
+      `https://source.unsplash.com/500x400/?gadget&sig=${id}2`,
+      `https://source.unsplash.com/500x400/?tech&sig=${id}3`,
+      `https://source.unsplash.com/500x400/?device&sig=${id}4`,
+    ];
+  };
+
+  const getRelatedProductImage = (category, index) => {
+    // Return realistic product images based on category
+    const categoryKeywords = {
+      Smartphones: "smartphone",
+      Laptops: "laptop",
+      Tablets: "tablet",
+      Audio: "headphones",
+      Cameras: "camera",
+      Accessories: "tech-accessory",
+    };
+
+    const keyword = categoryKeywords[category] || "electronics";
+    return `https://source.unsplash.com/300x200/?${keyword}&sig=${category}${index}`;
   };
 
   if (loading) {
@@ -376,65 +490,231 @@ const ProductDetail = () => {
         </Breadcrumbs>
 
         {/* Product Details */}
+        <Box sx={{ mb: 4 }}>
+          <Typography
+            variant="h3"
+            component="h1"
+            gutterBottom
+            sx={{
+              fontWeight: 700,
+              letterSpacing: "-0.5px",
+              background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              mb: 1,
+            }}
+          >
+            {product.name}
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
+              mb: 2,
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Rating
+                value={parseFloat(product.rating)}
+                precision={0.5}
+                readOnly
+                sx={{ mr: 1 }}
+              />
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                {product.rating}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                ({product.reviews.length} reviews)
+              </Typography>
+            </Box>
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{ mx: 1, height: 16 }}
+            />
+            <Typography variant="body2" color="text.secondary">
+              Sold by{" "}
+              <Link
+                to={`/seller/${product.seller.id}`}
+                style={{
+                  textDecoration: "none",
+                  color: theme.palette.primary.main,
+                }}
+              >
+                {product.seller.name}
+              </Link>
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
+            <Chip
+              label={product.brand}
+              size="small"
+              sx={{
+                borderRadius: 1.5,
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                color: theme.palette.primary.main,
+                fontWeight: 500,
+                border: "none",
+              }}
+            />
+            <Chip
+              label={product.category}
+              size="small"
+              sx={{
+                borderRadius: 1.5,
+                bgcolor: alpha(theme.palette.secondary.main, 0.1),
+                color: theme.palette.secondary.main,
+                fontWeight: 500,
+                border: "none",
+              }}
+            />
+            <Chip
+              label={product.condition}
+              size="small"
+              color={
+                product.condition === "New"
+                  ? "success"
+                  : product.condition === "Like New"
+                  ? "info"
+                  : product.condition === "Good"
+                  ? "primary"
+                  : "warning"
+              }
+              sx={{
+                borderRadius: 1.5,
+                fontWeight: 500,
+                border: "none",
+              }}
+            />
+          </Box>
+        </Box>
+
         <Grid container spacing={4}>
           {/* Product Images */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, mb: 2, position: "relative" }}>
+            <Paper
+              elevation={0}
+              sx={{
+                borderRadius: 3,
+                overflow: "hidden",
+                position: "relative",
+                mb: 2,
+                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  boxShadow: "0 15px 40px rgba(0,0,0,0.12)",
+                },
+              }}
+            >
               <Box
-                component="img"
-                src={product.images[imageIndex]}
-                alt={product.name}
                 sx={{
-                  width: "100%",
-                  height: "auto",
+                  position: "relative",
+                  paddingTop: "75%", // 4:3 aspect ratio
                   cursor: "zoom-in",
-                  borderRadius: 1,
+                  overflow: "hidden",
                 }}
                 onClick={handleZoomToggle}
-              />
+              >
+                <img
+                  src={product.images[imageIndex]}
+                  alt={`${product.name} - Image ${imageIndex + 1}`}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    transition: "transform 0.5s ease",
+                  }}
+                  className="product-image-zoom"
+                />
+                <style jsx>{`
+                  .product-image-zoom:hover {
+                    transform: scale(1.05);
+                  }
+                `}</style>
+              </Box>
+
               <Box
                 sx={{
                   position: "absolute",
                   top: "50%",
-                  left: 0,
+                  left: 16,
                   transform: "translateY(-50%)",
                   zIndex: 1,
                 }}
               >
                 <IconButton
-                  onClick={() => handleImageNavigation("prev")}
                   sx={{
-                    bgcolor: "rgba(255, 255, 255, 0.7)",
-                    "&:hover": { bgcolor: "rgba(255, 255, 255, 0.9)" },
+                    bgcolor: "rgba(255, 255, 255, 0.9)",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                    "&:hover": { bgcolor: "rgba(255, 255, 255, 1)" },
+                    transition: "all 0.2s ease",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleImageNavigation(-1);
                   }}
                 >
                   <ArrowBack />
                 </IconButton>
               </Box>
+
               <Box
                 sx={{
                   position: "absolute",
                   top: "50%",
-                  right: 0,
+                  right: 16,
                   transform: "translateY(-50%)",
                   zIndex: 1,
                 }}
               >
                 <IconButton
-                  onClick={() => handleImageNavigation("next")}
                   sx={{
-                    bgcolor: "rgba(255, 255, 255, 0.7)",
-                    "&:hover": { bgcolor: "rgba(255, 255, 255, 0.9)" },
+                    bgcolor: "rgba(255, 255, 255, 0.9)",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                    "&:hover": { bgcolor: "rgba(255, 255, 255, 1)" },
+                    transition: "all 0.2s ease",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleImageNavigation(1);
                   }}
                 >
                   <ArrowForward />
                 </IconButton>
               </Box>
+
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 16,
+                  left: 16,
+                  bgcolor: "rgba(0, 0, 0, 0.7)",
+                  color: "white",
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: 2,
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
+                  backdropFilter: "blur(4px)",
+                }}
+              >
+                {imageIndex + 1} / {product.images.length}
+              </Box>
             </Paper>
+
             <Box
               sx={{
                 display: "flex",
-                gap: 1,
+                gap: 1.5,
                 flexWrap: "wrap",
                 justifyContent: "center",
               }}
@@ -442,593 +722,1183 @@ const ProductDetail = () => {
               {product.images.map((image, index) => (
                 <Box
                   key={index}
-                  component="img"
-                  src={image}
-                  alt={`${product.name} thumbnail ${index + 1}`}
                   sx={{
                     width: 80,
-                    height: 80,
-                    objectFit: "cover",
-                    cursor: "pointer",
-                    borderRadius: 1,
+                    height: 60,
+                    borderRadius: 2,
+                    overflow: "hidden",
                     border:
                       index === imageIndex
-                        ? "2px solid"
-                        : "2px solid transparent",
-                    borderColor:
-                      index === imageIndex ? "primary.main" : "transparent",
+                        ? `2px solid ${theme.palette.primary.main}`
+                        : `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    opacity: index === imageIndex ? 1 : 0.7,
+                    "&:hover": {
+                      opacity: 1,
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                    },
                   }}
                   onClick={() => setImageIndex(index)}
-                />
+                >
+                  <img
+                    src={image}
+                    alt={`Thumbnail ${index + 1}`}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </Box>
               ))}
             </Box>
           </Grid>
 
           {/* Product Info */}
           <Grid item xs={12} md={6}>
-            <Typography variant="h4" component="h1" gutterBottom>
-              {product.name}
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-              <Rating
-                value={parseFloat(product.rating)}
-                precision={0.5}
-                readOnly
-              />
-              <Typography variant="body2" sx={{ ml: 1 }}>
-                {product.rating} ({product.reviews.length} reviews)
-              </Typography>
-            </Box>
-            <Typography variant="h5" color="primary" gutterBottom>
-              ${product.price.toFixed(2)}
-            </Typography>
-            <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-              <Chip
-                label={product.condition}
+            <Box>
+              <Typography
+                variant="h5"
                 color="primary"
-                variant="outlined"
-              />
-              <Chip label={product.brand} variant="outlined" />
-              <Chip label={product.category} variant="outlined" />
-            </Box>
-            <Typography variant="body1" paragraph>
-              {product.description}
-            </Typography>
+                sx={{
+                  fontWeight: 700,
+                  mb: 3,
+                  fontSize: "2rem",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                ${product.price.toFixed(2)}
+                {product.shipping.free && (
+                  <Chip
+                    label="Free Shipping"
+                    size="small"
+                    color="success"
+                    sx={{ ml: 2, fontWeight: 500 }}
+                  />
+                )}
+              </Typography>
 
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-              <Grid item xs={6}>
-                <Typography variant="body2">
-                  <strong>Seller:</strong> {product.seller.name}
+              <Box
+                sx={{
+                  p: 2.5,
+                  mb: 3,
+                  borderRadius: 3,
+                  bgcolor: alpha(theme.palette.background.paper, 0.7),
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
+                }}
+              >
+                <Typography variant="body1" paragraph sx={{ lineHeight: 1.7 }}>
+                  {product.description}
                 </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2">
-                  <strong>Condition:</strong> {product.condition}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2">
-                  <strong>Warranty:</strong> {product.warranty}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2">
-                  <strong>Shipping:</strong>{" "}
-                  {product.shipping.free ? "Free" : "Standard"} (
-                  {product.shipping.estimatedDelivery})
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography
-                  variant="body2"
-                  color={product.stock > 0 ? "success.main" : "error.main"}
-                >
-                  <strong>Availability:</strong>{" "}
-                  {product.stock > 0
-                    ? `In Stock (${product.stock} available)`
-                    : "Out of Stock"}
-                </Typography>
-              </Grid>
-            </Grid>
+              </Box>
 
-            {product.stock > 0 && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" gutterBottom>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  mb: 3,
+                  p: 2,
+                  borderRadius: 3,
+                  bgcolor: alpha(theme.palette.primary.main, 0.05),
+                }}
+              >
+                <Typography variant="body1" fontWeight={500}>
                   Quantity:
                 </Typography>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    border: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+                    borderRadius: 2,
+                    overflow: "hidden",
+                  }}
+                >
                   <IconButton
+                    size="small"
                     onClick={() => handleQuantityChange(-1)}
                     disabled={quantity <= 1}
+                    sx={{
+                      borderRadius: 0,
+                      bgcolor: alpha(theme.palette.background.paper, 0.7),
+                    }}
                   >
                     <Remove />
                   </IconButton>
-                  <TextField
-                    value={quantity}
-                    inputProps={{
-                      readOnly: true,
-                      style: { textAlign: "center" },
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      mx: 2,
+                      minWidth: 24,
+                      textAlign: "center",
+                      fontWeight: 600,
                     }}
-                    sx={{ width: 60, mx: 1 }}
-                  />
+                  >
+                    {quantity}
+                  </Typography>
                   <IconButton
+                    size="small"
                     onClick={() => handleQuantityChange(1)}
                     disabled={quantity >= product.stock}
+                    sx={{
+                      borderRadius: 0,
+                      bgcolor: alpha(theme.palette.background.paper, 0.7),
+                    }}
                   >
                     <Add />
                   </IconButton>
                 </Box>
+                <Typography variant="body2" color="text.secondary">
+                  {product.stock} available
+                </Typography>
               </Box>
-            )}
 
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 3 }}>
-              <Button
-                variant="contained"
-                startIcon={<ShoppingCart />}
-                onClick={handleAddToCart}
-                disabled={product.stock <= 0}
-                sx={{ flex: isMobile ? "1 1 100%" : "1 1 auto" }}
-              >
-                Add to Cart
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<CompareArrows />}
-                onClick={handleExchange}
-                sx={{ flex: isMobile ? "1 1 100%" : "1 1 auto" }}
-              >
-                Propose Exchange
-              </Button>
-              <IconButton
-                onClick={toggleFavorite}
-                color={isFavorite ? "primary" : "default"}
-              >
-                {isFavorite ? <Favorite /> : <FavoriteBorder />}
-              </IconButton>
-              <IconButton onClick={handleShare}>
-                <Share />
-              </IconButton>
-              <IconButton color="error">
-                <Flag />
-              </IconButton>
-            </Box>
+              <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  startIcon={<ShoppingCart />}
+                  onClick={handleAddToCart}
+                  sx={{
+                    flex: 1,
+                    borderRadius: 2,
+                    py: 1.5,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                    transition: "all 0.3s ease",
+                    fontWeight: 600,
+                    "&:hover": {
+                      boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                      transform: "translateY(-2px)",
+                    },
+                  }}
+                >
+                  Add to Cart
+                </Button>
 
-            <Divider sx={{ mb: 2 }} />
+                <Button
+                  variant="outlined"
+                  startIcon={<CompareArrows />}
+                  onClick={handleExchange}
+                  sx={{
+                    flex: 1,
+                    borderRadius: 2,
+                    py: 1.5,
+                    fontWeight: 500,
+                    borderWidth: "1.5px",
+                    "&:hover": {
+                      borderWidth: "1.5px",
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
+                    },
+                  }}
+                >
+                  Propose Exchange
+                </Button>
 
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-              {["Secure Payment", "Verified Seller", "Return Policy"].map(
-                (feature, index) => (
-                  <Chip
-                    key={index}
-                    icon={
-                      index === 0 ? (
-                        <Security />
-                      ) : index === 1 ? (
-                        <Person />
-                      ) : (
-                        <LocalShipping />
-                      )
-                    }
-                    label={feature}
-                    variant="outlined"
-                    sx={{ borderRadius: 1 }}
-                  />
-                )
-              )}
+                <IconButton
+                  color={isFavorite ? "error" : "default"}
+                  onClick={toggleFavorite}
+                  sx={{
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: 2,
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                    },
+                  }}
+                >
+                  {isFavorite ? <Favorite /> : <FavoriteBorder />}
+                </IconButton>
+
+                <IconButton
+                  onClick={handleShare}
+                  sx={{
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: 2,
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                    },
+                  }}
+                >
+                  <Share />
+                </IconButton>
+              </Box>
+
+              <Divider sx={{ mb: 3 }} />
+
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">
+                    Condition
+                  </Typography>
+                  <Typography variant="body1" fontWeight={500}>
+                    {product.condition}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">
+                    Warranty
+                  </Typography>
+                  <Typography variant="body1" fontWeight={500}>
+                    {product.warranty}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">
+                    Shipping
+                  </Typography>
+                  <Typography variant="body1" fontWeight={500}>
+                    {product.shipping.free ? "Free Shipping" : "Standard"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="text.secondary">
+                    Estimated Delivery
+                  </Typography>
+                  <Typography variant="body1" fontWeight={500}>
+                    {product.shipping.estimatedDelivery}
+                  </Typography>
+                </Grid>
+              </Grid>
             </Box>
           </Grid>
         </Grid>
 
         {/* Tabs Section */}
         <Box sx={{ mt: 6 }}>
-          <Paper sx={{ mb: 4 }}>
-            <Tabs
-              value={tabValue}
-              onChange={handleTabChange}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{ borderBottom: 1, borderColor: "divider" }}
-            >
-              <Tab icon={<Description />} label="Description" />
-              <Tab icon={<Info />} label="Specifications" />
-              <Tab
-                icon={<Star />}
-                label={`Reviews (${product.reviews.length})`}
-              />
-              <Tab icon={<Person />} label="Seller Information" />
-            </Tabs>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              mb: 4,
+              borderBottom: 1,
+              borderColor: "divider",
+              "& .MuiTab-root": {
+                minWidth: 120,
+                fontWeight: 600,
+                fontSize: "0.95rem",
+                textTransform: "none",
+                transition: "all 0.2s ease",
+                mx: 0.5,
+                "&.Mui-selected": {
+                  color: theme.palette.primary.main,
+                },
+              },
+              "& .MuiTabs-indicator": {
+                height: 3,
+                borderRadius: 1.5,
+              },
+            }}
+          >
+            <Tab
+              label="Description"
+              icon={<Description />}
+              iconPosition="start"
+            />
+            <Tab label="Specifications" icon={<Info />} iconPosition="start" />
+            <Tab label="Reviews" icon={<Star />} iconPosition="start" />
+            <Tab label="Seller Info" icon={<Person />} iconPosition="start" />
+            <Tab
+              label="Shipping"
+              icon={<LocalShipping />}
+              iconPosition="start"
+            />
+          </Tabs>
 
-            <Box sx={{ p: 3 }}>
-              {tabValue === 0 && (
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Product Description
-                  </Typography>
-                  <Typography variant="body1" paragraph>
-                    {product.description}
-                  </Typography>
-                  <Typography variant="body1">
-                    This product is in {product.condition.toLowerCase()}{" "}
-                    condition.{" "}
-                    {product.condition === "New"
-                      ? "It is brand new and unused with original packaging."
-                      : product.condition === "Like New"
-                      ? "It shows minimal signs of use and is in excellent working condition."
-                      : product.condition === "Good"
-                      ? "It shows some signs of use but is in good working condition."
-                      : "It shows significant signs of use but is still functional."}
-                  </Typography>
-                </Box>
-              )}
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 3,
+              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
+              minHeight: 300,
+            }}
+          >
+            {tabValue === 0 && (
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  Product Description
+                </Typography>
+                <Typography variant="body1" paragraph>
+                  {product.description}
+                </Typography>
+                <Typography variant="body1">
+                  This product is in {product.condition.toLowerCase()}{" "}
+                  condition.{" "}
+                  {product.condition === "New"
+                    ? "It is brand new and unused with original packaging."
+                    : product.condition === "Like New"
+                    ? "It shows minimal signs of use and is in excellent working condition."
+                    : product.condition === "Good"
+                    ? "It shows some signs of use but is in good working condition."
+                    : "It shows significant signs of use but is still functional."}
+                </Typography>
+              </Box>
+            )}
 
-              {tabValue === 1 && (
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Technical Specifications
-                  </Typography>
-                  <Grid container spacing={2}>
-                    {Object.entries(product.specifications).map(
-                      ([key, value]) => (
-                        <Grid item xs={12} sm={6} key={key}>
-                          <Paper variant="outlined" sx={{ p: 2 }}>
-                            <Typography
-                              variant="subtitle2"
-                              color="text.secondary"
-                            >
-                              {key}
-                            </Typography>
-                            <Typography variant="body1">{value}</Typography>
-                          </Paper>
-                        </Grid>
-                      )
-                    )}
-                  </Grid>
-                </Box>
-              )}
-
-              {tabValue === 2 && (
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    Customer Reviews
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                    <Box sx={{ mr: 3 }}>
-                      <Typography variant="h3" component="div">
-                        {product.rating}
-                      </Typography>
-                      <Rating
-                        value={parseFloat(product.rating)}
-                        precision={0.5}
-                        readOnly
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        {product.reviews.length} reviews
-                      </Typography>
-                    </Box>
-                    <Box sx={{ flexGrow: 1 }}>
-                      {[5, 4, 3, 2, 1].map((star) => {
-                        const count = product.reviews.filter(
-                          (review) => Math.floor(review.rating) === star
-                        ).length;
-                        const percentage =
-                          (count / product.reviews.length) * 100;
-                        return (
-                          <Box
-                            key={star}
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              mb: 0.5,
-                            }}
+            {tabValue === 1 && (
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  Technical Specifications
+                </Typography>
+                <Grid container spacing={2}>
+                  {Object.entries(product.specifications).map(
+                    ([key, value]) => (
+                      <Grid item xs={12} sm={6} key={key}>
+                        <Paper variant="outlined" sx={{ p: 2 }}>
+                          <Typography
+                            variant="subtitle2"
+                            color="text.secondary"
                           >
-                            <Typography variant="body2" sx={{ minWidth: 30 }}>
-                              {star}★
-                            </Typography>
-                            <Box sx={{ flexGrow: 1, mx: 1 }}>
+                            {key}
+                          </Typography>
+                          <Typography variant="body1">{value}</Typography>
+                        </Paper>
+                      </Grid>
+                    )
+                  )}
+                </Grid>
+              </Box>
+            )}
+
+            {tabValue === 2 && (
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  Customer Reviews
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                  <Box sx={{ mr: 3 }}>
+                    <Typography variant="h3" component="div">
+                      {product.rating}
+                    </Typography>
+                    <Rating
+                      value={parseFloat(product.rating)}
+                      precision={0.5}
+                      readOnly
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      {product.reviews.length} reviews
+                    </Typography>
+                  </Box>
+                  <Box sx={{ flexGrow: 1 }}>
+                    {[5, 4, 3, 2, 1].map((star) => {
+                      const count = product.reviews.filter(
+                        (review) => Math.floor(review.rating) === star
+                      ).length;
+                      const percentage = (count / product.reviews.length) * 100;
+                      return (
+                        <Box
+                          key={star}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            mb: 0.5,
+                          }}
+                        >
+                          <Typography variant="body2" sx={{ minWidth: 30 }}>
+                            {star}★
+                          </Typography>
+                          <Box sx={{ flexGrow: 1, mx: 1 }}>
+                            <Box
+                              sx={{
+                                width: "100%",
+                                backgroundColor: "grey.300",
+                                height: 8,
+                                borderRadius: 1,
+                              }}
+                            >
                               <Box
                                 sx={{
-                                  width: "100%",
-                                  backgroundColor: "grey.300",
+                                  width: `${percentage}%`,
+                                  backgroundColor: "primary.main",
                                   height: 8,
                                   borderRadius: 1,
                                 }}
-                              >
-                                <Box
-                                  sx={{
-                                    width: `${percentage}%`,
-                                    backgroundColor: "primary.main",
-                                    height: 8,
-                                    borderRadius: 1,
-                                  }}
-                                />
-                              </Box>
-                            </Box>
-                            <Typography variant="body2" sx={{ minWidth: 40 }}>
-                              {count} ({percentage.toFixed(0)}%)
-                            </Typography>
-                          </Box>
-                        );
-                      })}
-                    </Box>
-                  </Box>
-
-                  <Divider sx={{ mb: 3 }} />
-
-                  <Typography variant="h6" gutterBottom>
-                    Write a Review
-                  </Typography>
-                  <Box
-                    component="form"
-                    onSubmit={handleReviewSubmit}
-                    sx={{ mb: 4 }}
-                  >
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" gutterBottom>
-                        Your Rating:
-                      </Typography>
-                      <Rating
-                        value={reviewRating}
-                        onChange={(event, newValue) => {
-                          setReviewRating(newValue);
-                        }}
-                        precision={1}
-                      />
-                    </Box>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={4}
-                      label="Your Review"
-                      value={reviewText}
-                      onChange={(e) => setReviewText(e.target.value)}
-                      placeholder="Share your experience with this product..."
-                      sx={{ mb: 2 }}
-                    />
-                    <Button type="submit" variant="contained">
-                      Submit Review
-                    </Button>
-                  </Box>
-
-                  <Divider sx={{ mb: 3 }} />
-
-                  <Typography variant="h6" gutterBottom>
-                    Customer Reviews ({product.reviews.length})
-                  </Typography>
-                  <List>
-                    {product.reviews.map((review) => (
-                      <React.Fragment key={review.id}>
-                        <ListItem alignItems="flex-start" sx={{ px: 0 }}>
-                          <ListItemAvatar>
-                            <Avatar src={review.avatar} alt={review.user} />
-                          </ListItemAvatar>
-                          <ListItemText
-                            primary={
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Typography variant="subtitle1">
-                                  {review.user}
-                                </Typography>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  {review.date}
-                                </Typography>
-                              </Box>
-                            }
-                            secondary={
-                              <Box sx={{ mt: 1 }}>
-                                <Rating
-                                  value={review.rating}
-                                  size="small"
-                                  readOnly
-                                  sx={{ mb: 1 }}
-                                />
-                                <Typography
-                                  variant="body2"
-                                  color="text.primary"
-                                >
-                                  {review.text}
-                                </Typography>
-                              </Box>
-                            }
-                          />
-                        </ListItem>
-                        <Divider variant="inset" component="li" />
-                      </React.Fragment>
-                    ))}
-                  </List>
-                </Box>
-              )}
-
-              {tabValue === 3 && (
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    About the Seller
-                  </Typography>
-                  <Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", mb: 2 }}
-                        >
-                          <Avatar sx={{ width: 60, height: 60, mr: 2 }}>
-                            {product.seller.name.charAt(0)}
-                          </Avatar>
-                          <Box>
-                            <Typography variant="h6">
-                              {product.seller.name}
-                            </Typography>
-                            <Box sx={{ display: "flex", alignItems: "center" }}>
-                              <Rating
-                                value={parseFloat(product.seller.rating)}
-                                precision={0.5}
-                                size="small"
-                                readOnly
                               />
-                              <Typography variant="body2" sx={{ ml: 1 }}>
-                                ({product.seller.rating})
+                            </Box>
+                          </Box>
+                          <Typography variant="body2" sx={{ minWidth: 40 }}>
+                            {count} ({percentage.toFixed(0)}%)
+                          </Typography>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Box>
+
+                <Divider sx={{ mb: 3 }} />
+
+                <Typography variant="h6" gutterBottom>
+                  Write a Review
+                </Typography>
+                <Box
+                  component="form"
+                  onSubmit={handleReviewSubmit}
+                  sx={{ mb: 4 }}
+                >
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" gutterBottom>
+                      Your Rating:
+                    </Typography>
+                    <Rating
+                      value={reviewRating}
+                      onChange={(event, newValue) => {
+                        setReviewRating(newValue);
+                      }}
+                      precision={1}
+                    />
+                  </Box>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    label="Your Review"
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                    placeholder="Share your experience with this product..."
+                    sx={{ mb: 2 }}
+                  />
+                  <Button type="submit" variant="contained">
+                    Submit Review
+                  </Button>
+                </Box>
+
+                <Divider sx={{ mb: 3 }} />
+
+                <Typography variant="h6" gutterBottom>
+                  Customer Reviews ({product.reviews.length})
+                </Typography>
+                <List>
+                  {product.reviews.map((review) => (
+                    <React.Fragment key={review.id}>
+                      <ListItem alignItems="flex-start" sx={{ px: 0 }}>
+                        <ListItemAvatar>
+                          <Avatar src={review.avatar} alt={review.user} />
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                              }}
+                            >
+                              <Typography variant="subtitle1">
+                                {review.user}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {review.date}
                               </Typography>
                             </Box>
+                          }
+                          secondary={
+                            <Box sx={{ mt: 1 }}>
+                              <Rating
+                                value={review.rating}
+                                size="small"
+                                readOnly
+                                sx={{ mb: 1 }}
+                              />
+                              <Typography variant="body2" color="text.primary">
+                                {review.text}
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                      </ListItem>
+                      <Divider variant="inset" component="li" />
+                    </React.Fragment>
+                  ))}
+                </List>
+              </Box>
+            )}
+
+            {tabValue === 3 && (
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  About the Seller
+                </Typography>
+                <Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 2 }}
+                      >
+                        <Avatar sx={{ width: 60, height: 60, mr: 2 }}>
+                          {product.seller.name.charAt(0)}
+                        </Avatar>
+                        <Box>
+                          <Typography variant="h6">
+                            {product.seller.name}
+                          </Typography>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <Rating
+                              value={parseFloat(product.seller.rating)}
+                              precision={0.5}
+                              size="small"
+                              readOnly
+                            />
+                            <Typography variant="body2" sx={{ ml: 1 }}>
+                              ({product.seller.rating})
+                            </Typography>
                           </Box>
                         </Box>
-                        <Typography variant="body2" paragraph>
-                          <strong>Member since:</strong>{" "}
-                          {product.seller.joinDate}
-                        </Typography>
-                        <Typography variant="body2" paragraph>
-                          <strong>Total sales:</strong>{" "}
-                          {product.seller.totalSales} items
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Response rate:</strong>{" "}
-                          {product.seller.responseRate}%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Button
-                          variant="outlined"
-                          fullWidth
-                          component={Link}
-                          to={`/messages?seller=${product.seller.id}`}
-                          sx={{ mb: 2 }}
-                        >
-                          Contact Seller
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          fullWidth
-                          component={Link}
-                          to={`/profile/${product.seller.id}`}
-                          sx={{ mb: 2 }}
-                        >
-                          View Profile
-                        </Button>
-                        <Button variant="outlined" color="error" fullWidth>
-                          Report Seller
-                        </Button>
-                      </Grid>
+                      </Box>
+                      <Typography variant="body2" paragraph>
+                        <strong>Member since:</strong> {product.seller.joinDate}
+                      </Typography>
+                      <Typography variant="body2" paragraph>
+                        <strong>Total sales:</strong>{" "}
+                        {product.seller.totalSales} items
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Response rate:</strong>{" "}
+                        {product.seller.responseRate}%
+                      </Typography>
                     </Grid>
-                  </Paper>
+                    <Grid item xs={12} sm={6}>
+                      <Button
+                        variant="outlined"
+                        fullWidth
+                        component={Link}
+                        to={`/messages?seller=${product.seller.id}`}
+                        sx={{ mb: 2 }}
+                      >
+                        Contact Seller
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        fullWidth
+                        component={Link}
+                        to={`/profile/${product.seller.id}`}
+                        sx={{ mb: 2 }}
+                      >
+                        View Profile
+                      </Button>
+                      <Button variant="outlined" color="error" fullWidth>
+                        Report Seller
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Paper>
 
-                  <Typography variant="h6" gutterBottom>
-                    Other Items from this Seller
-                  </Typography>
-                  <Grid container spacing={2}>
-                    {relatedProducts.map((relatedProduct) => (
-                      <Grid item xs={6} sm={3} key={relatedProduct.id}>
-                        <Card
-                          sx={{
-                            height: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                          }}
-                        >
+                <Typography variant="h6" gutterBottom>
+                  Other Items from this Seller
+                </Typography>
+                <Grid container spacing={2}>
+                  {relatedProducts.map((relatedProduct) => (
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      md={4}
+                      lg={2}
+                      key={relatedProduct.id}
+                    >
+                      <Card
+                        sx={{
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          borderRadius: 3,
+                          overflow: "hidden",
+                          transition: "all 0.3s ease",
+                          boxShadow: "0 5px 15px rgba(0,0,0,0.05)",
+                          "&:hover": {
+                            transform: "translateY(-8px)",
+                            boxShadow: "0 12px 25px rgba(0,0,0,0.1)",
+                          },
+                          position: "relative",
+                        }}
+                        component={Link}
+                        to={`/products/${relatedProduct.id}`}
+                        style={{ textDecoration: "none" }}
+                      >
+                        <Box sx={{ position: "relative" }}>
                           <CardMedia
                             component="img"
-                            height="140"
+                            height="160"
                             image={relatedProduct.image}
                             alt={relatedProduct.name}
+                            sx={{
+                              transition: "transform 0.5s ease",
+                              "&:hover": {
+                                transform: "scale(1.05)",
+                              },
+                            }}
                           />
-                          <CardContent sx={{ flexGrow: 1 }}>
-                            <Typography variant="subtitle2" noWrap>
-                              {relatedProduct.name}
-                            </Typography>
-                            <Typography variant="body2" color="primary">
-                              ${relatedProduct.price.toFixed(2)}
-                            </Typography>
-                          </CardContent>
-                          <CardActions>
-                            <Button
+                          <Chip
+                            label={relatedProduct.condition}
+                            size="small"
+                            color={
+                              relatedProduct.condition === "New"
+                                ? "success"
+                                : relatedProduct.condition === "Like New"
+                                ? "info"
+                                : relatedProduct.condition === "Good"
+                                ? "primary"
+                                : "warning"
+                            }
+                            sx={{
+                              position: "absolute",
+                              top: 10,
+                              right: 10,
+                              fontWeight: 500,
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                            }}
+                          />
+                        </Box>
+
+                        <CardContent sx={{ flexGrow: 1, p: 2 }}>
+                          <Typography
+                            variant="subtitle1"
+                            component="div"
+                            sx={{
+                              fontWeight: 600,
+                              mb: 0.5,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              lineHeight: 1.3,
+                              height: 42,
+                            }}
+                          >
+                            {relatedProduct.name}
+                          </Typography>
+
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mb: 1 }}
+                          >
+                            {relatedProduct.brand}
+                          </Typography>
+
+                          <Typography
+                            variant="h6"
+                            color="primary"
+                            sx={{
+                              fontWeight: 700,
+                              mb: 1,
+                            }}
+                          >
+                            ${relatedProduct.price.toFixed(2)}
+                          </Typography>
+
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <Rating
+                              value={parseFloat(relatedProduct.rating)}
+                              precision={0.5}
                               size="small"
-                              component={Link}
-                              to={`/products/${relatedProduct.id}`}
+                              readOnly
+                            />
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ ml: 1 }}
                             >
-                              View
-                            </Button>
-                          </CardActions>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-              )}
-            </Box>
+                              ({relatedProduct.reviews})
+                            </Typography>
+                          </Box>
+                        </CardContent>
+
+                        <CardActions sx={{ p: 2, pt: 0 }}>
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            fullWidth
+                            sx={{
+                              borderRadius: 2,
+                              textTransform: "none",
+                              fontWeight: 600,
+                              py: 0.5,
+                            }}
+                          >
+                            View Details
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            )}
+
+            {tabValue === 4 && (
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  Shipping Information
+                </Typography>
+                <Typography variant="body1" paragraph>
+                  {product.shipping.free ? "Free Shipping" : "Standard"}
+                </Typography>
+                <Typography variant="body1">
+                  Estimated Delivery: {product.shipping.estimatedDelivery}
+                </Typography>
+              </Box>
+            )}
           </Paper>
         </Box>
 
         {/* Related Products */}
-        <Box sx={{ mt: 6, mb: 4 }}>
-          <Typography variant="h5" component="h2" gutterBottom>
-            Related Products
-          </Typography>
-          <Grid container spacing={3}>
-            {relatedProducts.map((relatedProduct) => (
-              <Grid item xs={12} sm={6} md={3} key={relatedProduct.id}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={relatedProduct.image}
-                    alt={relatedProduct.name}
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" component="div" noWrap>
-                      {relatedProduct.name}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      gutterBottom
-                    >
-                      {relatedProduct.category}
-                    </Typography>
-                    <Typography variant="h6" color="primary" gutterBottom>
-                      ${relatedProduct.price.toFixed(2)}
-                    </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <Rating
-                        value={parseFloat(relatedProduct.rating)}
-                        precision={0.5}
-                        size="small"
-                        readOnly
-                      />
+        <Box sx={{ mt: 8, mb: 4 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 3,
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                position: "relative",
+                "&:after": {
+                  content: '""',
+                  position: "absolute",
+                  bottom: -8,
+                  left: 0,
+                  width: 60,
+                  height: 3,
+                  borderRadius: 1.5,
+                  bgcolor: theme.palette.secondary.main,
+                },
+              }}
+            >
+              You May Also Like
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              overflowX: "auto",
+              pb: 2,
+              "&::-webkit-scrollbar": {
+                height: 8,
+              },
+              "&::-webkit-scrollbar-track": {
+                bgcolor: alpha(theme.palette.divider, 0.1),
+                borderRadius: 4,
+              },
+              "&::-webkit-scrollbar-thumb": {
+                bgcolor: alpha(theme.palette.primary.main, 0.2),
+                borderRadius: 4,
+                "&:hover": {
+                  bgcolor: alpha(theme.palette.primary.main, 0.3),
+                },
+              },
+            }}
+          >
+            {Array(8)
+              .fill()
+              .map((_, index) => {
+                const randomCategory = [
+                  "Smartphones",
+                  "Laptops",
+                  "Tablets",
+                  "Audio",
+                  "Cameras",
+                  "Accessories",
+                ][Math.floor(Math.random() * 6)];
+                const randomBrand = getRandomBrandByCategory(randomCategory);
+                const randomName = getProductNameByCategory(
+                  randomCategory,
+                  index % 5
+                );
+                const randomPrice = Math.floor(Math.random() * 1000) + 100;
+                const randomRating = (Math.random() * 2 + 3).toFixed(1);
+                const randomReviews = Math.floor(Math.random() * 100);
+
+                return (
+                  <Card
+                    key={index}
+                    sx={{
+                      minWidth: 220,
+                      maxWidth: 220,
+                      borderRadius: 3,
+                      overflow: "hidden",
+                      transition: "all 0.3s ease",
+                      boxShadow: "0 5px 15px rgba(0,0,0,0.05)",
+                      "&:hover": {
+                        transform: "translateY(-5px)",
+                        boxShadow: "0 12px 25px rgba(0,0,0,0.1)",
+                      },
+                      flexShrink: 0,
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={`https://source.unsplash.com/300x200/?${randomCategory.toLowerCase()}&sig=${index}`}
+                      alt={randomName}
+                    />
+                    <CardContent sx={{ p: 2 }}>
+                      <Typography
+                        variant="subtitle1"
+                        component="div"
+                        sx={{
+                          fontWeight: 600,
+                          mb: 0.5,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {randomName}
+                      </Typography>
+
                       <Typography
                         variant="body2"
                         color="text.secondary"
-                        sx={{ ml: 1 }}
+                        sx={{ mb: 1 }}
                       >
-                        ({relatedProduct.reviews})
+                        {randomBrand}
                       </Typography>
-                    </Box>
-                    <Chip size="small" label={relatedProduct.condition} />
-                  </CardContent>
-                  <CardActions>
-                    <Button
-                      size="small"
-                      component={Link}
-                      to={`/products/${relatedProduct.id}`}
-                    >
-                      View Details
-                    </Button>
-                    <Button size="small" startIcon={<ShoppingCart />}>
-                      Add to Cart
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
+
+                      <Typography
+                        variant="h6"
+                        color="primary"
+                        sx={{
+                          fontWeight: 700,
+                          mb: 1,
+                        }}
+                      >
+                        ${randomPrice.toFixed(2)}
+                      </Typography>
+
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Rating
+                          value={parseFloat(randomRating)}
+                          precision={0.5}
+                          size="small"
+                          readOnly
+                        />
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ ml: 1 }}
+                        >
+                          ({randomReviews})
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                    <CardActions sx={{ p: 2, pt: 0 }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        fullWidth
+                        component={Link}
+                        to={`/products/${1000 + index}`}
+                        sx={{
+                          borderRadius: 2,
+                          textTransform: "none",
+                          fontWeight: 600,
+                          py: 0.5,
+                        }}
+                      >
+                        View Details
+                      </Button>
+                    </CardActions>
+                  </Card>
+                );
+              })}
+          </Box>
+        </Box>
+
+        <Box sx={{ mt: 6, mb: 4 }}>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 700,
+              mb: 3,
+              position: "relative",
+              "&:after": {
+                content: '""',
+                position: "absolute",
+                bottom: -8,
+                left: 0,
+                width: 60,
+                height: 3,
+                borderRadius: 1.5,
+                bgcolor: theme.palette.primary.main,
+              },
+            }}
+          >
+            Product Highlights
+          </Typography>
+
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  borderRadius: 3,
+                  height: "100%",
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  boxShadow: "0 5px 15px rgba(0,0,0,0.05)",
+                  transition: "transform 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Avatar
+                    sx={{
+                      bgcolor: alpha(theme.palette.primary.main, 0.1),
+                      color: theme.palette.primary.main,
+                      mr: 2,
+                    }}
+                  >
+                    <Info />
+                  </Avatar>
+                  <Typography variant="h6" fontWeight={600}>
+                    Key Features
+                  </Typography>
+                </Box>
+
+                <List disablePadding>
+                  {Object.entries(product.specifications)
+                    .slice(0, 4)
+                    .map(([key, value]) => (
+                      <ListItem key={key} disablePadding sx={{ mb: 1 }}>
+                        <ListItemText
+                          primary={
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {key}
+                              </Typography>
+                              <Typography variant="body2" fontWeight={500}>
+                                {value}
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                </List>
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  borderRadius: 3,
+                  height: "100%",
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  boxShadow: "0 5px 15px rgba(0,0,0,0.05)",
+                  transition: "transform 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Avatar
+                    sx={{
+                      bgcolor: alpha(theme.palette.success.main, 0.1),
+                      color: theme.palette.success.main,
+                      mr: 2,
+                    }}
+                  >
+                    <LocalShipping />
+                  </Avatar>
+                  <Typography variant="h6" fontWeight={600}>
+                    Shipping
+                  </Typography>
+                </Box>
+
+                <List disablePadding>
+                  <ListItem disablePadding sx={{ mb: 1 }}>
+                    <ListItemText
+                      primary={
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            Method
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            {product.shipping.free
+                              ? "Free Shipping"
+                              : "Standard"}
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem disablePadding sx={{ mb: 1 }}>
+                    <ListItemText
+                      primary={
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            Estimated Delivery
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            {product.shipping.estimatedDelivery}
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem disablePadding sx={{ mb: 1 }}>
+                    <ListItemText
+                      primary={
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            Return Policy
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            30 days
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  borderRadius: 3,
+                  height: "100%",
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  boxShadow: "0 5px 15px rgba(0,0,0,0.05)",
+                  transition: "transform 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-5px)",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  },
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Avatar
+                    sx={{
+                      bgcolor: alpha(theme.palette.warning.main, 0.1),
+                      color: theme.palette.warning.main,
+                      mr: 2,
+                    }}
+                  >
+                    <Security />
+                  </Avatar>
+                  <Typography variant="h6" fontWeight={600}>
+                    Warranty
+                  </Typography>
+                </Box>
+
+                <List disablePadding>
+                  <ListItem disablePadding sx={{ mb: 1 }}>
+                    <ListItemText
+                      primary={
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            Coverage
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            {product.warranty}
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem disablePadding sx={{ mb: 1 }}>
+                    <ListItemText
+                      primary={
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            Condition
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            {product.condition}
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem disablePadding sx={{ mb: 1 }}>
+                    <ListItemText
+                      primary={
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary">
+                            Support
+                          </Typography>
+                          <Typography variant="body2" fontWeight={500}>
+                            Available
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            </Grid>
           </Grid>
         </Box>
       </Container>
@@ -1039,61 +1909,163 @@ const ProductDetail = () => {
         onClose={handleZoomToggle}
         maxWidth="lg"
         fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            overflow: "hidden",
+            boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
+          },
+        }}
       >
-        <DialogTitle
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          {product.name}
-          <IconButton onClick={handleZoomToggle}>
-            <Close />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
+        <DialogTitle>
           <Box
-            component="img"
-            src={product.images[imageIndex]}
-            alt={product.name}
             sx={{
-              width: "100%",
-              height: "auto",
-              maxHeight: "80vh",
-              objectFit: "contain",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
-          />
+          >
+            <Typography variant="h6" fontWeight={600}>
+              {product.name}
+            </Typography>
+            <IconButton
+              onClick={handleZoomToggle}
+              sx={{
+                bgcolor: alpha(theme.palette.divider, 0.1),
+                "&:hover": {
+                  bgcolor: alpha(theme.palette.divider, 0.2),
+                },
+              }}
+            >
+              <Close />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "relative",
+              minHeight: "70vh",
+              bgcolor: "#000",
+            }}
+          >
+            <img
+              src={product.images[imageIndex]}
+              alt={`${product.name} - Image ${imageIndex + 1}`}
+              style={{
+                maxWidth: "100%",
+                maxHeight: "70vh",
+                objectFit: "contain",
+              }}
+            />
+
+            <IconButton
+              sx={{
+                position: "absolute",
+                left: 16,
+                top: "50%",
+                transform: "translateY(-50%)",
+                bgcolor: "rgba(255,255,255,0.2)",
+                color: "white",
+                "&:hover": {
+                  bgcolor: "rgba(255,255,255,0.3)",
+                },
+              }}
+              onClick={() => handleImageNavigation(-1)}
+            >
+              <ArrowBack />
+            </IconButton>
+
+            <IconButton
+              sx={{
+                position: "absolute",
+                right: 16,
+                top: "50%",
+                transform: "translateY(-50%)",
+                bgcolor: "rgba(255,255,255,0.2)",
+                color: "white",
+                "&:hover": {
+                  bgcolor: "rgba(255,255,255,0.3)",
+                },
+              }}
+              onClick={() => handleImageNavigation(1)}
+            >
+              <ArrowForward />
+            </IconButton>
+          </Box>
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 1.5,
+              p: 2,
+              bgcolor: "#f5f5f5",
+            }}
+          >
+            {product.images.map((image, index) => (
+              <Box
+                key={index}
+                sx={{
+                  width: 80,
+                  height: 60,
+                  borderRadius: 1,
+                  overflow: "hidden",
+                  border:
+                    index === imageIndex
+                      ? `2px solid ${theme.palette.primary.main}`
+                      : `1px solid ${theme.palette.divider}`,
+                  cursor: "pointer",
+                  opacity: index === imageIndex ? 1 : 0.6,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    opacity: 1,
+                  },
+                }}
+                onClick={() => setImageIndex(index)}
+              >
+                <img
+                  src={image}
+                  alt={`Thumbnail ${index + 1}`}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </Box>
+            ))}
+          </Box>
         </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => handleImageNavigation("prev")}
-            startIcon={<ArrowBack />}
-          >
-            Previous
-          </Button>
-          <Typography>
-            {imageIndex + 1} / {product.images.length}
-          </Typography>
-          <Button
-            onClick={() => handleImageNavigation("next")}
-            endIcon={<ArrowForward />}
-          >
-            Next
-          </Button>
-        </DialogActions>
       </Dialog>
 
+      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        sx={{ mb: 2, mr: 2 }}
       >
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbar.severity}
-          sx={{ width: "100%" }}
+          variant="filled"
+          sx={{
+            width: "100%",
+            borderRadius: 2,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+            "& .MuiAlert-icon": {
+              fontSize: "1.5rem",
+            },
+            "& .MuiAlert-message": {
+              fontSize: "0.95rem",
+              fontWeight: 500,
+            },
+          }}
         >
           {snackbar.message}
         </Alert>

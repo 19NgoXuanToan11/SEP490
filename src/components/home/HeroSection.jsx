@@ -74,23 +74,27 @@ const HeroSection = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          <motion.button
-            className="flex items-center px-6 py-3 text-base md:text-lg font-bold rounded-full bg-gradient-to-r from-indigo-600 to-indigo-500 shadow-lg shadow-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Explore className="mr-2" />
-            Browse Products
-          </motion.button>
+          <Link to="/products">
+            <motion.button
+              className="flex items-center px-6 py-3 text-base md:text-lg font-bold rounded-full bg-gradient-to-r from-indigo-600 to-indigo-500 shadow-lg shadow-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Explore className="mr-2" />
+              Browse Products
+            </motion.button>
+          </Link>
 
-          <motion.button
-            className="flex items-center px-6 py-3 text-base md:text-lg font-bold rounded-full border-2 border-white/50 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-white hover:-translate-y-1 transition-all duration-300"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <ShoppingCart className="mr-2" />
-            Join Our Community
-          </motion.button>
+          <Link to="/exchange">
+            <motion.button
+              className="flex items-center px-6 py-3 text-base md:text-lg font-bold rounded-full border-2 border-white/50 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-white hover:-translate-y-1 transition-all duration-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ShoppingCart className="mr-2" />
+              Join Our Community
+            </motion.button>
+          </Link>
         </motion.div>
 
         {/* Stats counter */}

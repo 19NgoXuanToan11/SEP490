@@ -1624,39 +1624,66 @@ const Products = () => {
         <Grid container spacing={2}>
           {compareProducts.map((product) => (
             <Grid item xs={6} sm={4} md={3} key={product.id}>
-              <Card sx={{ position: "relative", borderRadius: 3 }}>
+              <Paper
+                sx={{
+                  position: "relative",
+                  borderRadius: 3,
+                }}
+              >
                 <IconButton
                   size="small"
                   onClick={() => toggleCompare(product)}
                   sx={{
                     position: "absolute",
-                    top: 5,
-                    right: 5,
-                    bgcolor: "rgba(255,255,255,0.8)",
+                    top: 8,
+                    right: 8,
+                    bgcolor: "background.paper",
+                    boxShadow: 1,
+                    "&:hover": { bgcolor: "error.light", color: "white" },
                   }}
                 >
                   <Close fontSize="small" />
                 </IconButton>
-                <CardMedia
-                  component="img"
-                  height={120}
-                  image={product.image}
-                  alt={product.name}
-                  sx={{ objectFit: "cover" }}
-                />
-                <CardContent sx={{ p: 1.5 }}>
-                  <Typography variant="body2" noWrap>
-                    {product.name}
-                  </Typography>
-                  <Typography
-                    variant="subtitle2"
-                    color="primary.main"
-                    sx={{ fontWeight: 600 }}
-                  >
-                    ${product.discountedPrice.toFixed(2)}
-                  </Typography>
-                </CardContent>
-              </Card>
+                <Box
+                  sx={{
+                    height: 100,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mb: 1,
+                  }}
+                >
+                  <img
+                    src={getProductImage(product.category, product.brand)}
+                    alt={product.name}
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                </Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    fontWeight: 600,
+                    mb: 1,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {product.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {product.condition} • {product.brand}
+                </Typography>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, mt: 1 }}>
+                  ${product.price}
+                </Typography>
+              </Paper>
             </Grid>
           ))}
         </Grid>
@@ -1783,54 +1810,6 @@ const Products = () => {
               />
             </Box>
           </Paper>
-
-          {/* Category Tabs */}
-          <Box sx={{ mb: 4 }}>
-            <Tabs
-              value={activeTab}
-              onChange={handleTabChange}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{
-                "& .MuiTab-root": {
-                  fontWeight: 600,
-                  fontSize: "1rem",
-                  textTransform: "none",
-                  minWidth: "auto",
-                  px: 3,
-                  py: 2,
-                },
-                "& .Mui-selected": {
-                  color: "primary.main",
-                },
-                "& .MuiTabs-indicator": {
-                  height: 3,
-                  borderRadius: 1.5,
-                },
-                bgcolor: "white",
-                borderRadius: 3,
-                boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-              }}
-            >
-              <Tab
-                label="All Products"
-                icon={<ViewModule />}
-                iconPosition="start"
-              />
-              <Tab label="Featured" icon={<Star />} iconPosition="start" />
-              <Tab
-                label="New Arrivals"
-                icon={<LocalOffer />}
-                iconPosition="start"
-              />
-              <Tab label="On Sale" icon={<LocalOffer />} iconPosition="start" />
-              <Tab
-                label="Best Sellers"
-                icon={<TrendingUp />}
-                iconPosition="start"
-              />
-            </Tabs>
-          </Box>
 
           {/* Toolbar */}
           <Paper

@@ -33,6 +33,7 @@ import Users from "../pages/admin/Users";
 import AdminProducts from "../pages/admin/Products";
 import Exchanges from "../pages/admin/Exchanges";
 import AdminSettings from "../pages/admin/Settings";
+import Checkout from "../pages/Checkout";
 
 // Auth Guard Component
 const ProtectedRoute = ({ children }) => {
@@ -72,6 +73,7 @@ const AppRouter = () => {
       <Route path="/contact" element={<Contact />} />
       <Route path="/products" element={<Products />} />
       <Route path="/products/:id" element={<ProductDetail />} />
+      <Route path="checkout" element={<Checkout />}/>
       <Route path="/faq" element={<FAQ />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />

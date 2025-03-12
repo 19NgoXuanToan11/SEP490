@@ -10,13 +10,23 @@ import {
   Alert,
   useMediaQuery,
   Chip,
+  IconButton,
 } from "@mui/material";
-import { motion, useAnimation, useInView } from "framer-motion";
+import {
+  motion,
+  useAnimation,
+  useInView,
+  AnimatePresence,
+} from "framer-motion";
 import {
   LocalFireDepartment,
   ArrowForward,
   Explore,
   ErrorOutline,
+  ArrowBackIos,
+  ArrowForwardIos,
+  KeyboardArrowLeft,
+  KeyboardArrowRight,
 } from "@mui/icons-material";
 import ProductCard from "./ProductCard";
 
@@ -35,10 +45,17 @@ const FeaturedProducts = ({
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const ref = useRef(null);
+  const carouselRef = useRef(null);
   const isInView = useInView(ref, { once: false, amount: 0.2 });
   const controls = useAnimation();
   const isTablet = useMediaQuery("(max-width:900px)");
   const isMobile = useMediaQuery("(max-width:600px)");
+
+  // Carousel state
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(null);
+  const itemsPerPage = isMobile ? 1 : isTablet ? 2 : 4;
+  const totalPages = products ? Math.ceil(products.length / itemsPerPage) : 0;
 
   useEffect(() => {
     if (isInView) {
@@ -46,24 +63,154 @@ const FeaturedProducts = ({
     }
   }, [isInView, controls]);
 
-  // Simplified hexagon background pattern - static, no animation
-  const HexagonPattern = () => {
-    return (
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          opacity: 0.05,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 17.32v34.64L30 60 0 51.96V17.32L30 0zm0 10.39L8.31 22.17v26.22L30 59.61l21.69-11.22V22.17L30 10.39z' fill='%236366F1' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
-          backgroundSize: "60px 60px",
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
+  // Auto-scroll effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (products && products.length > 0) {
+        handleNext();
+      }
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [currentIndex, products]);
+
+  const handlePrev = () => {
+    setDirection("left");
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? totalPages - 1 : prevIndex - 1
     );
+  };
+
+  const handleNext = () => {
+    setDirection("right");
+    setCurrentIndex((prevIndex) =>
+      prevIndex === totalPages - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  // Modern background
+  const ModernBackground = () => {
+    return (
+      <>
+        {/* Gradient background */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+            zIndex: 0,
+          }}
+        />
+
+        {/* Subtle wave pattern */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            opacity: 0.3,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52.357-.13.72-.264.888-.14 1.254-.874 1.454-2.278 2.016-3.62.2-.585.6-1.595.7-2.52' fill='%236366F1' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+            backgroundSize: "100px 20px",
+            zIndex: 0,
+          }}
+        />
+
+        {/* Floating gradient circles */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: "10%",
+            left: "5%",
+            width: "300px",
+            height: "300px",
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(99,102,241,0.1) 0%, rgba(99,102,241,0) 70%)",
+            filter: "blur(40px)",
+            animation: "float 15s infinite ease-in-out",
+            "@keyframes float": {
+              "0%": { transform: "translate(0, 0)" },
+              "50%": { transform: "translate(30px, 20px)" },
+              "100%": { transform: "translate(0, 0)" },
+            },
+            zIndex: 0,
+          }}
+        />
+
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "15%",
+            right: "10%",
+            width: "250px",
+            height: "250px",
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(79,70,229,0.1) 0%, rgba(79,70,229,0) 70%)",
+            filter: "blur(40px)",
+            animation: "float2 18s infinite ease-in-out",
+            "@keyframes float2": {
+              "0%": { transform: "translate(0, 0)" },
+              "50%": { transform: "translate(-20px, -30px)" },
+              "100%": { transform: "translate(0, 0)" },
+            },
+            zIndex: 0,
+          }}
+        />
+
+        {/* Subtle dot grid pattern */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            opacity: 0.3,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%234F46E5' fill-opacity='0.1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='1'/%3E%3Ccircle cx='13' cy='13' r='1'/%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: "20px 20px",
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        />
+      </>
+    );
+  };
+
+  // Variants for carousel animation
+  const carouselVariants = {
+    hidden: (direction) => ({
+      x: direction === "right" ? 1000 : -1000,
+      opacity: 0,
+    }),
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: {
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.5 },
+      },
+    },
+    exit: (direction) => ({
+      x: direction === "right" ? -1000 : 1000,
+      opacity: 0,
+      transition: {
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.5 },
+      },
+    }),
+  };
+
+  // Get current products to display
+  const getCurrentProducts = () => {
+    if (!products || products.length === 0) return [];
+    const startIndex = currentIndex * itemsPerPage;
+    return products.slice(startIndex, startIndex + itemsPerPage);
   };
 
   return (
@@ -73,10 +220,7 @@ const FeaturedProducts = ({
         position: "relative",
         py: { xs: 8, md: 12 },
         overflow: "hidden",
-        background: "linear-gradient(to bottom, #f8fafc, #f1f5f9)",
-        width: "100vw",
-        marginLeft: "calc(-50vw + 50%)",
-        marginRight: "calc(-50vw + 50%)",
+        width: "100%",
         my: 6,
         boxSizing: "border-box",
       }}
@@ -87,8 +231,8 @@ const FeaturedProducts = ({
         visible: { opacity: 1, transition: { duration: 0.5 } },
       }}
     >
-      {/* Only keeping the static hexagon pattern */}
-      <HexagonPattern />
+      {/* Modern background */}
+      <ModernBackground />
 
       <Container maxWidth="xl" sx={{ position: "relative", zIndex: 2 }}>
         {/* Header Section */}
@@ -269,28 +413,150 @@ const FeaturedProducts = ({
           </Box>
         )}
 
-        {/* Products Grid - simplified animations */}
+        {/* Carousel Products - New Implementation */}
         {!loading && !error && products && products.length > 0 && (
-          <Grid container spacing={4}>
-            {products.map((product, index) => (
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-                key={product.id}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-              >
-                <ProductCard
-                  product={product}
-                  toggleFavorite={toggleFavorite}
-                  favorites={favorites}
+          <Box
+            sx={{
+              position: "relative",
+              overflow: "hidden",
+              px: { xs: 2, md: 6 },
+            }}
+          >
+            <Box
+              ref={carouselRef}
+              sx={{
+                position: "relative",
+                minHeight: { xs: 450, md: 500 },
+                overflow: "hidden",
+              }}
+            >
+              <AnimatePresence initial={false} custom={direction} mode="wait">
+                <MotionBox
+                  key={currentIndex}
+                  custom={direction}
+                  variants={carouselVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  sx={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                  }}
+                >
+                  <Grid container spacing={3} justifyContent="center">
+                    {getCurrentProducts().map((product, index) => (
+                      <Grid
+                        item
+                        xs={12}
+                        sm={6}
+                        md={3}
+                        key={product.id}
+                        onMouseEnter={() => setHoveredIndex(index)}
+                        onMouseLeave={() => setHoveredIndex(null)}
+                      >
+                        <MotionBox
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{
+                            opacity: 1,
+                            y: 0,
+                            transition: {
+                              delay: index * 0.1,
+                              duration: 0.5,
+                            },
+                          }}
+                          whileHover={{
+                            y: -10,
+                            boxShadow: "0 20px 30px rgba(0, 0, 0, 0.1)",
+                            transition: { duration: 0.3 },
+                          }}
+                        >
+                          <ProductCard
+                            product={product}
+                            toggleFavorite={toggleFavorite}
+                            favorites={favorites}
+                          />
+                        </MotionBox>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </MotionBox>
+              </AnimatePresence>
+            </Box>
+
+            {/* Navigation Arrows */}
+            <IconButton
+              onClick={handlePrev}
+              sx={{
+                position: "absolute",
+                left: { xs: -10, md: 0 },
+                top: "50%",
+                transform: "translateY(-50%)",
+                bgcolor: "rgba(255, 255, 255, 0.8)",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                "&:hover": {
+                  bgcolor: "white",
+                  transform: "translateY(-50%) scale(1.1)",
+                },
+                zIndex: 10,
+                transition: "all 0.3s ease",
+              }}
+            >
+              <KeyboardArrowLeft sx={{ fontSize: 28, color: "#4F46E5" }} />
+            </IconButton>
+
+            <IconButton
+              onClick={handleNext}
+              sx={{
+                position: "absolute",
+                right: { xs: -10, md: 0 },
+                top: "50%",
+                transform: "translateY(-50%)",
+                bgcolor: "rgba(255, 255, 255, 0.8)",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                "&:hover": {
+                  bgcolor: "white",
+                  transform: "translateY(-50%) scale(1.1)",
+                },
+                zIndex: 10,
+                transition: "all 0.3s ease",
+              }}
+            >
+              <KeyboardArrowRight sx={{ fontSize: 28, color: "#4F46E5" }} />
+            </IconButton>
+
+            {/* Pagination Dots */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                mt: 4,
+                gap: 1,
+              }}
+            >
+              {Array.from({ length: totalPages }).map((_, index) => (
+                <Box
+                  key={index}
+                  onClick={() => {
+                    setDirection(index > currentIndex ? "right" : "left");
+                    setCurrentIndex(index);
+                  }}
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: "50%",
+                    bgcolor: currentIndex === index ? "#4F46E5" : "#cbd5e1",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      transform: "scale(1.2)",
+                      bgcolor: currentIndex === index ? "#4F46E5" : "#94a3b8",
+                    },
+                  }}
                 />
-              </Grid>
-            ))}
-          </Grid>
+              ))}
+            </Box>
+          </Box>
         )}
 
         {/* Empty State */}

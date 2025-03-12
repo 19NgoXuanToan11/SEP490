@@ -337,45 +337,62 @@ const Home = () => {
   };
 
   return (
-    <>
+    <Box sx={{ 
+      width: '100%', 
+      overflowX: 'hidden' // Thêm thuộc tính này để ngăn cuộn ngang
+    }}>
       <Header scrolled={scrolled} />
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
+        style={{ width: '100%', overflowX: 'hidden' }} // Thêm style này cho motion.div
       >
         {/* Hero Section */}
         <HeroSection />
 
         {/* Main Content */}
-        <Container maxWidth="lg" sx={{ mt: 10 }}>
+        <Container 
+          maxWidth="lg" 
+          sx={{ 
+            mt: 10,
+            px: { xs: 2, sm: 3, md: 4 }, // Padding responsive
+            width: '100%',
+            boxSizing: 'border-box', // Đảm bảo padding không làm tăng chiều rộng
+            overflow: 'hidden' // Ngăn cuộn ngang trong container
+          }}
+        >
           {/* Categories Section */}
           <CategorySection />
 
           {/* Featured Products */}
-          <FeaturedProducts
-            products={featuredProducts}
-            loading={loading}
-            error={error}
-            toggleFavorite={toggleFavorite}
-            favorites={favorites}
-          />
+          <Box sx={{ width: '100%', overflow: 'hidden' }}>
+            <FeaturedProducts
+              products={featuredProducts}
+              loading={loading}
+              error={error}
+              toggleFavorite={toggleFavorite}
+              favorites={favorites}
+            />
+          </Box>
 
           {/* Why Choose Us */}
           <WhyChooseUs />
 
           {/* Trending Products & Recent Exchanges Tabs */}
-          <TabSection
-            trendingProducts={trendingProducts}
-            recentExchanges={recentExchanges}
-            loading={loading}
-            error={error}
-            toggleFavorite={toggleFavorite}
-            favorites={favorites}
-            tabValue={tabValue}
-            handleTabChange={handleTabChange}
-          />
+          <Box sx={{ width: '100%', overflow: 'hidden' }}>
+            <TabSection
+              trendingProducts={trendingProducts}
+              recentExchanges={recentExchanges}
+              loading={loading}
+              error={error}
+              toggleFavorite={toggleFavorite}
+              favorites={favorites}
+              tabValue={tabValue}
+              handleTabChange={handleTabChange}
+            />
+          </Box>
 
           {/* Call to Action */}
           <CallToAction />
@@ -383,7 +400,7 @@ const Home = () => {
       </motion.div>
 
       <Footer />
-    </>
+    </Box>
   );
 };
 

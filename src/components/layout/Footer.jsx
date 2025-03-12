@@ -252,8 +252,8 @@ const Footer = () => {
                   }}
                 >
                   ReTech is a platform for buying, selling, and exchanging used
-                  electronics. Our mission is to reduce electronic waste and make
-                  technology more accessible to everyone.
+                  electronics. Our mission is to reduce electronic waste and
+                  make technology more accessible to everyone.
                 </Typography>
               </motion.div>
 
@@ -524,7 +524,6 @@ const Footer = () => {
                       </motion.div>
                     ) : null}
                   </AnimatePresence>
-
                   <TextField
                     variant="outlined"
                     placeholder="Your Email"
@@ -551,37 +550,32 @@ const Footer = () => {
                       },
                       bgcolor: "rgba(255, 255, 255, 0.1)",
                     }}
-                    InputProps={{
-                      endAdornment: (
-                        <Button
-                          type="submit"
-                          variant="contained"
-                          sx={{
-                            height: "100%",
-                            borderRadius: "0 8px 8px 0",
-                            px: 2,
-                            background:
-                              "linear-gradient(45deg, #3f51b5, #9c27b0)",
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              background:
-                                "linear-gradient(45deg, #303f9f, #7b1fa2)",
-                              transform: "translateX(2px)",
-                            },
-                          }}
-                        >
-                          <Send
-                            sx={{
-                              transition: "transform 0.3s ease",
-                              "&:hover": {
-                                transform: "translateX(2px)",
-                              },
-                            }}
-                          />
-                        </Button>
-                      ),
-                    }}
                   />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      height: "48px",
+                      minWidth: "48px",
+                      borderRadius: "0 8px 8px 0",
+                      px: 2,
+                      background: "linear-gradient(45deg, #3f51b5, #9c27b0)",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        background: "linear-gradient(45deg, #303f9f, #7b1fa2)",
+                        transform: "translateX(2px)",
+                      },
+                    }}
+                  >
+                    <Send
+                      sx={{
+                        transition: "transform 0.3s ease",
+                        "&:hover": {
+                          transform: "translateX(2px)",
+                        },
+                      }}
+                    />
+                  </Button>
                 </Box>
               </motion.div>
 
@@ -693,7 +687,8 @@ const Footer = () => {
               transform: "translateX(-50%)",
               width: "50px",
               height: "3px",
-              background: "linear-gradient(90deg, transparent, #6366f1, transparent)",
+              background:
+                "linear-gradient(90deg, transparent, #6366f1, transparent)",
               borderRadius: "3px",
             },
           }}

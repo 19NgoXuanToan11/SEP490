@@ -641,119 +641,7 @@ const ProductDetail = () => {
                   }
                 `}</style>
               </Box>
-
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: 16,
-                  transform: "translateY(-50%)",
-                  zIndex: 1,
-                }}
-              >
-                <IconButton
-                  sx={{
-                    bgcolor: "rgba(255, 255, 255, 0.9)",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-                    "&:hover": { bgcolor: "rgba(255, 255, 255, 1)" },
-                    transition: "all 0.2s ease",
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleImageNavigation(-1);
-                  }}
-                >
-                  <ArrowBack />
-                </IconButton>
-              </Box>
-
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  right: 16,
-                  transform: "translateY(-50%)",
-                  zIndex: 1,
-                }}
-              >
-                <IconButton
-                  sx={{
-                    bgcolor: "rgba(255, 255, 255, 0.9)",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-                    "&:hover": { bgcolor: "rgba(255, 255, 255, 1)" },
-                    transition: "all 0.2s ease",
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleImageNavigation(1);
-                  }}
-                >
-                  <ArrowForward />
-                </IconButton>
-              </Box>
-
-              <Box
-                sx={{
-                  position: "absolute",
-                  bottom: 16,
-                  left: 16,
-                  bgcolor: "rgba(0, 0, 0, 0.7)",
-                  color: "white",
-                  px: 1.5,
-                  py: 0.5,
-                  borderRadius: 2,
-                  fontSize: "0.75rem",
-                  fontWeight: 500,
-                  backdropFilter: "blur(4px)",
-                }}
-              >
-                {imageIndex + 1} / {product.images.length}
-              </Box>
             </Paper>
-
-            <Box
-              sx={{
-                display: "flex",
-                gap: 1.5,
-                flexWrap: "wrap",
-                justifyContent: "center",
-              }}
-            >
-              {product.images.map((image, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    width: 80,
-                    height: 60,
-                    borderRadius: 2,
-                    overflow: "hidden",
-                    border:
-                      index === imageIndex
-                        ? `2px solid ${theme.palette.primary.main}`
-                        : `1px solid ${alpha(theme.palette.divider, 0.3)}`,
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    opacity: index === imageIndex ? 1 : 0.7,
-                    "&:hover": {
-                      opacity: 1,
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                    },
-                  }}
-                  onClick={() => setImageIndex(index)}
-                >
-                  <img
-                    src={image}
-                    alt={`Thumbnail ${index + 1}`}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </Box>
-              ))}
-            </Box>
           </Grid>
 
           {/* Product Info */}
@@ -915,21 +803,6 @@ const ProductDetail = () => {
                   }}
                 >
                   {isFavorite ? <Favorite /> : <FavoriteBorder />}
-                </IconButton>
-
-                <IconButton
-                  onClick={handleShare}
-                  sx={{
-                    border: `1px solid ${theme.palette.divider}`,
-                    borderRadius: 2,
-                    transition: "all 0.2s ease",
-                    "&:hover": {
-                      transform: "scale(1.05)",
-                      boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                    },
-                  }}
-                >
-                  <Share />
                 </IconButton>
               </Box>
 
@@ -1995,49 +1868,6 @@ const ProductDetail = () => {
             >
               <ArrowForward />
             </IconButton>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 1.5,
-              p: 2,
-              bgcolor: "#f5f5f5",
-            }}
-          >
-            {product.images.map((image, index) => (
-              <Box
-                key={index}
-                sx={{
-                  width: 80,
-                  height: 60,
-                  borderRadius: 1,
-                  overflow: "hidden",
-                  border:
-                    index === imageIndex
-                      ? `2px solid ${theme.palette.primary.main}`
-                      : `1px solid ${theme.palette.divider}`,
-                  cursor: "pointer",
-                  opacity: index === imageIndex ? 1 : 0.6,
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    opacity: 1,
-                  },
-                }}
-                onClick={() => setImageIndex(index)}
-              >
-                <img
-                  src={image}
-                  alt={`Thumbnail ${index + 1}`}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-              </Box>
-            ))}
           </Box>
         </DialogContent>
       </Dialog>

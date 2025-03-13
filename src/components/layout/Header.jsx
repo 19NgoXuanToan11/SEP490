@@ -20,8 +20,13 @@ import {
   LightMode as SunIcon,
   Category,
   Favorite as HeartIcon,
+  Person as UserOutlined,
 } from "@mui/icons-material";
 import logo from "../../assets/pictures/logo/original.png";
+import UserDropdown from "../auth/UserDropdown";
+import { Box, IconButton } from "@mui/material";
+import { motion } from "framer-motion";
+import { Button } from "@mui/material";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -35,6 +40,8 @@ const Header = () => {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
+  const userMenuOpen = Boolean(userMenuAnchorEl);
 
   // Thay thế bằng trạng thái xác thực thực tế
   const isLoggedIn = true;
@@ -88,9 +95,15 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    // Xử lý logic đăng xuất ở đây
+    // Clear user data from localStorage
+    localStorage.removeItem("user");
+
+    // Trigger logout event for other tabs
+    const logoutEvent = new Date().getTime();
+    localStorage.setItem("logout_event", logoutEvent);
+
     console.log("Logging out...");
-    setProfileMenuOpen(false);
+    navigate("/");
   };
 
   const toggleDarkMode = () => {
@@ -104,6 +117,14 @@ const Header = () => {
 
   const toggleNotifications = () => {
     setNotificationsOpen(!notificationsOpen);
+  };
+
+  const handleUserMenuOpen = (event) => {
+    setUserMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setUserMenuAnchorEl(null);
   };
 
   const menuItems = [
@@ -415,115 +436,45 @@ const Header = () => {
                     </div>
                   </div>
 
-                  {/* User menu dropdown */}
-                  <div className="relative ml-1">
-                    <button
-                      onClick={toggleProfileMenu}
-                      className={`flex items-center rounded-full ${
-                        scrolled
-                          ? "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                          : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                      } p-1 pr-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300`}
-                    >
-                      <span className="sr-only">Open user menu</span>
-                      <div className="h-8 w-8 rounded-full overflow-hidden ring-2 ring-indigo-500/30 dark:ring-indigo-400/30 transition-all duration-300">
-                        <img
-                          className="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
-                          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                          alt=""
-                        />
-                      </div>
-                      <span className="hidden sm:flex ml-2 text-sm font-medium">
-                        User
-                      </span>
-                      <ChevronDownIcon
-                        className={`ml-1 h-4 w-4 transition-transform duration-300 ${
-                          profileMenuOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
+                  {/* User profile button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleUserMenuOpen}
+                    className="relative flex items-center space-x-2 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center text-white font-medium">
+                      {/* Display first letter of user's name */}
+                      {localStorage.getItem("user")
+                        ? JSON.parse(
+                            localStorage.getItem("user")
+                          )?.name?.charAt(0) ||
+                          JSON.parse(
+                            localStorage.getItem("user")
+                          )?.email?.charAt(0) ||
+                          "U"
+                        : "U"}
+                    </div>
+                  </motion.button>
 
-                    {profileMenuOpen && (
-                      <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl bg-white dark:bg-gray-800 shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-200 dark:divide-gray-700 overflow-hidden transform transition-all duration-300 ease-out">
-                        <div className="px-4 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white">
-                          <div className="flex items-center">
-                            <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-indigo-500 transition-all duration-300">
-                              <img
-                                className="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
-                                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                alt=""
-                              />
-                            </div>
-                            <div className="ml-3">
-                              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                                John Doe
-                              </p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                john.doe@example.com
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="py-1">
-                          <Link
-                            to="/profile"
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 group transition-colors duration-300"
-                          >
-                            <UserCircleIcon className="mr-3 h-5 w-5 text-indigo-500 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300" />
-                            Profile
-                          </Link>
-                          <Link
-                            to="/settings"
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 group transition-colors duration-300"
-                          >
-                            <CogIcon className="mr-3 h-5 w-5 text-indigo-500 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300" />
-                            Settings
-                          </Link>
-                          {isAdmin && (
-                            <Link
-                              to="/admin"
-                              className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 group transition-colors duration-300"
-                            >
-                              <ViewGridIcon className="mr-3 h-5 w-5 text-indigo-500 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300" />
-                              Admin Dashboard
-                            </Link>
-                          )}
-                          <button
-                            onClick={toggleDarkMode}
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left group transition-colors duration-300"
-                          >
-                            {darkMode ? (
-                              <SunIcon className="mr-3 h-5 w-5 text-amber-500 dark:text-amber-400 group-hover:scale-110 transition-transform duration-300" />
-                            ) : (
-                              <MoonIcon className="mr-3 h-5 w-5 text-indigo-500 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300" />
-                            )}
-                            {darkMode ? "Light Mode" : "Dark Mode"}
-                          </button>
-                        </div>
-                        <div className="py-1">
-                          <button
-                            onClick={handleLogout}
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left group transition-colors duration-300"
-                          >
-                            <LogoutIcon className="mr-3 h-5 w-5 text-red-500 dark:text-red-400 group-hover:scale-110 transition-transform duration-300" />
-                            Sign out
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  {/* User dropdown menu */}
+                  <UserDropdown
+                    anchorEl={userMenuAnchorEl}
+                    open={userMenuOpen}
+                    onClose={handleUserMenuClose}
+                    onLogout={handleLogout}
+                  />
                 </>
               ) : (
-                <>
-                  <Link
-                    to="/login"
-                    className={`flex items-center space-x-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400
-                             transition-colors duration-300 whitespace-nowrap text-base font-medium`}
-                  >
-                    <UserCircleIcon className="h-5 w-5" />
-                    <span>Login/Register</span>
-                  </Link>
-                </>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate("/login")}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+                >
+                  <UserOutlined />
+                  <span>Đăng nhập</span>
+                </motion.button>
               )}
 
               {/* Mobile menu button */}

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Container,
   Typography,
@@ -7,7 +9,6 @@ import {
   Paper,
   Button,
   TextField,
-  Divider,
   Card,
   CardMedia,
   CardContent,
@@ -18,53 +19,35 @@ import {
   Step,
   StepLabel,
   CircularProgress,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
+  FormControlLabel,
+  Checkbox,
+  useMediaQuery,
+  useTheme,
   Avatar,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Snackbar,
   Alert,
-  FormControlLabel,
-  Checkbox,
-  useMediaQuery,
-  useTheme,
-  Breadcrumbs,
-  Tabs,
-  Tab,
 } from "@mui/material";
 import {
   CompareArrows,
   Search,
   Add,
-  Delete,
   ArrowForward,
   Check,
   Close,
-  Message,
   Info,
-  Star,
   ArrowBack,
   AttachMoney,
   Send,
-  ShoppingCart,
-  Favorite,
-  FavoriteBorder,
-  Share,
-  LocalShipping,
-  Remove,
-  Description,
-  Person,
+  Star,
+  CheckCircle,
 } from "@mui/icons-material";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import Layout from "../components/layout/Layout";
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
 import { alpha } from "@mui/material/styles";
-import { motion, AnimatePresence } from "framer-motion";
 
 const Exchange = () => {
   const theme = useTheme();
@@ -95,9 +78,6 @@ const Exchange = () => {
     fair: false,
     difference: 0,
   });
-  const [tabValue, setTabValue] = useState(0);
-  const [reviewRating, setReviewRating] = useState(5);
-  const [reviewText, setReviewText] = useState("");
 
   const steps = [
     "Select Target Product",
@@ -132,11 +112,12 @@ const Exchange = () => {
                 Math.floor(Math.random() * 6)
               ],
               rating: (Math.random() * 2 + 3).toFixed(1), // Between 3 and 5
-              reviews: Math.floor(Math.random() * 100),
+              reviewCount: Math.floor(Math.random() * 100),
               seller: {
                 id: Math.floor(Math.random() * 100) + 1,
                 name: `Seller ${Math.floor(Math.random() * 100) + 1}`,
                 rating: (Math.random() * 2 + 3).toFixed(1), // Between 3 and 5
+                exchangeCount: Math.floor(Math.random() * 50),
               },
               condition: ["New", "Like New", "Good", "Fair"][
                 Math.floor(Math.random() * 4)
@@ -170,7 +151,7 @@ const Exchange = () => {
                 Math.floor(Math.random() * 6)
               ],
               rating: (Math.random() * 5).toFixed(1),
-              reviews: Math.floor(Math.random() * 100),
+              reviewCount: Math.floor(Math.random() * 100),
               condition: ["New", "Like New", "Good", "Fair"][
                 Math.floor(Math.random() * 4)
               ],
@@ -293,41 +274,41 @@ const Exchange = () => {
     });
   };
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-  };
-
-  const handleReviewSubmit = (e) => {
-    e.preventDefault();
-    if (reviewText.trim() === "") {
-      setSnackbar({
-        open: true,
-        message: "Please enter a review text",
-        severity: "error",
-      });
-      return;
-    }
-
-    // In a real app, you would submit the review to your API
-    // For now, we'll just show a snackbar and clear the form
-    setSnackbar({
-      open: true,
-      message: "Your review has been submitted",
-      severity: "success",
-    });
-    setReviewText("");
-    setReviewRating(5);
-  };
-
   const renderStepContent = (step) => {
     switch (step) {
       case 0:
         return (
-          <Box>
-            <Typography variant="h6" gutterBottom>
+          <Box
+            className="bg-[#1e2a3b] rounded-lg text-white p-6"
+            sx={{
+              transition: "all 0.3s ease",
+              "&:hover": {
+                boxShadow: "inset 0 0 20px rgba(99, 102, 241, 0.1)",
+              },
+            }}
+          >
+            <Typography
+              variant="h6"
+              gutterBottom
+              className="text-white"
+              sx={{
+                position: "relative",
+                display: "inline-block",
+                "&::after": {
+                  content: '""',
+                  position: "absolute",
+                  width: "30%",
+                  height: "3px",
+                  bottom: -5,
+                  left: 0,
+                  backgroundColor: "#6366f1",
+                  borderRadius: "2px",
+                },
+              }}
+            >
               Select a Product to Exchange For
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" paragraph className="text-gray-400">
               Browse products and select one that you'd like to propose an
               exchange for.
             </Typography>
@@ -335,11 +316,30 @@ const Exchange = () => {
               variant="contained"
               component={Link}
               to="/products"
-              sx={{ mb: 3 }}
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg transition-all mb-6 shadow-lg hover:shadow-indigo-500/50 transform hover:-translate-y-1 hover:scale-105"
+              sx={{
+                mb: 3,
+                position: "relative",
+                overflow: "hidden",
+                "&::after": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: "-100%",
+                  width: "100%",
+                  height: "100%",
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
+                  transition: "all 0.5s ease",
+                },
+                "&:hover::after": {
+                  left: "100%",
+                },
+              }}
             >
               Browse Products
             </Button>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" className="text-gray-400">
               Or, if you already know which product you want to exchange for,
               enter its ID below:
             </Typography>
@@ -348,9 +348,52 @@ const Exchange = () => {
                 label="Product ID"
                 variant="outlined"
                 size="small"
-                sx={{ mr: 2 }}
+                sx={{
+                  mr: 2,
+                  "& .MuiOutlinedInput-root": {
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      boxShadow: "0 0 0 2px rgba(99, 102, 241, 0.3)",
+                    },
+                    "&.Mui-focused": {
+                      boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.5)",
+                    },
+                  },
+                }}
+                className="bg-[#273548] rounded-lg"
+                InputProps={{
+                  className: "text-white",
+                }}
+                InputLabelProps={{
+                  className: "text-gray-400",
+                }}
               />
-              <Button variant="outlined">Find Product</Button>
+
+              <Button
+                variant="outlined"
+                className="border border-indigo-500 text-indigo-300 hover:bg-indigo-900/30 transition-all duration-300 hover:shadow-md hover:shadow-indigo-500/30 transform hover:-translate-y-1"
+                sx={{
+                  position: "relative",
+                  overflow: "hidden",
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    background: "rgba(99, 102, 241, 0.2)",
+                    transform: "scaleX(0)",
+                    transformOrigin: "left",
+                    transition: "transform 0.3s ease",
+                  },
+                  "&:hover::before": {
+                    transform: "scaleX(1)",
+                  },
+                }}
+              >
+                Find Product
+              </Button>
             </Box>
           </Box>
         );
@@ -358,13 +401,20 @@ const Exchange = () => {
       case 1:
         return (
           <Box>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom className="text-white">
               Choose Your Offer
             </Typography>
 
             {targetProduct && (
-              <Paper sx={{ p: 3, mb: 4 }}>
-                <Typography variant="subtitle1" gutterBottom>
+              <Paper
+                sx={{ p: 3, mb: 4 }}
+                className="bg-[#1e2a3b] rounded-lg border border-gray-800"
+              >
+                <Typography
+                  variant="subtitle1"
+                  gutterBottom
+                  className="text-gray-300"
+                >
                   You want to exchange for:
                 </Typography>
                 <Grid container spacing={3}>
@@ -372,14 +422,16 @@ const Exchange = () => {
                     <img
                       src={targetProduct.image}
                       alt={targetProduct.name}
-                      style={{ width: "100%", borderRadius: 8 }}
+                      className="w-full rounded-lg"
                     />
                   </Grid>
                   <Grid item xs={12} sm={8}>
-                    <Typography variant="h6">{targetProduct.name}</Typography>
+                    <Typography variant="h6" className="text-white">
+                      {targetProduct.name}
+                    </Typography>
                     <Typography
                       variant="body2"
-                      color="text.secondary"
+                      className="text-gray-400"
                       paragraph
                     >
                       {targetProduct.category} • {targetProduct.brand} •{" "}
@@ -394,16 +446,15 @@ const Exchange = () => {
                       />
                       <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{ ml: 1 }}
+                        className="text-gray-400 ml-1"
                       >
-                        ({targetProduct.reviews} reviews)
+                        ({targetProduct.reviewCount} reviews)
                       </Typography>
                     </Box>
-                    <Typography variant="h6" color="primary" gutterBottom>
+                    <Typography variant="h6" className="text-indigo-400 mb-2">
                       ${targetProduct.price.toFixed(2)}
                     </Typography>
-                    <Typography variant="body2">
+                    <Typography variant="body2" className="text-gray-300">
                       Seller: {targetProduct.seller.name}
                     </Typography>
                     <Button
@@ -412,6 +463,7 @@ const Exchange = () => {
                       component={Link}
                       to={`/products/${targetProduct.id}`}
                       sx={{ mt: 2 }}
+                      className="border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors"
                     >
                       View Details
                     </Button>
@@ -420,7 +472,7 @@ const Exchange = () => {
               </Paper>
             )}
 
-            <Typography variant="subtitle1" gutterBottom>
+            <Typography variant="subtitle1" gutterBottom className="text-white">
               Select one of your products to offer in exchange:
             </Typography>
 
@@ -429,17 +481,76 @@ const Exchange = () => {
               placeholder="Search your products..."
               value={searchQuery}
               onChange={handleSearchChange}
-              sx={{ mb: 3 }}
+              sx={{
+                mb: 3,
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#273548",
+                  borderRadius: "0.5rem",
+                  transition: "all 0.3s ease",
+                  border: "1px solid rgba(99, 102, 241, 0.3)",
+                  "&:hover": {
+                    boxShadow: "0 0 15px rgba(99, 102, 241, 0.3)",
+                    borderColor: "rgba(99, 102, 241, 0.5)",
+                  },
+                  "&.Mui-focused": {
+                    boxShadow: "0 0 20px rgba(99, 102, 241, 0.4)",
+                    borderColor: "#6366f1",
+                    backgroundColor: "#2d3c54",
+                  },
+                  "& fieldset": {
+                    borderColor: "transparent",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "transparent",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "transparent",
+                  },
+                },
+                "& .MuiInputBase-input": {
+                  padding: "12px 16px",
+                  fontSize: "1rem",
+                  color: "white",
+                  "&::placeholder": {
+                    color: "rgba(156, 163, 175, 0.8)",
+                    opacity: 1,
+                  },
+                },
+              }}
               InputProps={{
                 startAdornment: (
-                  <Search sx={{ color: "action.active", mr: 1 }} />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      mr: 1,
+                      animation: "pulse 2s infinite",
+                      "@keyframes pulse": {
+                        "0%": {
+                          opacity: 0.6,
+                        },
+                        "50%": {
+                          opacity: 1,
+                        },
+                        "100%": {
+                          opacity: 0.6,
+                        },
+                      },
+                    }}
+                  >
+                    <Search className="text-indigo-400" fontSize="medium" />
+                  </Box>
                 ),
+                className: "text-white",
               }}
             />
 
             {filteredProducts.length === 0 ? (
-              <Paper sx={{ p: 3, textAlign: "center" }}>
-                <Typography variant="body1" paragraph>
+              <Paper
+                sx={{ p: 3, textAlign: "center" }}
+                className="bg-[#1e2a3b] rounded-lg border border-gray-800"
+              >
+                <Typography variant="body1" paragraph className="text-gray-300">
                   No products found matching your search.
                 </Typography>
                 <Button
@@ -447,6 +558,7 @@ const Exchange = () => {
                   startIcon={<Add />}
                   component={Link}
                   to="/products/new"
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg transition-all"
                 >
                   Add New Product
                 </Button>
@@ -456,7 +568,7 @@ const Exchange = () => {
                 {filteredProducts.map((product) => (
                   <Grid item xs={12} sm={6} md={4} key={product.id}>
                     <motion.div
-                      whileHover={{ y: -10 }}
+                      whileHover={{ y: -8 }}
                       transition={{ type: "spring", stiffness: 300 }}
                     >
                       <Card
@@ -467,22 +579,39 @@ const Exchange = () => {
                           border:
                             selectedProduct?.id === product.id
                               ? "2px solid"
-                              : "none",
-                          borderColor: "primary.main",
-                          borderRadius: 3,
-                          overflow: "hidden",
-                          boxShadow:
+                              : "1px solid",
+                          borderColor:
                             selectedProduct?.id === product.id
-                              ? `0 8px 24px ${alpha(
-                                  theme.palette.primary.main,
-                                  0.4
-                                )}`
-                              : "0 4px 12px rgba(0,0,0,0.05)",
+                              ? "#6366f1"
+                              : "#1f2937",
                           transition: "all 0.3s ease",
+                          position: "relative",
+                          overflow: "hidden",
                           "&:hover": {
-                            boxShadow: "0 12px 28px rgba(0,0,0,0.15)",
+                            boxShadow:
+                              selectedProduct?.id === product.id
+                                ? "0 0 20px rgba(99, 102, 241, 0.5)"
+                                : "0 0 15px rgba(99, 102, 241, 0.3)",
+                          },
+                          "&::before": {
+                            content: '""',
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: "4px",
+                            background:
+                              selectedProduct?.id === product.id
+                                ? "linear-gradient(90deg, #6366f1, #a855f7)"
+                                : "transparent",
+                            opacity: selectedProduct?.id === product.id ? 1 : 0,
+                            transition: "opacity 0.3s ease",
+                          },
+                          "&:hover::before": {
+                            opacity: 1,
                           },
                         }}
+                        className="bg-[#1e2a3b] rounded-lg overflow-hidden"
                         onClick={() => handleSelectProduct(product)}
                       >
                         <Box sx={{ position: "relative" }}>
@@ -516,45 +645,68 @@ const Exchange = () => {
                               top: 10,
                               right: 10,
                               fontWeight: 500,
-                              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                              boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
                             }}
+                            className="shadow-lg"
                           />
                         </Box>
-                        <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
-                          <Typography
-                            variant="h6"
-                            component="div"
-                            noWrap
+
+                        <CardContent
+                          sx={{
+                            flexGrow: 1,
+                            p: 2.5,
+                            background:
+                              selectedProduct?.id === product.id
+                                ? "linear-gradient(180deg, rgba(99, 102, 241, 0.1), transparent)"
+                                : "transparent",
+                          }}
+                        >
+                          <Box
                             sx={{
-                              fontWeight: 600,
-                              fontSize: "1rem",
-                              mb: 0.5,
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                              mb: 1.5,
+                              flexWrap: "wrap",
                             }}
                           >
-                            {product.name}
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            gutterBottom
-                            sx={{ mb: 1.5 }}
-                          >
-                            {product.category} • {product.brand}
-                          </Typography>
+                            <Chip
+                              label={product.category}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: "0.7rem",
+                                backgroundColor: "rgba(99, 102, 241, 0.2)",
+                                color: "#a5b4fc",
+                              }}
+                            />
+                            <Chip
+                              label={product.brand}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: "0.7rem",
+                                backgroundColor: "rgba(99, 102, 241, 0.1)",
+                                color: "#a5b4fc",
+                              }}
+                            />
+                          </Box>
+
                           <Typography
                             variant="h6"
-                            color="primary"
+                            className="text-indigo-400"
                             gutterBottom
                             sx={{
                               fontWeight: 700,
                               display: "flex",
                               alignItems: "center",
                               gap: 0.5,
+                              mb: 1.5,
                             }}
                           >
-                            <AttachMoney sx={{ fontSize: 20 }} />
-                            {product.price.toFixed(2)}
+                            $ {product.price.toFixed(2)}
                           </Typography>
+
                           <Box
                             sx={{
                               display: "flex",
@@ -567,16 +719,21 @@ const Exchange = () => {
                               precision={0.5}
                               size="small"
                               readOnly
+                              sx={{
+                                "& .MuiRating-iconFilled": {
+                                  color: "#f59e0b",
+                                },
+                              }}
                             />
                             <Typography
                               variant="body2"
-                              color="text.secondary"
-                              sx={{ ml: 1 }}
+                              className="text-gray-400 ml-1"
                             >
-                              ({product.reviews})
+                              ({product.reviewCount})
                             </Typography>
                           </Box>
                         </CardContent>
+
                         <CardActions sx={{ p: 2, pt: 0 }}>
                           <Button
                             size="medium"
@@ -592,7 +749,45 @@ const Exchange = () => {
                               py: 1,
                               textTransform: "none",
                               fontWeight: 600,
+                              position: "relative",
+                              overflow: "hidden",
+                              transition: "all 0.3s ease",
+                              "&::after": {
+                                content: '""',
+                                position: "absolute",
+                                top: 0,
+                                left: "-100%",
+                                width: "100%",
+                                height: "100%",
+                                background:
+                                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
+                                transition: "all 0.5s ease",
+                              },
+                              "&:hover": {
+                                transform: "translateY(-2px)",
+                                boxShadow:
+                                  selectedProduct?.id === product.id
+                                    ? "0 5px 15px rgba(99, 102, 241, 0.4)"
+                                    : "0 5px 15px rgba(31, 41, 55, 0.4)",
+                              },
+                              "&:hover::after": {
+                                left: "100%",
+                              },
+                              backgroundColor:
+                                selectedProduct?.id === product.id
+                                  ? "#4f46e5"
+                                  : "transparent",
                             }}
+                            className={
+                              selectedProduct?.id === product.id
+                                ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                                : "border border-indigo-500 text-indigo-300 hover:bg-indigo-900/30"
+                            }
+                            startIcon={
+                              selectedProduct?.id === product.id ? (
+                                <CheckCircle />
+                              ) : null
+                            }
                           >
                             {selectedProduct?.id === product.id
                               ? "Selected"
@@ -612,22 +807,46 @@ const Exchange = () => {
                   <Checkbox
                     checked={cashOption}
                     onChange={handleCashOptionChange}
+                    className="text-indigo-400"
                   />
                 }
                 label="Add cash to your offer"
+                className="text-white font-medium"
+                sx={{
+                  "& .MuiFormControlLabel-label": {
+                    color: "white",
+                    fontWeight: 500,
+                  },
+                }}
               />
 
               {cashOption && (
                 <TextField
                   label="Additional Cash Amount ($)"
-                  type="number"
+                  type="text"
                   value={additionalCash}
                   onChange={handleAdditionalCashChange}
                   fullWidth
-                  sx={{ mt: 2 }}
+                  sx={{
+                    mt: 2,
+                    "& .MuiInputLabel-root": {
+                      color: "rgba(255, 255, 255, 0.7)",
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "white",
+                    },
+                  }}
                   InputProps={{
                     inputProps: { min: 0 },
+                    className: "text-white",
+                    sx: {
+                      "&::placeholder": {
+                        color: "white",
+                        opacity: 0.7,
+                      },
+                    },
                   }}
+                  className="bg-[#273548] rounded-lg"
                 />
               )}
             </Box>
@@ -637,7 +856,7 @@ const Exchange = () => {
       case 2:
         return (
           <Box>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom className="text-white">
               Review & Submit Your Exchange Proposal
             </Typography>
 
@@ -649,151 +868,79 @@ const Exchange = () => {
                     p: 3,
                     height: "100%",
                     borderRadius: 3,
-                    background: `linear-gradient(135deg, ${alpha(
-                      theme.palette.background.paper,
-                      0.9
-                    )}, ${alpha(theme.palette.background.paper, 0.7)})`,
-                    backdropFilter: "blur(20px)",
-                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                    boxShadow: "0 10px 40px rgba(0,0,0,0.08)",
-                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                    "&:hover": {
-                      transform: "translateY(-5px)",
-                      boxShadow: "0 15px 50px rgba(0,0,0,0.12)",
-                    },
+                    backgroundColor: "#1e2a3b",
+                    border: "1px solid #1f2937",
                   }}
                 >
                   <Typography
                     variant="subtitle1"
                     gutterBottom
                     fontWeight="600"
-                    color="secondary.main"
+                    className="text-indigo-400"
                   >
                     Your Offer:
                   </Typography>
                   {selectedProduct ? (
                     <Box>
-                      <Box
-                        sx={{
-                          position: "relative",
-                          borderRadius: 3,
-                          overflow: "hidden",
-                          mb: 2,
-                          boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
+                      <img
+                        src={selectedProduct.image}
+                        alt={selectedProduct.name}
+                        style={{
+                          width: "100%",
+                          borderRadius: "8px",
+                          marginBottom: "16px",
                         }}
+                      />
+                      <Typography
+                        variant="h6"
+                        className="text-white"
+                        gutterBottom
                       >
-                        <img
-                          src={selectedProduct.image}
-                          alt={selectedProduct.name}
-                          style={{
-                            width: "100%",
-                            aspectRatio: "4/3",
-                            objectFit: "cover",
+                        {selectedProduct.name}
+                      </Typography>
+                      <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+                        <Chip
+                          label={selectedProduct.category}
+                          size="small"
+                          sx={{
+                            height: 24,
+                            fontSize: "0.75rem",
+                            backgroundColor: "rgba(99, 102, 241, 0.2)",
+                            color: "#a5b4fc",
                           }}
                         />
-                        <Box
+                        <Chip
+                          label={selectedProduct.brand}
+                          size="small"
                           sx={{
-                            position: "absolute",
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            p: 1.5,
-                            background:
-                              "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))",
+                            height: 24,
+                            fontSize: "0.75rem",
+                            backgroundColor: "rgba(99, 102, 241, 0.1)",
+                            color: "#a5b4fc",
                           }}
-                        >
-                          <Typography
-                            variant="subtitle1"
-                            color="white"
-                            fontWeight="600"
-                          >
-                            {selectedProduct.name}
-                          </Typography>
-                          <Box sx={{ display: "flex", gap: 0.5 }}>
-                            <Chip
-                              label={selectedProduct.category}
-                              size="small"
-                              sx={{
-                                borderRadius: 1,
-                                height: 20,
-                                fontSize: "0.7rem",
-                                backgroundColor: "rgba(255,255,255,0.3)",
-                                color: "white",
-                              }}
-                            />
-                            <Chip
-                              label={selectedProduct.condition}
-                              size="small"
-                              sx={{
-                                borderRadius: 1,
-                                height: 20,
-                                fontSize: "0.7rem",
-                                backgroundColor: "rgba(255,255,255,0.3)",
-                                color: "white",
-                              }}
-                            />
-                          </Box>
-                        </Box>
+                        />
                       </Box>
-
-                      <Box sx={{ mb: 2 }}>
+                      <Typography
+                        variant="h6"
+                        className="text-indigo-400"
+                        gutterBottom
+                      >
+                        $ {selectedProduct.price.toFixed(2)}
+                      </Typography>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 2 }}
+                      >
+                        <Rating
+                          value={parseFloat(selectedProduct.rating)}
+                          precision={0.5}
+                          size="small"
+                          readOnly
+                        />
                         <Typography
                           variant="body2"
-                          color="text.secondary"
-                          paragraph
+                          className="text-gray-400 ml-1"
                         >
-                          {selectedProduct.description.length > 120
-                            ? `${selectedProduct.description.substring(
-                                0,
-                                120
-                              )}...`
-                            : selectedProduct.description}
-                        </Typography>
-
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            gap: 0.5,
-                            mb: 1,
-                          }}
-                        >
-                          {selectedProduct.features.map((feature, index) => (
-                            <Typography
-                              key={index}
-                              variant="body2"
-                              sx={{ display: "flex", alignItems: "center" }}
-                            >
-                              <Check
-                                sx={{
-                                  fontSize: 16,
-                                  mr: 0.5,
-                                  color: "success.main",
-                                }}
-                              />
-                              {feature}
-                            </Typography>
-                          ))}
-                        </Box>
-                      </Box>
-
-                      <Box
-                        sx={{
-                          p: 2,
-                          bgcolor: alpha(theme.palette.background.paper, 0.5),
-                          borderRadius: 2,
-                          mb: 2,
-                        }}
-                      >
-                        <Typography variant="subtitle2" gutterBottom>
-                          Giá trị sản phẩm:
-                        </Typography>
-                        <Typography
-                          variant="h5"
-                          color="primary"
-                          fontWeight="600"
-                        >
-                          ${selectedProduct.price.toFixed(2)}
+                          ({selectedProduct.reviewCount})
                         </Typography>
                       </Box>
 
@@ -802,54 +949,31 @@ const Exchange = () => {
                           sx={{
                             mt: 2,
                             p: 2,
-                            bgcolor: alpha(theme.palette.success.main, 0.1),
                             borderRadius: 2,
-                            border: `1px solid ${alpha(
-                              theme.palette.success.main,
-                              0.2
-                            )}`,
+                            backgroundColor: "rgba(16, 185, 129, 0.1)",
+                            border: "1px solid rgba(16, 185, 129, 0.3)",
                           }}
                         >
-                          <Typography variant="subtitle2" gutterBottom>
-                            Tiền mặt bổ sung:
+                          <Typography
+                            variant="subtitle2"
+                            gutterBottom
+                            className="text-gray-300"
+                          >
+                            Additional Cash:
                           </Typography>
                           <Typography
-                            variant="h5"
-                            color="success.main"
+                            variant="h6"
+                            className="text-green-400"
                             fontWeight="600"
                           >
                             + ${additionalCash.toFixed(2)}
                           </Typography>
                         </Box>
                       )}
-
-                      <Box
-                        sx={{
-                          mt: 3,
-                          p: 2,
-                          bgcolor: alpha(theme.palette.primary.main, 0.1),
-                          borderRadius: 2,
-                          border: `1px solid ${alpha(
-                            theme.palette.primary.main,
-                            0.2
-                          )}`,
-                        }}
-                      >
-                        <Typography variant="subtitle2" gutterBottom>
-                          Tổng giá trị đề xuất:
-                        </Typography>
-                        <Typography
-                          variant="h4"
-                          color="primary.dark"
-                          fontWeight="700"
-                        >
-                          ${(selectedProduct.price + additionalCash).toFixed(2)}
-                        </Typography>
-                      </Box>
                     </Box>
                   ) : (
                     <Typography variant="body1" color="error" sx={{ mt: 2 }}>
-                      Please go back and select a product to recommend.
+                      Please go back and select a product to offer.
                     </Typography>
                   )}
                 </Paper>
@@ -868,71 +992,20 @@ const Exchange = () => {
                 <Box
                   sx={{
                     display: "flex",
-                    flexDirection: isMobile ? "row" : "column",
+                    flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
                     height: "100%",
                   }}
                 >
-                  <Paper
-                    elevation={0}
+                  <CompareArrows
                     sx={{
-                      p: 2,
-                      borderRadius: "50%",
-                      bgcolor: alpha(theme.palette.background.paper, 0.7),
-                      backdropFilter: "blur(10px)",
-                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: 60,
-                      height: 60,
+                      fontSize: 36,
+                      color: "#6366f1",
+                      transform: "rotate(90deg)",
+                      mb: 2,
                     }}
-                  >
-                    <CompareArrows
-                      sx={{
-                        fontSize: 30,
-                        transform: isMobile ? "none" : "rotate(90deg)",
-                        color: theme.palette.text.secondary,
-                      }}
-                    />
-                  </Paper>
-
-                  {exchangeValue.fair && (
-                    <Chip
-                      label="Đề xuất công bằng"
-                      color="success"
-                      sx={{
-                        mt: 2,
-                        fontWeight: 500,
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      }}
-                    />
-                  )}
-
-                  {!exchangeValue.fair && exchangeValue.difference > 0 && (
-                    <Chip
-                      label="Đề xuất cao hơn"
-                      color="info"
-                      sx={{
-                        mt: 2,
-                        fontWeight: 500,
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      }}
-                    />
-                  )}
-
-                  {!exchangeValue.fair && exchangeValue.difference < 0 && (
-                    <Chip
-                      label="Đề xuất thấp hơn"
-                      color="warning"
-                      sx={{
-                        mt: 2,
-                        fontWeight: 500,
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      }}
-                    />
-                  )}
+                  />
                 </Box>
               </Grid>
 
@@ -943,172 +1016,80 @@ const Exchange = () => {
                     p: 3,
                     height: "100%",
                     borderRadius: 3,
-                    background: `linear-gradient(135deg, ${alpha(
-                      theme.palette.secondary.light,
-                      0.1
-                    )}, ${alpha(theme.palette.secondary.main, 0.05)})`,
-                    backdropFilter: "blur(10px)",
-                    border: `1px solid ${alpha(
-                      theme.palette.secondary.main,
-                      0.1
-                    )}`,
+                    backgroundColor: "#1e2a3b",
+                    border: "1px solid #1f2937",
                   }}
                 >
                   <Typography
                     variant="subtitle1"
                     gutterBottom
                     fontWeight="600"
-                    color="secondary.main"
+                    className="text-indigo-400"
                   >
-                    In exchange:
+                    In exchange for:
                   </Typography>
                   {targetProduct ? (
                     <Box>
-                      <Box
-                        sx={{
-                          position: "relative",
-                          borderRadius: 3,
-                          overflow: "hidden",
-                          mb: 2,
-                          boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
+                      <img
+                        src={targetProduct.image}
+                        alt={targetProduct.name}
+                        style={{
+                          width: "100%",
+                          borderRadius: "8px",
+                          marginBottom: "16px",
                         }}
+                      />
+                      <Typography
+                        variant="h6"
+                        className="text-white"
+                        gutterBottom
                       >
-                        <img
-                          src={targetProduct.image}
-                          alt={targetProduct.name}
-                          style={{
-                            width: "100%",
-                            aspectRatio: "4/3",
-                            objectFit: "cover",
+                        {targetProduct.name}
+                      </Typography>
+                      <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+                        <Chip
+                          label={targetProduct.category}
+                          size="small"
+                          sx={{
+                            height: 24,
+                            fontSize: "0.75rem",
+                            backgroundColor: "rgba(99, 102, 241, 0.2)",
+                            color: "#a5b4fc",
                           }}
                         />
-                        <Box
+                        <Chip
+                          label={targetProduct.brand}
+                          size="small"
                           sx={{
-                            position: "absolute",
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            p: 1.5,
-                            background:
-                              "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))",
+                            height: 24,
+                            fontSize: "0.75rem",
+                            backgroundColor: "rgba(99, 102, 241, 0.1)",
+                            color: "#a5b4fc",
                           }}
-                        >
-                          <Typography
-                            variant="subtitle1"
-                            color="white"
-                            fontWeight="600"
-                          >
-                            {targetProduct.name}
-                          </Typography>
-                          <Box sx={{ display: "flex", gap: 0.5 }}>
-                            <Chip
-                              label={targetProduct.category}
-                              size="small"
-                              sx={{
-                                borderRadius: 1,
-                                height: 20,
-                                fontSize: "0.7rem",
-                                backgroundColor: "rgba(255,255,255,0.3)",
-                                color: "white",
-                              }}
-                            />
-                            <Chip
-                              label={targetProduct.condition}
-                              size="small"
-                              sx={{
-                                borderRadius: 1,
-                                height: 20,
-                                fontSize: "0.7rem",
-                                backgroundColor: "rgba(255,255,255,0.3)",
-                                color: "white",
-                              }}
-                            />
-                          </Box>
-                        </Box>
+                        />
                       </Box>
-
-                      <Box sx={{ mb: 2 }}>
+                      <Typography
+                        variant="h6"
+                        className="text-indigo-400"
+                        gutterBottom
+                      >
+                        $ {targetProduct.price.toFixed(2)}
+                      </Typography>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 2 }}
+                      >
+                        <Rating
+                          value={parseFloat(targetProduct.rating)}
+                          precision={0.5}
+                          size="small"
+                          readOnly
+                        />
                         <Typography
                           variant="body2"
-                          color="text.secondary"
-                          paragraph
+                          className="text-gray-400 ml-1"
                         >
-                          {targetProduct.description.length > 120
-                            ? `${targetProduct.description.substring(
-                                0,
-                                120
-                              )}...`
-                            : targetProduct.description}
+                          ({targetProduct.reviewCount})
                         </Typography>
-
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            gap: 0.5,
-                            mb: 1,
-                          }}
-                        >
-                          {targetProduct.features.map((feature, index) => (
-                            <Typography
-                              key={index}
-                              variant="body2"
-                              sx={{ display: "flex", alignItems: "center" }}
-                            >
-                              <Check
-                                sx={{
-                                  fontSize: 16,
-                                  mr: 0.5,
-                                  color: "success.main",
-                                }}
-                              />
-                              {feature}
-                            </Typography>
-                          ))}
-                        </Box>
-                      </Box>
-
-                      <Box
-                        sx={{
-                          p: 2,
-                          bgcolor: alpha(theme.palette.background.paper, 0.5),
-                          borderRadius: 2,
-                          mb: 2,
-                        }}
-                      >
-                        <Typography variant="subtitle2" gutterBottom>
-                          Giá trị sản phẩm:
-                        </Typography>
-                        <Typography
-                          variant="h5"
-                          color="secondary"
-                          fontWeight="600"
-                        >
-                          ${targetProduct.price.toFixed(2)}
-                        </Typography>
-                      </Box>
-
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", mt: 3 }}
-                      >
-                        <Avatar
-                          src={targetProduct.seller.avatar}
-                          sx={{ width: 40, height: 40, mr: 1.5 }}
-                        />
-                        <Box>
-                          <Typography variant="body1" fontWeight="500">
-                            {targetProduct.seller.name}
-                          </Typography>
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <Star
-                              sx={{ color: "#FFB400", fontSize: 16, mr: 0.5 }}
-                            />
-                            <Typography variant="body2" color="text.secondary">
-                              {targetProduct.seller.rating} •{" "}
-                              {targetProduct.seller.exchangeCount} trao đổi
-                            </Typography>
-                          </Box>
-                        </Box>
                       </Box>
                     </Box>
                   ) : (
@@ -1126,18 +1107,18 @@ const Exchange = () => {
                 p: 3,
                 mt: 4,
                 borderRadius: 3,
-                background: `linear-gradient(135deg, ${alpha(
-                  theme.palette.background.paper,
-                  0.9
-                )}, ${alpha(theme.palette.background.paper, 0.7)})`,
-                backdropFilter: "blur(10px)",
-                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                backgroundColor: "#1e2a3b",
+                border: "1px solid #1f2937",
               }}
             >
-              <Typography variant="subtitle1" gutterBottom fontWeight="600">
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                className="text-white"
+              >
                 Add message (Optional):
               </Typography>
-              <Typography variant="body2" color="text.secondary" paragraph>
+              <Typography variant="body2" className="text-gray-400" paragraph>
                 Explain why you think this is a fair exchange, or provide more
                 information about your proposal.
               </Typography>
@@ -1151,6 +1132,10 @@ const Exchange = () => {
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: 2,
+                    backgroundColor: "#273548",
+                  },
+                  "& .MuiOutlinedInput-input": {
+                    color: "white",
                   },
                 }}
               />
@@ -1161,17 +1146,22 @@ const Exchange = () => {
                 mt: 4,
                 p: 3,
                 borderRadius: 3,
-                bgcolor: alpha(theme.palette.info.main, 0.1),
-                border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
+                backgroundColor: "rgba(30, 58, 138, 0.3)",
+                border: "1px solid rgba(30, 64, 175, 0.5)",
               }}
             >
               <Box sx={{ display: "flex", alignItems: "flex-start" }}>
-                <Info sx={{ color: "info.main", mr: 2, mt: 0.5 }} />
+                <Info sx={{ mr: 2, mt: 0.5 }} className="text-blue-400" />
                 <Box>
-                  <Typography variant="subtitle2" fontWeight="600" gutterBottom>
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight="600"
+                    gutterBottom
+                    className="text-white"
+                  >
                     Terms of exchange
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" className="text-gray-300">
                     By submitting this proposal, you agree to our terms and
                     conditions of exchange. The other party will have 7 days to
                     respond to your proposal. If accepted, you will be guided on
@@ -1190,96 +1180,93 @@ const Exchange = () => {
 
   if (loading) {
     return (
-      <Layout>
-        <Container maxWidth="lg" sx={{ py: 8 }}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              minHeight: "60vh",
-            }}
-          >
-            <CircularProgress size={60} thickness={4} />
-            <Typography variant="h6" sx={{ mt: 3, fontWeight: 500 }}>
-              Loading exchange data...
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Please wait a moment
-            </Typography>
-          </Box>
-        </Container>
-      </Layout>
+      <>
+        <Header />
+        <Box className="bg-[#121a29] min-h-screen">
+          <Container maxWidth="lg" sx={{ py: 8 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: "60vh",
+              }}
+            >
+              <CircularProgress
+                size={60}
+                thickness={4}
+                className="text-indigo-500"
+              />
+              <Typography
+                variant="h6"
+                sx={{ mt: 3, fontWeight: 500 }}
+                className="text-white"
+              >
+                Loading exchange data...
+              </Typography>
+              <Typography
+                variant="body2"
+                className="text-gray-400"
+                sx={{ mt: 1 }}
+              >
+                Please wait a moment
+              </Typography>
+            </Box>
+          </Container>
+        </Box>
+        <Footer />
+      </>
     );
   }
 
   if (error) {
     return (
-      <Layout>
-        <Container maxWidth="lg" sx={{ py: 8 }}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 4,
-              borderRadius: 3,
-              textAlign: "center",
-              border: `1px solid ${theme.palette.divider}`,
-            }}
-          >
-            <Typography color="error" variant="h6" sx={{ mb: 2 }}>
-              {error}
-            </Typography>
-            <Typography color="text.secondary" paragraph>
-              Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau.
-            </Typography>
-            <Button
-              component={Link}
-              to="/products"
-              variant="contained"
+      <>
+        <Header />
+        <Box className="bg-[#121a29] min-h-screen">
+          <Container maxWidth="lg" sx={{ py: 8 }}>
+            <Paper
+              elevation={0}
               sx={{
-                mt: 2,
-                borderRadius: 2,
-                px: 3,
-                py: 1,
+                p: 4,
+                borderRadius: 3,
+                textAlign: "center",
               }}
+              className="bg-[#1e2a3b] border border-gray-800"
             >
-              Quay lại Sản phẩm
-            </Button>
-          </Paper>
-        </Container>
-      </Layout>
+              <Typography color="error" variant="h6" sx={{ mb: 2 }}>
+                {error}
+              </Typography>
+              <Typography className="text-gray-400" paragraph>
+                An error occurred while loading data. Please try again later.
+              </Typography>
+              <Button
+                component={Link}
+                to="/products"
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1,
+                }}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+              >
+                Back to Products
+              </Button>
+            </Paper>
+          </Container>
+        </Box>
+        <Footer />
+      </>
     );
   }
 
   return (
-    <Layout>
-      <Box
-        sx={{
-          position: "relative",
-          overflow: "hidden",
-          pb: 8,
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: "100%",
-            backgroundImage: `radial-gradient(circle at 30% 20%, ${alpha(
-              theme.palette.primary.main,
-              0.15
-            )}, transparent 25%), 
-                          radial-gradient(circle at 70% 60%, ${alpha(
-                            theme.palette.secondary.main,
-                            0.1
-                          )}, transparent 25%)`,
-            backgroundSize: "100% 100%",
-            opacity: 0.8,
-            zIndex: -1,
-          },
-        }}
-      >
+    <>
+      <Header />
+      <Box className="bg-[#121a29] min-h-screen">
         <Container maxWidth="lg" sx={{ py: 4 }}>
           <Box
             sx={{
@@ -1294,22 +1281,14 @@ const Exchange = () => {
               component="h1"
               align="center"
               fontWeight="800"
-              sx={{
-                mb: 2,
-                background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
-                backgroundClip: "text",
-                textFillColor: "transparent",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                letterSpacing: "-0.5px",
-                textShadow: "0 2px 10px rgba(0,0,0,0.08)",
-              }}
+              sx={{ mb: 2 }}
+              className="bg-gradient-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent"
             >
               Proposed Exchange
             </Typography>
             <Typography
               variant="subtitle1"
-              color="text.secondary"
+              className="text-gray-400"
               align="center"
               sx={{
                 maxWidth: 600,
@@ -1331,13 +1310,17 @@ const Exchange = () => {
                 "& .MuiStepLabel-label": {
                   mt: 1,
                   fontWeight: 500,
+                  color: "white",
                 },
                 "& .MuiStepIcon-root": {
                   fontSize: 36,
-                  filter: "drop-shadow(0 2px 5px rgba(0,0,0,0.1))",
                   transition: "all 0.3s ease",
                   "&.Mui-active": {
                     transform: "scale(1.2)",
+                    color: "#6366f1",
+                  },
+                  "&.Mui-completed": {
+                    color: "#6366f1",
                   },
                 },
                 "& .MuiStepIcon-text": {
@@ -1348,11 +1331,11 @@ const Exchange = () => {
                 "& .MuiStepConnector-line": {
                   borderTopWidth: 3,
                   borderRadius: 1,
-                  borderColor: alpha(theme.palette.primary.main, 0.3),
+                  borderColor: "rgba(99, 102, 241, 0.3)",
                 },
                 "& .MuiStepConnector-root.Mui-active .MuiStepConnector-line, & .MuiStepConnector-root.Mui-completed .MuiStepConnector-line":
                   {
-                    borderColor: theme.palette.primary.main,
+                    borderColor: "#6366f1",
                   },
               }}
             >
@@ -1362,6 +1345,9 @@ const Exchange = () => {
                     <Typography
                       variant="body2"
                       fontWeight={activeStep >= index ? 600 : 400}
+                      className={
+                        activeStep >= index ? "text-white" : "text-gray-500"
+                      }
                     >
                       {label}
                     </Typography>
@@ -1371,20 +1357,7 @@ const Exchange = () => {
             </Stepper>
           </Box>
 
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 2, sm: 4 },
-              borderRadius: 4,
-              background: `linear-gradient(135deg, ${alpha(
-                theme.palette.background.paper,
-                0.9
-              )}, ${alpha(theme.palette.background.paper, 0.7)})`,
-              backdropFilter: "blur(10px)",
-              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-              boxShadow: "0 10px 40px rgba(0,0,0,0.07)",
-            }}
-          >
+          <Box className="bg-[#1e2a3b] border border-gray-800 rounded-lg p-4 md:p-6">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStep}
@@ -1418,10 +1391,18 @@ const Exchange = () => {
                   fontWeight: 600,
                   boxShadow: "none",
                   borderWidth: "1.5px",
-                  "&:hover": {
+                  transition: "all 0.3s ease",
+                  "&:hover:not(:disabled)": {
                     borderWidth: "1.5px",
+                    transform: "translateX(-5px)",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
                   },
                 }}
+                className={
+                  activeStep === 0
+                    ? "border-gray-700 text-gray-500"
+                    : "border-indigo-500 text-indigo-300 hover:bg-indigo-900/30"
+                }
               >
                 Back
               </Button>
@@ -1437,14 +1418,29 @@ const Exchange = () => {
                     py: 1.2,
                     textTransform: "none",
                     fontWeight: 600,
-                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                     transition: "all 0.3s ease",
+                    position: "relative",
+                    overflow: "hidden",
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      top: 0,
+                      left: "-100%",
+                      width: "100%",
+                      height: "100%",
+                      background:
+                        "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
+                      transition: "all 0.5s ease",
+                    },
                     "&:hover": {
-                      boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
-                      transform: "translateY(-2px)",
+                      transform: "translateY(-3px) translateX(3px)",
+                      boxShadow: "0 10px 25px -5px rgba(99, 102, 241, 0.4)",
+                    },
+                    "&:hover::after": {
+                      left: "100%",
                     },
                   }}
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg"
                 >
                   Submit Exchange Proposal
                 </Button>
@@ -1459,24 +1455,39 @@ const Exchange = () => {
                     py: 1.2,
                     textTransform: "none",
                     fontWeight: 600,
-                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                     transition: "all 0.3s ease",
+                    position: "relative",
+                    overflow: "hidden",
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      top: 0,
+                      left: "-100%",
+                      width: "100%",
+                      height: "100%",
+                      background:
+                        "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
+                      transition: "all 0.5s ease",
+                    },
                     "&:hover": {
-                      boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
-                      transform: "translateY(-2px)",
+                      transform: "translateY(-3px) translateX(3px)",
+                      boxShadow: "0 10px 25px -5px rgba(99, 102, 241, 0.4)",
+                    },
+                    "&:hover::after": {
+                      left: "100%",
                     },
                   }}
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg"
                 >
                   Continue
                 </Button>
               )}
             </Box>
-          </Paper>
+          </Box>
         </Container>
       </Box>
 
-      {/* Hộp thoại xác nhận */}
+      {/* Confirmation Dialog */}
       <Dialog
         open={dialogOpen}
         onClose={handleCloseDialog}
@@ -1485,13 +1496,8 @@ const Exchange = () => {
         PaperProps={{
           sx: {
             borderRadius: 3,
-            boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
-            background: `linear-gradient(135deg, ${alpha(
-              theme.palette.background.paper,
-              0.95
-            )}, ${alpha(theme.palette.background.paper, 0.9)})`,
-            backdropFilter: "blur(10px)",
           },
+          className: "bg-[#1e2a3b] border border-gray-800",
         }}
       >
         <DialogTitle
@@ -1502,11 +1508,17 @@ const Exchange = () => {
             fontWeight: 700,
             fontSize: "1.5rem",
           }}
+          className="text-white"
         >
           Confirm Exchange Proposal
         </DialogTitle>
         <DialogContent sx={{ px: 4 }}>
-          <Typography variant="body1" align="center" paragraph>
+          <Typography
+            variant="body1"
+            align="center"
+            paragraph
+            className="text-gray-300"
+          >
             Are you sure you want to submit this exchange proposal? Once
             submitted, the other party will be notified and can accept or
             decline your offer.
@@ -1529,16 +1541,20 @@ const Exchange = () => {
                   width: 80,
                   height: 80,
                   mx: "auto",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                   borderRadius: 2,
                 }}
+                className="shadow-lg"
               />
-              <Typography variant="body2" sx={{ mt: 1, fontWeight: 500 }}>
+              <Typography
+                variant="body2"
+                sx={{ mt: 1, fontWeight: 500 }}
+                className="text-gray-300"
+              >
                 Your Product
               </Typography>
             </Box>
 
-            <CompareArrows sx={{ fontSize: 30, color: "text.secondary" }} />
+            <CompareArrows sx={{ fontSize: 30 }} className="text-gray-400" />
 
             <Box sx={{ textAlign: "center" }}>
               <Avatar
@@ -1548,11 +1564,15 @@ const Exchange = () => {
                   width: 80,
                   height: 80,
                   mx: "auto",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                   borderRadius: 2,
                 }}
+                className="shadow-lg"
               />
-              <Typography variant="body2" sx={{ mt: 1, fontWeight: 500 }}>
+              <Typography
+                variant="body2"
+                sx={{ mt: 1, fontWeight: 500 }}
+                className="text-gray-300"
+              >
                 Their Product
               </Typography>
             </Box>
@@ -1563,15 +1583,23 @@ const Exchange = () => {
               sx={{
                 textAlign: "center",
                 p: 2,
-                bgcolor: alpha(theme.palette.success.main, 0.1),
                 borderRadius: 2,
                 mb: 2,
               }}
+              className="bg-green-900/30 border border-green-800"
             >
-              <Typography variant="body2" fontWeight={500}>
+              <Typography
+                variant="body2"
+                fontWeight={500}
+                className="text-gray-300"
+              >
                 Plus additional cash:
               </Typography>
-              <Typography variant="h6" color="success.main" fontWeight={700}>
+              <Typography
+                variant="h6"
+                className="text-green-400"
+                fontWeight={700}
+              >
                 ${additionalCash.toFixed(2)}
               </Typography>
             </Box>
@@ -1589,13 +1617,13 @@ const Exchange = () => {
               textTransform: "none",
               fontWeight: 600,
             }}
+            className="border-gray-600 text-gray-300 hover:bg-gray-700"
           >
             Cancel
           </Button>
           <Button
             onClick={handleConfirmExchange}
             variant="contained"
-            color="primary"
             startIcon={<Check />}
             sx={{
               borderRadius: 2,
@@ -1603,14 +1631,15 @@ const Exchange = () => {
               py: 1,
               textTransform: "none",
               fontWeight: 600,
-              boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
             }}
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg"
           >
             Confirm
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Snackbar Notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
@@ -1625,7 +1654,6 @@ const Exchange = () => {
           sx={{
             width: "100%",
             borderRadius: 2,
-            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
             "& .MuiAlert-icon": {
               fontSize: "1.5rem",
             },
@@ -1634,11 +1662,17 @@ const Exchange = () => {
               fontWeight: 500,
             },
           }}
+          className={
+            snackbar.severity === "success"
+              ? "bg-gradient-to-r from-green-600 to-emerald-600"
+              : "bg-gradient-to-r from-red-600 to-rose-600"
+          }
         >
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Layout>
+      <Footer />
+    </>
   );
 };
 

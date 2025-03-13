@@ -1,2238 +1,464 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  Container,
-  Typography,
-  Box,
-  Grid,
-  Card,
-  CardMedia,
-  CardContent,
-  CardActions,
-  Button,
-  Chip,
-  Rating,
-  TextField,
-  InputAdornment,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Slider,
-  Pagination,
-  IconButton,
-  CircularProgress,
-  Paper,
-  Drawer,
-  useMediaQuery,
-  useTheme,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  Tabs,
-  Tab,
-  Tooltip,
-  Badge,
-  Avatar,
-  Fade,
-  Zoom,
-  Divider,
-  SwipeableDrawer,
-  Backdrop,
-  Skeleton,
-  Stack,
-} from "@mui/material";
-import {
-  Search,
-  FilterList,
-  ShoppingCart,
-  Favorite,
-  FavoriteBorder,
-  Close,
-  Sort,
-  ViewModule,
-  ViewList,
-  LocalOffer,
-  Tune,
-  TrendingUp,
-  Star,
-  StarBorder,
-  ArrowUpward,
-  CompareArrows,
-  Share,
-  Info,
-  ShoppingBag,
-  Visibility,
-  AddShoppingCart,
-  FlashOn,
-  LocalShipping,
-  Verified,
-  VerifiedUser,
-} from "@mui/icons-material";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import Layout from "../components/layout/Layout";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import ProductFilters from "../components/product/ProductFilters";
+import ProductGrid from "../components/product/ProductGrid";
+import ProductSort from "../components/product/ProductSort";
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
+import products from "../data/products";
+import useProductFilter from "../hooks/useProductFilter";
+import ProductCard from "../components/product/ProductCard";
+import ProductList from "../components/product/ProductList";
+import { useCompare } from "../context/CompareContext";
+import CompareArrows from "@mui/icons-material/CompareArrows";
+import CloseIcon from "@mui/icons-material/Close";
+import ShoppingCart from "@mui/icons-material/ShoppingCart";
+import Visibility from "@mui/icons-material/Visibility";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useSelector, useDispatch } from "react-redux";
+import { clearCompare } from "../store/compareSlice";
 
-// Hàm lấy hình ảnh thực tế cho sản phẩm
-const getProductImage = (category, brand) => {
-  const imageMap = {
-    Smartphones: {
-      Apple:
-        "https://images.unsplash.com/photo-1603891128711-11b4b03bb138?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      Samsung:
-        "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      Sony: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      default:
-        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    },
-    Laptops: {
-      Apple:
-        "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      Dell: "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      HP: "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      Lenovo:
-        "https://images.unsplash.com/photo-1585247226801-bc613c441316?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      default:
-        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    },
-    Tablets: {
-      Apple:
-        "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      Samsung:
-        "https://images.unsplash.com/photo-1589739900243-4b52cd9dd8df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      default:
-        "https://images.unsplash.com/photo-1527698266440-12104e498b76?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    },
-    Audio: {
-      Bose: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      Sony: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      Apple:
-        "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      default:
-        "https://images.unsplash.com/photo-1558089687-f282ffcbc0d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    },
-    Cameras: {
-      Canon:
-        "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      Nikon:
-        "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      Sony: "https://images.unsplash.com/photo-1516724562728-afc824a36e84?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      default:
-        "https://images.unsplash.com/photo-1480365501497-199581be0e66?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    },
-    Accessories: {
-      Apple:
-        "https://images.unsplash.com/photo-1600861194942-f883de0dfe96?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      Samsung:
-        "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-      default:
-        "https://images.unsplash.com/photo-1563770660941-10a2b3654e41?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    },
-    default:
-      "https://images.unsplash.com/photo-1519183071298-a2962feb14f4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-  };
-
-  if (imageMap[category]) {
-    return imageMap[category][brand] || imageMap[category].default;
-  }
-  return imageMap.default;
-};
-
-// Component chính
 const Products = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("lg"));
   const location = useLocation();
   const navigate = useNavigate();
-  const queryParams = new URLSearchParams(location.search);
-  const scrollRef = useRef(null);
+  const [view, setView] = useState("grid");
+  const [isLoading, setIsLoading] = useState(true);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  // State for products and filtering
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [favorites, setFavorites] = useState([]);
-  const [viewMode, setViewMode] = useState("grid");
-  const [quickViewProduct, setQuickViewProduct] = useState(null);
-  const [showQuickView, setShowQuickView] = useState(false);
-  const [showScrollTop, setShowScrollTop] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
-  const [compareProducts, setCompareProducts] = useState([]);
+  // Sử dụng custom hook để xử lý logic lọc sản phẩm
+  const {
+    filters,
+    updateFilter,
+    handlePriceChange,
+    handleConditionChange,
+    handleBrandChange,
+    handleSortChange,
+    filteredProducts,
+    resetAllFilters,
+  } = useProductFilter(products);
 
-  // Pagination
-  const [page, setPage] = useState(1);
-  const [productsPerPage] = useState(12);
+  const { compareItems, toggleCompare, isInCompareList, clearCompareList } =
+    useCompare();
+  const [showCompareModal, setShowCompareModal] = useState(false);
 
-  // Filter states
-  const [searchQuery, setSearchQuery] = useState(
-    queryParams.get("search") || ""
-  );
-  const [category, setCategory] = useState(
-    queryParams.get("category") || "all"
-  );
-  const [priceRange, setPriceRange] = useState([0, 2000]);
-  const [sortBy, setSortBy] = useState("newest");
-  const [condition, setCondition] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [selectedBrands, setSelectedBrands] = useState([]);
-  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-  const [showFilters, setShowFilters] = useState(!isMobile);
+  const dispatch = useDispatch();
 
-  // Scroll event listener
+  // Xử lý tham số URL khi trang được tải
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
+    const searchParams = new URLSearchParams(location.search);
+    const category = searchParams.get("category");
+    const search = searchParams.get("search");
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    if (category) {
+      updateFilter("category", category);
+    }
 
-  // Fetch products
+    if (search) {
+      updateFilter("searchQuery", search);
+    }
+
+    // Giả lập thời gian tải
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [location.search]);
+
+  // Cập nhật URL khi bộ lọc thay đổi
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        // Here you would fetch data from your API
-        // For now, we'll use mock data
-        setTimeout(() => {
-          const categories = [
-            "Smartphones",
-            "Laptops",
-            "Tablets",
-            "Audio",
-            "Cameras",
-            "Accessories",
-          ];
-          const brandsList = [
-            "Apple",
-            "Samsung",
-            "Sony",
-            "Dell",
-            "HP",
-            "Lenovo",
-            "Bose",
-            "Canon",
-            "Nikon",
-            "Microsoft",
-          ];
-          const conditionOptions = ["New", "Like New", "Good", "Fair"];
+    const searchParams = new URLSearchParams();
 
-          // Generate products
-          const mockProducts = Array(50)
-            .fill()
-            .map((_, index) => {
-              const brand =
-                brandsList[Math.floor(Math.random() * brandsList.length)];
-              const productCategory =
-                categories[Math.floor(Math.random() * categories.length)];
-              const productCondition =
-                conditionOptions[
-                  Math.floor(Math.random() * conditionOptions.length)
-                ];
-              const discount =
-                Math.random() > 0.7 ? Math.floor(Math.random() * 30) + 10 : 0;
-              const price = Math.floor(Math.random() * 1900) + 100;
-              const discountedPrice =
-                discount > 0 ? Math.round(price * (1 - discount / 100)) : price;
-              const isFeatured = Math.random() > 0.8;
-              const isNew = Math.random() > 0.7;
-              const stock = Math.floor(Math.random() * 50);
-              const isLowStock = stock < 5 && stock > 0;
-
-              return {
-                id: index + 1,
-                name: `${brand} ${productCategory} Model ${Math.floor(
-                  Math.random() * 1000
-                )}`,
-                description: `This is a description for a ${productCategory} from ${brand}. It's in ${productCondition} condition.`,
-                price: price,
-                discountedPrice: discountedPrice,
-                discount: discount,
-                image: getProductImage(productCategory, brand),
-                category: productCategory,
-                brand: brand,
-                rating: (Math.random() * 5).toFixed(1),
-                reviews: Math.floor(Math.random() * 100),
-                seller: `User ${Math.floor(Math.random() * 20) + 1}`,
-                condition: productCondition,
-                dateAdded: new Date(
-                  2023,
-                  Math.floor(Math.random() * 12),
-                  Math.floor(Math.random() * 28) + 1
-                ).toISOString(),
-                isFeatured: isFeatured,
-                isNew: isNew,
-                stock: stock,
-                isLowStock: isLowStock,
-                sold: Math.floor(Math.random() * 200),
-                specs: {
-                  color: ["Black", "White", "Silver"][
-                    Math.floor(Math.random() * 3)
-                  ],
-                  weight: `${(Math.random() * 2 + 0.2).toFixed(1)} kg`,
-                  dimensions: `${Math.floor(Math.random() * 30) + 10}cm x ${
-                    Math.floor(Math.random() * 20) + 5
-                  }cm x ${Math.floor(Math.random() * 5) + 1}cm`,
-                  warranty: `${Math.floor(Math.random() * 24) + 6} months`,
-                },
-              };
-            });
-
-          setProducts(mockProducts);
-          setBrands(
-            [...new Set(mockProducts.map((product) => product.brand))].sort()
-          );
-          setLoading(false);
-        }, 1000);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        setError("Failed to load products. Please try again.");
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  // Apply filters
-  useEffect(() => {
-    let result = [...products];
-
-    // Apply search filter
-    if (searchQuery) {
-      result = result.filter(
-        (product) =>
-          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.description
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          product.brand.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+    if (filters.category !== "All Categories") {
+      searchParams.set("category", filters.category);
     }
 
-    // Apply category filter
-    if (category && category !== "all") {
-      result = result.filter((product) => product.category === category);
+    if (filters.searchQuery) {
+      searchParams.set("search", filters.searchQuery);
     }
 
-    // Apply price range filter
-    result = result.filter(
-      (product) =>
-        product.discountedPrice >= priceRange[0] &&
-        product.discountedPrice <= priceRange[1]
-    );
+    const newUrl = searchParams.toString()
+      ? `${location.pathname}?${searchParams.toString()}`
+      : location.pathname;
 
-    // Apply condition filter
-    if (condition.length > 0) {
-      result = result.filter((product) =>
-        condition.includes(product.condition)
-      );
-    }
-
-    // Apply brand filter
-    if (selectedBrands.length > 0) {
-      result = result.filter((product) =>
-        selectedBrands.includes(product.brand)
-      );
-    }
-
-    // Apply tab filtering
-    if (activeTab === 1) {
-      // Featured products
-      result = result.filter((product) => product.isFeatured);
-    } else if (activeTab === 2) {
-      // New arrivals
-      result = result.filter((product) => product.isNew);
-    } else if (activeTab === 3) {
-      // On sale
-      result = result.filter((product) => product.discount > 0);
-    } else if (activeTab === 4) {
-      // Best sellers
-      result.sort((a, b) => b.sold - a.sold);
-      result = result.slice(0, 20);
-    }
-
-    // Apply sorting
-    switch (sortBy) {
-      case "price-low-high":
-        result.sort((a, b) => a.discountedPrice - b.discountedPrice);
-        break;
-      case "price-high-low":
-        result.sort((a, b) => b.discountedPrice - a.discountedPrice);
-        break;
-      case "rating":
-        result.sort((a, b) => b.rating - a.rating);
-        break;
-      case "popularity":
-        result.sort((a, b) => b.reviews - a.reviews);
-        break;
-      case "newest":
-      default:
-        result.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-        break;
-    }
-
-    setFilteredProducts(result);
-    // Reset to first page when filters change
-    setPage(1);
-  }, [
-    products,
-    searchQuery,
-    category,
-    priceRange,
-    condition,
-    selectedBrands,
-    sortBy,
-    activeTab,
-  ]);
-
-  // Update URL with filters
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchQuery) params.set("search", searchQuery);
-    if (category && category !== "all") params.set("category", category);
-    if (activeTab !== 0) params.set("tab", activeTab);
-
-    const newUrl = `${location.pathname}?${params.toString()}`;
     navigate(newUrl, { replace: true });
-  }, [searchQuery, category, activeTab, navigate, location.pathname]);
+  }, [filters.category, filters.searchQuery]);
 
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
+  // Xử lý thêm vào giỏ hàng
+  const handleAddToCart = (product) => {
+    console.log("Adding to cart:", product);
+    // Thêm logic thêm vào giỏ hàng ở đây
   };
 
-  const handleCategoryChange = (event) => {
-    setCategory(event.target.value);
+  // Xử lý thêm vào wishlist
+  const handleAddToWishlist = (product) => {
+    console.log("Adding to wishlist:", product);
+    // Thêm logic thêm vào wishlist ở đây
   };
 
-  const handlePriceRangeChange = (event, newValue) => {
-    setPriceRange(newValue);
+  // Xử lý thay đổi danh mục
+  const handleCategoryChange = (category) => {
+    updateFilter("category", category);
   };
 
-  const handleSortChange = (event) => {
-    setSortBy(event.target.value);
+  // Xử lý thay đổi chế độ xem
+  const handleViewChange = (newView) => {
+    setView(newView);
   };
 
-  const handleConditionChange = (event) => {
-    const value = event.target.value;
-    if (condition.includes(value)) {
-      setCondition(condition.filter((c) => c !== value));
-    } else {
-      setCondition([...condition, value]);
-    }
+  // Function to open the comparison modal
+  const openCompareModal = () => {
+    setShowCompareModal(true);
   };
 
-  const handleBrandChange = (event) => {
-    const value = event.target.value;
-    if (selectedBrands.includes(value)) {
-      setSelectedBrands(selectedBrands.filter((b) => b !== value));
-    } else {
-      setSelectedBrands([...selectedBrands, value]);
-    }
+  // Function to close the comparison modal
+  const closeCompareModal = () => {
+    setShowCompareModal(false);
   };
-
-  const toggleFavorite = (productId) => {
-    if (favorites.includes(productId)) {
-      setFavorites(favorites.filter((id) => id !== productId));
-    } else {
-      setFavorites([...favorites, productId]);
-    }
-  };
-
-  const handlePageChange = (event, value) => {
-    setPage(value);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const toggleFilterDrawer = () => {
-    setFilterDrawerOpen(!filterDrawerOpen);
-  };
-
-  const handleViewModeChange = (mode) => {
-    setViewMode(mode);
-  };
-
-  const handleQuickView = (product) => {
-    setQuickViewProduct(product);
-    setShowQuickView(true);
-  };
-
-  const handleCloseQuickView = () => {
-    setShowQuickView(false);
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
-
-  const toggleCompare = (product) => {
-    if (compareProducts.some((p) => p.id === product.id)) {
-      setCompareProducts(compareProducts.filter((p) => p.id !== product.id));
-    } else {
-      if (compareProducts.length < 4) {
-        setCompareProducts([...compareProducts, product]);
-      } else {
-        // Show notification that max 4 products can be compared
-        alert("You can compare up to 4 products at a time");
-      }
-    }
-  };
-
-  // Calculate pagination
-  const indexOfLastProduct = page * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-
-  // Filter sidebar content
-  const filterContent = (
-    <Box sx={{ p: 3, width: isMobile ? "100%" : 280 }}>
-      {isMobile && (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 3,
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Filters
-          </Typography>
-          <IconButton onClick={toggleFilterDrawer} size="large">
-            <Close />
-          </IconButton>
-        </Box>
-      )}
-
-      <Typography
-        variant="subtitle1"
-        gutterBottom
-        sx={{ fontWeight: 600, color: "primary.main" }}
-      >
-        Categories
-      </Typography>
-      <FormControl fullWidth size="small" sx={{ mb: 4 }}>
-        <InputLabel>Category</InputLabel>
-        <Select
-          value={category}
-          label="Category"
-          onChange={handleCategoryChange}
-          sx={{ borderRadius: 2 }}
-        >
-          <MenuItem value="all">All Categories</MenuItem>
-          {[
-            "Smartphones",
-            "Laptops",
-            "Tablets",
-            "Audio",
-            "Cameras",
-            "Accessories",
-          ].map((cat) => (
-            <MenuItem key={cat} value={cat}>
-              {cat}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <Typography
-        variant="subtitle1"
-        gutterBottom
-        sx={{ fontWeight: 600, color: "primary.main" }}
-      >
-        Price Range
-      </Typography>
-      <Box sx={{ px: 1, mb: 4 }}>
-        <Slider
-          value={priceRange}
-          onChange={handlePriceRangeChange}
-          valueLabelDisplay="auto"
-          min={0}
-          max={2000}
-          step={50}
-          sx={{
-            color: "primary.main",
-            "& .MuiSlider-thumb": {
-              height: 20,
-              width: 20,
-            },
-          }}
-        />
-        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
-          <Chip label={`$${priceRange[0]}`} size="small" />
-          <Chip label={`$${priceRange[1]}`} size="small" />
-        </Box>
-      </Box>
-
-      <Typography
-        variant="subtitle1"
-        gutterBottom
-        sx={{ fontWeight: 600, color: "primary.main" }}
-      >
-        Condition
-      </Typography>
-      <FormGroup sx={{ mb: 4 }}>
-        {["New", "Like New", "Good", "Fair"].map((cond) => (
-          <FormControlLabel
-            key={cond}
-            control={
-              <Checkbox
-                checked={condition.includes(cond)}
-                onChange={handleConditionChange}
-                value={cond}
-                size="small"
-                sx={{ color: "primary.main" }}
-              />
-            }
-            label={cond}
-          />
-        ))}
-      </FormGroup>
-
-      <Typography
-        variant="subtitle1"
-        gutterBottom
-        sx={{ fontWeight: 600, color: "primary.main" }}
-      >
-        Brands
-      </Typography>
-      <FormGroup sx={{ mb: 4, maxHeight: 200, overflow: "auto" }}>
-        {brands.map((brand) => (
-          <FormControlLabel
-            key={brand}
-            control={
-              <Checkbox
-                checked={selectedBrands.includes(brand)}
-                onChange={handleBrandChange}
-                value={brand}
-                size="small"
-                sx={{ color: "primary.main" }}
-              />
-            }
-            label={brand}
-          />
-        ))}
-      </FormGroup>
-
-      {isMobile && (
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={toggleFilterDrawer}
-          sx={{
-            mt: 2,
-            py: 1.5,
-            borderRadius: 2,
-            fontWeight: 600,
-            background:
-              "linear-gradient(90deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%)",
-          }}
-        >
-          Apply Filters
-        </Button>
-      )}
-    </Box>
-  );
-
-  // Grid view product card
-  const GridProductCard = ({ product }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <Card
-        sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          borderRadius: 4,
-          overflow: "hidden",
-          position: "relative",
-          transition: "all 0.3s",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-          "&:hover": {
-            transform: "translateY(-10px)",
-            boxShadow: "0 20px 40px rgba(0,0,0,0.12)",
-          },
-        }}
-      >
-        {/* Badges */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: 12,
-            left: 12,
-            zIndex: 2,
-            display: "flex",
-            flexDirection: "column",
-            gap: 1,
-          }}
-        >
-          {product.discount > 0 && (
-            <Chip
-              label={`-${product.discount}%`}
-              size="small"
-              sx={{
-                bgcolor: "#ff4757",
-                color: "white",
-                fontWeight: 700,
-                fontSize: "0.75rem",
-              }}
-            />
-          )}
-          {product.isNew && (
-            <Chip
-              label="NEW"
-              size="small"
-              sx={{
-                bgcolor: "#2ed573",
-                color: "white",
-                fontWeight: 700,
-                fontSize: "0.75rem",
-              }}
-            />
-          )}
-          {product.isLowStock && (
-            <Chip
-              label="LOW STOCK"
-              size="small"
-              sx={{
-                bgcolor: "#ffa502",
-                color: "white",
-                fontWeight: 700,
-                fontSize: "0.75rem",
-              }}
-            />
-          )}
-        </Box>
-
-        {/* Product Image */}
-        <Box sx={{ position: "relative", overflow: "hidden", pt: "75%" }}>
-          <CardMedia
-            component="img"
-            image={product.image}
-            alt={product.name}
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              transition: "transform 0.6s",
-              "&:hover": {
-                transform: "scale(1.1)",
-              },
-            }}
-          />
-
-          {/* Quick actions overlay */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              bgcolor: "rgba(0,0,0,0.02)",
-              transition: "all 0.3s",
-              opacity: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              "&:hover": {
-                opacity: 1,
-                bgcolor: "rgba(0,0,0,0.15)",
-              },
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                gap: 1,
-                transform: "translateY(20px)",
-                transition: "all 0.3s",
-                ".MuiCard-root:hover &": {
-                  transform: "translateY(0)",
-                },
-              }}
-            >
-              <Tooltip title="Quick view">
-                <IconButton
-                  onClick={() => handleQuickView(product)}
-                  sx={{
-                    bgcolor: "white",
-                    "&:hover": { bgcolor: "primary.main", color: "white" },
-                  }}
-                >
-                  <Visibility />
-                </IconButton>
-              </Tooltip>
-              <Tooltip
-                title={
-                  favorites.includes(product.id)
-                    ? "Remove from wishlist"
-                    : "Add to wishlist"
-                }
-              >
-                <IconButton
-                  onClick={() => toggleFavorite(product.id)}
-                  sx={{
-                    bgcolor: "white",
-                    color: favorites.includes(product.id)
-                      ? "error.main"
-                      : "inherit",
-                    "&:hover": { bgcolor: "error.main", color: "white" },
-                  }}
-                >
-                  {favorites.includes(product.id) ? (
-                    <Favorite />
-                  ) : (
-                    <FavoriteBorder />
-                  )}
-                </IconButton>
-              </Tooltip>
-              <Tooltip
-                title={
-                  compareProducts.some((p) => p.id === product.id)
-                    ? "Remove from compare"
-                    : "Add to compare"
-                }
-              >
-                <IconButton
-                  onClick={() => toggleCompare(product)}
-                  sx={{
-                    bgcolor: "white",
-                    color: compareProducts.some((p) => p.id === product.id)
-                      ? "primary.main"
-                      : "inherit",
-                    "&:hover": { bgcolor: "primary.main", color: "white" },
-                  }}
-                >
-                  <CompareArrows />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Box>
-        </Box>
-
-        {/* Product Info */}
-        <CardContent sx={{ flexGrow: 1, p: 3 }}>
-          <Typography
-            variant="subtitle2"
-            color="text.secondary"
-            gutterBottom
-            sx={{
-              textTransform: "uppercase",
-              letterSpacing: 1,
-              fontSize: "0.7rem",
-            }}
-          >
-            {product.brand}
-          </Typography>
-
-          <Typography
-            variant="h6"
-            component={Link}
-            to={`/products/${product.id}`}
-            sx={{
-              fontWeight: 600,
-              textDecoration: "none",
-              color: "text.primary",
-              display: "block",
-              mb: 1,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              height: 48,
-              "&:hover": {
-                color: "primary.main",
-              },
-            }}
-          >
-            {product.name}
-          </Typography>
-
-          <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
-            <Rating
-              value={parseFloat(product.rating)}
-              precision={0.5}
-              size="small"
-              readOnly
-              sx={{ mr: 1 }}
-            />
-            <Typography variant="body2" color="text.secondary">
-              ({product.reviews})
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-            {product.discount > 0 && (
-              <Typography
-                variant="body2"
-                sx={{
-                  textDecoration: "line-through",
-                  color: "text.secondary",
-                }}
-              >
-                ${product.price.toFixed(2)}
-              </Typography>
-            )}
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                color: product.discount > 0 ? "#ff4757" : "primary.main",
-              }}
-            >
-              ${product.discountedPrice.toFixed(2)}
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              mt: 1.5,
-              color: product.stock > 0 ? "#2ed573" : "error.main",
-              fontSize: "0.875rem",
-            }}
-          >
-            {product.stock > 0 ? (
-              <>
-                <VerifiedUser fontSize="small" sx={{ mr: 0.5 }} />
-                <Typography variant="body2">
-                  {product.isLowStock
-                    ? `Only ${product.stock} left in stock`
-                    : "In Stock"}
-                </Typography>
-              </>
-            ) : (
-              <>
-                <Info fontSize="small" sx={{ mr: 0.5 }} />
-                <Typography variant="body2">Out of Stock</Typography>
-              </>
-            )}
-          </Box>
-        </CardContent>
-
-        {/* Actions */}
-        <CardActions sx={{ p: 3, pt: 0 }}>
-          <Button
-            variant="contained"
-            fullWidth
-            startIcon={<AddShoppingCart />}
-            sx={{
-              borderRadius: 2,
-              py: 1,
-              background:
-                product.stock > 0
-                  ? "linear-gradient(90deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%)"
-                  : "grey.500",
-              boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-              fontWeight: 600,
-              "&:hover": {
-                boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
-                transform: "translateY(-2px)",
-              },
-              transition: "all 0.3s",
-            }}
-            disabled={product.stock === 0}
-          >
-            {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
-          </Button>
-        </CardActions>
-      </Card>
-    </motion.div>
-  );
-
-  // List view product card
-  const ListProductCard = ({ product }) => (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <Card
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          borderRadius: 4,
-          overflow: "hidden",
-          position: "relative",
-          transition: "all 0.3s",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-          "&:hover": {
-            transform: "translateY(-5px)",
-            boxShadow: "0 20px 40px rgba(0,0,0,0.12)",
-          },
-          mb: 3,
-        }}
-      >
-        {/* Badges */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: 12,
-            left: 12,
-            zIndex: 2,
-            display: "flex",
-            flexDirection: "column",
-            gap: 1,
-          }}
-        >
-          {product.discount > 0 && (
-            <Chip
-              label={`-${product.discount}%`}
-              size="small"
-              sx={{
-                bgcolor: "#ff4757",
-                color: "white",
-                fontWeight: 700,
-                fontSize: "0.75rem",
-              }}
-            />
-          )}
-          {product.isNew && (
-            <Chip
-              label="NEW"
-              size="small"
-              sx={{
-                bgcolor: "#2ed573",
-                color: "white",
-                fontWeight: 700,
-                fontSize: "0.75rem",
-              }}
-            />
-          )}
-        </Box>
-
-        {/* Product Image */}
-        <Box
-          sx={{
-            position: "relative",
-            width: { xs: "100%", sm: 280 },
-            minWidth: { sm: 280 },
-            overflow: "hidden",
-          }}
-        >
-          <CardMedia
-            component="img"
-            image={product.image}
-            alt={product.name}
-            sx={{
-              height: { xs: 200, sm: "100%" },
-              objectFit: "cover",
-              transition: "transform 0.6s",
-              "&:hover": {
-                transform: "scale(1.1)",
-              },
-            }}
-          />
-
-          {/* Quick actions overlay */}
-          <Box
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              bgcolor: "rgba(0,0,0,0.02)",
-              transition: "all 0.3s",
-              opacity: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              "&:hover": {
-                opacity: 1,
-                bgcolor: "rgba(0,0,0,0.15)",
-              },
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                gap: 1,
-              }}
-            >
-              <Tooltip title="Quick view">
-                <IconButton
-                  onClick={() => handleQuickView(product)}
-                  sx={{
-                    bgcolor: "white",
-                    "&:hover": { bgcolor: "primary.main", color: "white" },
-                  }}
-                >
-                  <Visibility />
-                </IconButton>
-              </Tooltip>
-              <Tooltip
-                title={
-                  favorites.includes(product.id)
-                    ? "Remove from wishlist"
-                    : "Add to wishlist"
-                }
-              >
-                <IconButton
-                  onClick={() => toggleFavorite(product.id)}
-                  sx={{
-                    bgcolor: "white",
-                    color: favorites.includes(product.id)
-                      ? "error.main"
-                      : "inherit",
-                    "&:hover": { bgcolor: "error.main", color: "white" },
-                  }}
-                >
-                  {favorites.includes(product.id) ? (
-                    <Favorite />
-                  ) : (
-                    <FavoriteBorder />
-                  )}
-                </IconButton>
-              </Tooltip>
-              <Tooltip
-                title={
-                  compareProducts.some((p) => p.id === product.id)
-                    ? "Remove from compare"
-                    : "Add to compare"
-                }
-              >
-                <IconButton
-                  onClick={() => toggleCompare(product)}
-                  sx={{
-                    bgcolor: "white",
-                    color: compareProducts.some((p) => p.id === product.id)
-                      ? "primary.main"
-                      : "inherit",
-                    "&:hover": { bgcolor: "primary.main", color: "white" },
-                  }}
-                >
-                  <CompareArrows />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Box>
-        </Box>
-
-        {/* Product Info */}
-        <Box
-          sx={{ display: "flex", flexDirection: "column", flexGrow: 1, p: 3 }}
-        >
-          <Box sx={{ mb: "auto" }}>
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
-              gutterBottom
-              sx={{
-                textTransform: "uppercase",
-                letterSpacing: 1,
-                fontSize: "0.7rem",
-              }}
-            >
-              {product.brand} • {product.category}
-            </Typography>
-
-            <Typography
-              variant="h6"
-              component={Link}
-              to={`/products/${product.id}`}
-              sx={{
-                fontWeight: 600,
-                textDecoration: "none",
-                color: "text.primary",
-                display: "block",
-                mb: 1,
-                "&:hover": {
-                  color: "primary.main",
-                },
-              }}
-            >
-              {product.name}
-            </Typography>
-
-            <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
-              <Rating
-                value={parseFloat(product.rating)}
-                precision={0.5}
-                size="small"
-                readOnly
-                sx={{ mr: 1 }}
-              />
-              <Typography variant="body2" color="text.secondary">
-                ({product.reviews})
-              </Typography>
-            </Box>
-
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{
-                mb: 2,
-                display: "-webkit-box",
-                overflow: "hidden",
-                WebkitBoxOrient: "vertical",
-                WebkitLineClamp: 2,
-              }}
-            >
-              {product.description}
-            </Typography>
-
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
-              <Chip
-                icon={<LocalShipping fontSize="small" />}
-                label="Free Shipping"
-                size="small"
-                variant="outlined"
-              />
-              {product.condition && (
-                <Chip
-                  label={product.condition}
-                  size="small"
-                  variant="outlined"
-                />
-              )}
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mt: 2,
-            }}
-          >
-            <Box>
-              <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                {product.discount > 0 && (
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      textDecoration: "line-through",
-                      color: "text.secondary",
-                    }}
-                  >
-                    ${product.price.toFixed(2)}
-                  </Typography>
-                )}
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 700,
-                    color: product.discount > 0 ? "#ff4757" : "primary.main",
-                  }}
-                >
-                  ${product.discountedPrice.toFixed(2)}
-                </Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  mt: 0.5,
-                  color: product.stock > 0 ? "#2ed573" : "error.main",
-                  fontSize: "0.875rem",
-                }}
-              >
-                {product.stock > 0 ? (
-                  <>
-                    <VerifiedUser fontSize="small" sx={{ mr: 0.5 }} />
-                    <Typography variant="body2">
-                      {product.isLowStock
-                        ? `Only ${product.stock} left in stock`
-                        : "In Stock"}
-                    </Typography>
-                  </>
-                ) : (
-                  <>
-                    <Info fontSize="small" sx={{ mr: 0.5 }} />
-                    <Typography variant="body2">Out of Stock</Typography>
-                  </>
-                )}
-              </Box>
-            </Box>
-
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Button
-                variant="outlined"
-                sx={{
-                  borderRadius: 2,
-                  borderWidth: 2,
-                  fontWeight: 600,
-                  "&:hover": {
-                    borderWidth: 2,
-                  },
-                }}
-                component={Link}
-                to={`/products/${product.id}`}
-              >
-                Details
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<AddShoppingCart />}
-                sx={{
-                  borderRadius: 2,
-                  py: 1,
-                  px: 2,
-                  background:
-                    product.stock > 0
-                      ? "linear-gradient(90deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%)"
-                      : "grey.500",
-                  boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                  fontWeight: 600,
-                  "&:hover": {
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
-                    transform: "translateY(-2px)",
-                  },
-                  transition: "all 0.3s",
-                }}
-                disabled={product.stock === 0}
-              >
-                {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </Card>
-    </motion.div>
-  );
-
-  // Quick View Modal
-  const QuickViewModal = () => (
-    <Backdrop
-      sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      open={showQuickView}
-      onClick={handleCloseQuickView}
-    >
-      <Zoom in={showQuickView}>
-        <Box
-          onClick={(e) => e.stopPropagation()}
-          sx={{
-            position: "relative",
-            width: { xs: "95%", sm: "90%", md: "80%", lg: "70%" },
-            maxWidth: 1000,
-            maxHeight: "90vh",
-            overflowY: "auto",
-            bgcolor: "background.paper",
-            borderRadius: 4,
-            boxShadow: 24,
-            p: { xs: 2, sm: 4 },
-          }}
-        >
-          {quickViewProduct && (
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <Box
-                  sx={{
-                    position: "relative",
-                    borderRadius: 3,
-                    overflow: "hidden",
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    image={quickViewProduct.image}
-                    alt={quickViewProduct.name}
-                    sx={{
-                      width: "100%",
-                      borderRadius: 3,
-                      height: { xs: 300, sm: 400, md: 500 },
-                      objectFit: "cover",
-                    }}
-                  />
-                  {quickViewProduct.discount > 0 && (
-                    <Chip
-                      label={`-${quickViewProduct.discount}%`}
-                      size="small"
-                      sx={{
-                        position: "absolute",
-                        top: 16,
-                        left: 16,
-                        bgcolor: "#ff4757",
-                        color: "white",
-                        fontWeight: 700,
-                      }}
-                    />
-                  )}
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <IconButton
-                  onClick={handleCloseQuickView}
-                  sx={{ position: "absolute", top: 8, right: 8 }}
-                >
-                  <Close />
-                </IconButton>
-
-                <Typography
-                  variant="subtitle2"
-                  color="text.secondary"
-                  gutterBottom
-                  sx={{ textTransform: "uppercase", letterSpacing: 1 }}
-                >
-                  {quickViewProduct.brand} • {quickViewProduct.category}
-                </Typography>
-
-                <Typography
-                  variant="h4"
-                  component="h2"
-                  gutterBottom
-                  sx={{ fontWeight: 700 }}
-                >
-                  {quickViewProduct.name}
-                </Typography>
-
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <Rating
-                    value={parseFloat(quickViewProduct.rating)}
-                    precision={0.5}
-                    readOnly
-                    sx={{ mr: 1 }}
-                  />
-                  <Typography variant="body2" color="text.secondary">
-                    ({quickViewProduct.reviews} reviews)
-                  </Typography>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "baseline",
-                    gap: 1,
-                    mb: 3,
-                  }}
-                >
-                  {quickViewProduct.discount > 0 && (
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        textDecoration: "line-through",
-                        color: "text.secondary",
-                      }}
-                    >
-                      ${quickViewProduct.price.toFixed(2)}
-                    </Typography>
-                  )}
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: 700,
-                      color:
-                        quickViewProduct.discount > 0
-                          ? "#ff4757"
-                          : "primary.main",
-                    }}
-                  >
-                    ${quickViewProduct.discountedPrice.toFixed(2)}
-                  </Typography>
-                </Box>
-
-                <Typography variant="body1" paragraph>
-                  {quickViewProduct.description}
-                </Typography>
-
-                <Divider sx={{ my: 3 }} />
-
-                <Grid container spacing={2} sx={{ mb: 3 }}>
-                  <Grid item xs={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Condition
-                    </Typography>
-                    <Typography variant="body1">
-                      {quickViewProduct.condition}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Color
-                    </Typography>
-                    <Typography variant="body1">
-                      {quickViewProduct.specs.color}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Weight
-                    </Typography>
-                    <Typography variant="body1">
-                      {quickViewProduct.specs.weight}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Warranty
-                    </Typography>
-                    <Typography variant="body1">
-                      {quickViewProduct.specs.warranty}
-                    </Typography>
-                  </Grid>
-                </Grid>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    mb: 3,
-                    color:
-                      quickViewProduct.stock > 0 ? "#2ed573" : "error.main",
-                  }}
-                >
-                  {quickViewProduct.stock > 0 ? (
-                    <>
-                      <VerifiedUser sx={{ mr: 1 }} />
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {quickViewProduct.isLowStock
-                          ? `Only ${quickViewProduct.stock} left in stock - order soon`
-                          : "In Stock"}
-                      </Typography>
-                    </>
-                  ) : (
-                    <>
-                      <Info sx={{ mr: 1 }} />
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        Out of Stock
-                      </Typography>
-                    </>
-                  )}
-                </Box>
-
-                <Box sx={{ display: "flex", gap: 2 }}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    startIcon={<AddShoppingCart />}
-                    fullWidth
-                    sx={{
-                      borderRadius: 2,
-                      py: 1.5,
-                      background:
-                        quickViewProduct.stock > 0
-                          ? "linear-gradient(90deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%)"
-                          : "grey.500",
-                      boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                      fontWeight: 600,
-                      "&:hover": {
-                        boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
-                      },
-                    }}
-                    disabled={quickViewProduct.stock === 0}
-                  >
-                    Add to Cart
-                  </Button>
-
-                  <Button
-                    variant="outlined"
-                    size="large"
-                    startIcon={<Favorite />}
-                    sx={{
-                      borderRadius: 2,
-                      py: 1.5,
-                      borderWidth: 2,
-                      fontWeight: 600,
-                      color: favorites.includes(quickViewProduct.id)
-                        ? "error.main"
-                        : "inherit",
-                      borderColor: favorites.includes(quickViewProduct.id)
-                        ? "error.main"
-                        : "inherit",
-                      "&:hover": {
-                        borderWidth: 2,
-                        borderColor: "error.main",
-                        color: "error.main",
-                      },
-                    }}
-                    onClick={() => toggleFavorite(quickViewProduct.id)}
-                  >
-                    {favorites.includes(quickViewProduct.id) ? "Saved" : "Save"}
-                  </Button>
-                </Box>
-
-                <Button
-                  component={Link}
-                  to={`/products/${quickViewProduct.id}`}
-                  variant="text"
-                  fullWidth
-                  sx={{ mt: 2, fontWeight: 600 }}
-                >
-                  View Full Details
-                </Button>
-              </Grid>
-            </Grid>
-          )}
-        </Box>
-      </Zoom>
-    </Backdrop>
-  );
-
-  // Compare Products Drawer
-  const CompareDrawer = () => (
-    <SwipeableDrawer
-      anchor="bottom"
-      open={compareProducts.length > 0}
-      onClose={() => setCompareProducts([])}
-      onOpen={() => {}}
-      sx={{
-        "& .MuiDrawer-paper": {
-          borderTopLeftRadius: 16,
-          borderTopRightRadius: 16,
-          maxHeight: "80vh",
-        },
-      }}
-    >
-      <Box sx={{ p: 2 }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 2,
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Compare Products ({compareProducts.length})
-          </Typography>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => setCompareProducts([])}
-            sx={{ borderRadius: 2 }}
-          >
-            Clear All
-          </Button>
-        </Box>
-
-        <Grid container spacing={2}>
-          {compareProducts.map((product) => (
-            <Grid item xs={6} sm={4} md={3} key={product.id}>
-              <Paper
-                sx={{
-                  position: "relative",
-                  borderRadius: 3,
-                }}
-              >
-                <IconButton
-                  size="small"
-                  onClick={() => toggleCompare(product)}
-                  sx={{
-                    position: "absolute",
-                    top: 8,
-                    right: 8,
-                    bgcolor: "background.paper",
-                    boxShadow: 1,
-                    "&:hover": { bgcolor: "error.light", color: "white" },
-                  }}
-                >
-                  <Close fontSize="small" />
-                </IconButton>
-                <Box
-                  sx={{
-                    height: 100,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    mb: 1,
-                  }}
-                >
-                  <img
-                    src={getProductImage(product.category, product.brand)}
-                    alt={product.name}
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                      objectFit: "contain",
-                    }}
-                  />
-                </Box>
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    fontWeight: 600,
-                    mb: 1,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                  }}
-                >
-                  {product.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {product.condition} • {product.brand}
-                </Typography>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mt: 1 }}>
-                  ${product.price}
-                </Typography>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-
-        {compareProducts.length >= 2 && (
-          <Button
-            variant="contained"
-            fullWidth
-            component={Link}
-            to={`/compare?ids=${compareProducts.map((p) => p.id).join(",")}`}
-            sx={{
-              mt: 2,
-              borderRadius: 2,
-              py: 1.5,
-              background:
-                "linear-gradient(90deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%)",
-              fontWeight: 600,
-            }}
-          >
-            Compare Now
-          </Button>
-        )}
-      </Box>
-    </SwipeableDrawer>
-  );
 
   return (
-    <Layout>
-      <Box
-        sx={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-          pt: 2,
-          pb: 8,
-        }}
-        ref={scrollRef}
-      >
-        <Container maxWidth="xl">
-          {/* Hero Section */}
-          <Paper
-            elevation={0}
-            sx={{
-              mb: 4,
-              borderRadius: 4,
-              overflow: "hidden",
-              position: "relative",
-              height: { xs: 200, sm: 300, md: 400 },
-              backgroundImage:
-                "url(https://images.unsplash.com/photo-1498049794561-7780e7231661?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80)",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-            }}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                bgcolor: "rgba(0,0,0,0.4)",
-                zIndex: 1,
-              }}
-            />
-            <Box
-              sx={{
-                position: "relative",
-                zIndex: 2,
-                textAlign: "center",
-                color: "white",
-                p: 3,
-              }}
-            >
-              <Typography
-                variant="h2"
-                component="h1"
-                sx={{
-                  fontWeight: 800,
-                  mb: 2,
-                  textShadow: "0 2px 10px rgba(0,0,0,0.3)",
-                  fontSize: { xs: "2rem", sm: "3rem", md: "4rem" },
-                }}
-              >
-                Discover Quality Tech
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  maxWidth: 800,
-                  mx: "auto",
-                  mb: 4,
-                  textShadow: "0 2px 5px rgba(0,0,0,0.3)",
-                  fontSize: { xs: "1rem", sm: "1.25rem" },
-                }}
-              >
-                Find the perfect device from our curated collection of premium
-                electronics
-              </Typography>
-              <TextField
-                placeholder="What are you looking for?"
-                variant="outlined"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search sx={{ color: "primary.main" }} />
-                    </InputAdornment>
-                  ),
-                  sx: {
-                    bgcolor: "white",
-                    borderRadius: 3,
-                    width: { xs: "100%", sm: 400, md: 500 },
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "transparent",
-                    },
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                  },
-                }}
+    <>
+      <Header />
+
+      <main className="bg-gray-50 dark:bg-gray-900 pt-24 pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Product sorting and view options */}
+          <ProductSort
+            sortBy={filters.sortBy}
+            onSortChange={handleSortChange}
+            totalProducts={filteredProducts.length}
+            currentView={view}
+            onViewChange={handleViewChange}
+            onOpenMobileFilters={() => setMobileFiltersOpen(true)}
+          />
+
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Sidebar filters */}
+            <div className="w-full md:w-64 flex-shrink-0">
+              <ProductFilters
+                filters={filters}
+                handleCategoryChange={handleCategoryChange}
+                handlePriceChange={handlePriceChange}
+                handleConditionChange={handleConditionChange}
+                handleBrandChange={handleBrandChange}
+                resetFilters={resetAllFilters}
+                mobileFiltersOpen={mobileFiltersOpen}
+                setMobileFiltersOpen={setMobileFiltersOpen}
               />
-            </Box>
-          </Paper>
+            </div>
 
-          {/* Toolbar */}
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              mb: 4,
-              borderRadius: 3,
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 2,
-              bgcolor: "white",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Button
-                startIcon={<Tune />}
-                variant={showFilters ? "contained" : "outlined"}
-                onClick={() =>
-                  isMobile ? toggleFilterDrawer() : setShowFilters(!showFilters)
-                }
-                sx={{
-                  borderRadius: 2,
-                  display: { xs: "flex", md: showFilters ? "none" : "flex" },
-                }}
-              >
-                Filters
-              </Button>
-
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <IconButton
-                  onClick={() => handleViewModeChange("grid")}
-                  color={viewMode === "grid" ? "primary" : "default"}
-                  sx={{
-                    bgcolor:
-                      viewMode === "grid"
-                        ? "rgba(25, 118, 210, 0.1)"
-                        : "transparent",
-                  }}
-                >
-                  <ViewModule />
-                </IconButton>
-                <IconButton
-                  onClick={() => handleViewModeChange("list")}
-                  color={viewMode === "list" ? "primary" : "default"}
-                  sx={{
-                    bgcolor:
-                      viewMode === "list"
-                        ? "rgba(25, 118, 210, 0.1)"
-                        : "transparent",
-                  }}
-                >
-                  <ViewList />
-                </IconButton>
-              </Box>
-            </Box>
-
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ display: { xs: "none", sm: "block" } }}
-              >
-                Showing{" "}
-                {filteredProducts.length > 0 ? indexOfFirstProduct + 1 : 0}-
-                {Math.min(indexOfLastProduct, filteredProducts.length)} of{" "}
-                {filteredProducts.length} results
-              </Typography>
-
-              <FormControl size="small" sx={{ minWidth: 180 }}>
-                <InputLabel>Sort By</InputLabel>
-                <Select
-                  value={sortBy}
-                  label="Sort By"
-                  onChange={handleSortChange}
-                  sx={{ borderRadius: 2 }}
-                >
-                  <MenuItem value="newest">Newest First</MenuItem>
-                  <MenuItem value="price-low-high">Price: Low to High</MenuItem>
-                  <MenuItem value="price-high-low">Price: High to Low</MenuItem>
-                  <MenuItem value="rating">Highest Rated</MenuItem>
-                  <MenuItem value="popularity">Most Popular</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-          </Paper>
-
-          {/* Main Content */}
-          <Grid container spacing={3}>
-            {/* Filter Sidebar */}
-            {showFilters && (
-              <Grid
-                item
-                md={3}
-                lg={2.5}
-                sx={{ display: { xs: "none", md: "block" } }}
-              >
-                <Paper
-                  sx={{
-                    position: "sticky",
-                    top: 20,
-                    borderRadius: 3,
-                    overflow: "hidden",
-                    bgcolor: "white",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <Box
-                    sx={{ p: 3, borderBottom: "1px solid rgba(0,0,0,0.06)" }}
+            {/* Product grid */}
+            <div className="flex-1">
+              <AnimatePresence mode="wait">
+                {isLoading ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex justify-center items-center h-96"
                   >
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      Filters
-                    </Typography>
-                    {(category !== "all" ||
-                      condition.length > 0 ||
-                      selectedBrands.length > 0 ||
-                      priceRange[0] > 0 ||
-                      priceRange[1] < 2000) && (
-                      <Button
-                        variant="text"
-                        size="small"
-                        onClick={() => {
-                          setCategory("all");
-                          setCondition([]);
-                          setSelectedBrands([]);
-                          setPriceRange([0, 2000]);
-                        }}
-                        sx={{ mt: 1, fontWeight: 500 }}
-                      >
-                        Clear All
-                      </Button>
-                    )}
-                  </Box>
-                  {filterContent}
-                </Paper>
-              </Grid>
-            )}
-
-            {/* Products Grid */}
-            <Grid
-              item
-              xs={12}
-              md={showFilters ? 9 : 12}
-              lg={showFilters ? 9.5 : 12}
-            >
-              {/* Active Filters */}
-              {(category !== "all" ||
-                condition.length > 0 ||
-                selectedBrands.length > 0 ||
-                searchQuery) && (
-                <Box sx={{ mb: 3, display: "flex", flexWrap: "wrap", gap: 1 }}>
-                  {category !== "all" && (
-                    <Chip
-                      label={`Category: ${category}`}
-                      onDelete={() => setCategory("all")}
-                      size="medium"
-                      sx={{ borderRadius: 2 }}
-                    />
-                  )}
-                  {condition.map((cond) => (
-                    <Chip
-                      key={cond}
-                      label={`Condition: ${cond}`}
-                      onDelete={() =>
-                        setCondition(condition.filter((c) => c !== cond))
+                    <div className="relative w-20 h-20">
+                      <div className="absolute top-0 left-0 w-full h-full border-4 border-indigo-200 dark:border-indigo-900 rounded-full animate-ping"></div>
+                      <div className="absolute top-0 left-0 w-full h-full border-4 border-t-indigo-600 rounded-full animate-spin"></div>
+                    </div>
+                  </motion.div>
+                ) : filteredProducts.length > 0 ? (
+                  <motion.div
+                    key="products"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <div
+                      className={
+                        view === "grid"
+                          ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                          : "space-y-6"
                       }
-                      size="medium"
-                      sx={{ borderRadius: 2 }}
-                    />
-                  ))}
-                  {selectedBrands.map((brand) => (
-                    <Chip
-                      key={brand}
-                      label={`Brand: ${brand}`}
-                      onDelete={() =>
-                        setSelectedBrands(
-                          selectedBrands.filter((b) => b !== brand)
-                        )
-                      }
-                      size="medium"
-                      sx={{ borderRadius: 2 }}
-                    />
-                  ))}
-                  {searchQuery && (
-                    <Chip
-                      label={`Search: ${searchQuery}`}
-                      onDelete={() => setSearchQuery("")}
-                      size="medium"
-                      sx={{ borderRadius: 2 }}
-                    />
-                  )}
-                </Box>
-              )}
-
-              {loading ? (
-                <Box sx={{ py: 4 }}>
-                  <Grid container spacing={3}>
-                    {Array.from(new Array(8)).map((_, index) => (
-                      <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                        <Card
-                          sx={{
-                            borderRadius: 4,
-                            overflow: "hidden",
-                            boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-                          }}
-                        >
-                          <Skeleton variant="rectangular" height={200} />
-                          <CardContent>
-                            <Skeleton variant="text" height={30} width="80%" />
-                            <Skeleton variant="text" height={20} width="60%" />
-                            <Skeleton variant="text" height={40} width="40%" />
-                            <Skeleton variant="text" height={20} width="70%" />
-                          </CardContent>
-                          <CardActions>
-                            <Skeleton
-                              variant="rectangular"
-                              height={40}
-                              width="100%"
-                            />
-                          </CardActions>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-              ) : error ? (
-                <Paper
-                  sx={{
-                    p: 5,
-                    textAlign: "center",
-                    borderRadius: 3,
-                    bgcolor: "white",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <Typography variant="h6" color="error" gutterBottom>
-                    {error}
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    sx={{ mt: 2, borderRadius: 2 }}
-                    onClick={() => window.location.reload()}
-                  >
-                    Try Again
-                  </Button>
-                </Paper>
-              ) : filteredProducts.length === 0 ? (
-                <Paper
-                  sx={{
-                    p: 5,
-                    textAlign: "center",
-                    borderRadius: 3,
-                    bgcolor: "white",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <Box sx={{ mb: 3 }}>
-                    <img
-                      src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png"
-                      alt="No results"
-                      style={{ width: 120, height: 120, opacity: 0.7 }}
-                    />
-                  </Box>
-                  <Typography
-                    variant="h5"
-                    gutterBottom
-                    sx={{ fontWeight: 600 }}
-                  >
-                    No products found
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary" paragraph>
-                    Try adjusting your filters or search query to find what
-                    you're looking for.
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    sx={{
-                      mt: 2,
-                      borderRadius: 2,
-                      background:
-                        "linear-gradient(90deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%)",
-                    }}
-                    onClick={() => {
-                      setCategory("all");
-                      setCondition([]);
-                      setSelectedBrands([]);
-                      setSearchQuery("");
-                      setPriceRange([0, 2000]);
-                    }}
-                  >
-                    Clear All Filters
-                  </Button>
-                </Paper>
-              ) : (
-                <>
-                  {viewMode === "grid" ? (
-                    <Grid container spacing={3}>
-                      {currentProducts.map((product) => (
-                        <Grid
-                          item
-                          xs={12}
-                          sm={6}
-                          md={4}
-                          lg={3}
+                    >
+                      {filteredProducts.map((product) => (
+                        <motion.div
                           key={product.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
                         >
-                          <GridProductCard product={product} />
-                        </Grid>
+                          {view === "grid" ? (
+                            <ProductCard
+                              product={product}
+                              onAddToCart={handleAddToCart}
+                              onAddToWishlist={handleAddToWishlist}
+                              onToggleCompare={toggleCompare}
+                              isInCompareList={isInCompareList(product.id)}
+                            />
+                          ) : (
+                            <ProductList
+                              product={product}
+                              onAddToCart={handleAddToCart}
+                              onAddToWishlist={handleAddToWishlist}
+                            />
+                          )}
+                        </motion.div>
                       ))}
-                    </Grid>
-                  ) : (
-                    <Stack spacing={3}>
-                      {currentProducts.map((product) => (
-                        <ListProductCard key={product.id} product={product} />
-                      ))}
-                    </Stack>
-                  )}
-                </>
-              )}
-
-              {/* Pagination */}
-              {filteredProducts.length > 0 && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    mt: 6,
-                    mb: 2,
-                  }}
-                >
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 3,
-                      bgcolor: "white",
-                      boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                    }}
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center"
                   >
-                    <Pagination
-                      count={totalPages}
-                      page={page}
-                      onChange={handlePageChange}
-                      color="primary"
-                      showFirstButton
-                      showLastButton
-                      size="large"
-                      sx={{
-                        "& .MuiPaginationItem-root": {
-                          borderRadius: 2,
-                          fontWeight: 600,
-                        },
-                      }}
-                    />
-                  </Paper>
-                </Box>
-              )}
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
+                    <svg
+                      className="w-16 h-16 text-gray-400 mx-auto mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      No products found
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                      Try adjusting your filters or search criteria to find what
+                      you're looking for.
+                    </p>
+                    <button
+                      onClick={resetAllFilters}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      Reset All Filters
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </main>
 
-      {/* Filter Drawer - Mobile */}
-      <SwipeableDrawer
-        anchor="left"
-        open={filterDrawerOpen}
-        onClose={toggleFilterDrawer}
-        onOpen={() => setFilterDrawerOpen(true)}
-        sx={{
-          display: { md: "none" },
-          "& .MuiDrawer-paper": {
-            width: "85%",
-            maxWidth: 350,
-            borderTopRightRadius: 16,
-            borderBottomRightRadius: 16,
-            boxShadow: "5px 0 25px rgba(0,0,0,0.1)",
-          },
-        }}
-      >
-        {filterContent}
-      </SwipeableDrawer>
+      <Footer />
 
-      {/* Quick View Modal */}
-      {quickViewProduct && <QuickViewModal />}
+      {compareItems.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 bg-[#1e2a3b] p-4 shadow-lg z-50 border-t border-gray-700">
+          <div className="container mx-auto flex justify-between items-center">
+            <div className="text-white font-medium">
+              {compareItems.length}{" "}
+              {compareItems.length === 1 ? "product" : "products"} selected
+            </div>
+            <button
+              onClick={openCompareModal}
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg flex items-center"
+            >
+              <CompareArrows className="mr-2" />
+              Compare {compareItems.length}{" "}
+              {compareItems.length === 1 ? "Product" : "Products"}
+            </button>
+          </div>
+        </div>
+      )}
 
-      {/* Compare Products Drawer */}
-      <CompareDrawer />
+      {/* Comparison Modal */}
+      <AnimatePresence>
+        {showCompareModal && (
+          <motion.div
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeCompareModal}
+          >
+            <motion.div
+              className="bg-[#1e2a3b] rounded-xl w-full max-w-6xl max-h-[90vh] overflow-auto"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="sticky top-0 bg-[#1e2a3b] p-6 border-b border-gray-700 flex justify-between items-center z-10">
+                <h2 className="text-2xl font-bold text-white flex items-center">
+                  <CompareArrows className="mr-3" />
+                  Product Comparison
+                </h2>
+                <button
+                  onClick={closeCompareModal}
+                  className="w-10 h-10 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-white transition-colors"
+                >
+                  <CloseIcon />
+                </button>
+              </div>
 
-      {/* Scroll to Top Button */}
-      <Zoom in={showScrollTop}>
-        <Box
-          onClick={scrollToTop}
-          sx={{
-            position: "fixed",
-            bottom: 20,
-            right: 20,
-            zIndex: 10,
-            bgcolor: "white",
-            color: "primary.main",
-            borderRadius: "50%",
-            width: 50,
-            height: 50,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-            cursor: "pointer",
-            transition: "all 0.3s",
-            "&:hover": {
-              transform: "translateY(-5px)",
-              boxShadow: "0 6px 25px rgba(0,0,0,0.15)",
-              bgcolor: "primary.main",
-              color: "white",
-            },
-          }}
-        >
-          <ArrowUpward />
-        </Box>
-      </Zoom>
-    </Layout>
+              {/* Modal Content */}
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  {compareItems.map((item, index) => (
+                    <motion.div
+                      key={item.id}
+                      className="bg-[#273548] rounded-xl overflow-hidden shadow-lg"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      {/* Product Header */}
+                      <div className="relative">
+                        <div className="bg-[#2c3e50] p-3 flex justify-between items-center">
+                          <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
+                            {item.brand}
+                          </div>
+                          <button
+                            onClick={() => toggleCompare(item)}
+                            className="w-8 h-8 rounded-full bg-gray-700 hover:bg-red-500 flex items-center justify-center text-white transition-colors"
+                          >
+                            <CloseIcon fontSize="small" />
+                          </button>
+                        </div>
+
+                        {/* Product Image */}
+                        <div className="h-48 flex items-center justify-center p-4 bg-gradient-to-b from-[#273548] to-[#1e2a3b]">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="h-full object-contain"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Product Info */}
+                      <div className="p-5">
+                        <h3 className="text-white font-medium text-lg mb-3 line-clamp-2 h-[48px]">
+                          {item.name}
+                        </h3>
+
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex flex-col">
+                            <div className="text-xl font-bold text-indigo-400">
+                              ${item.price.toFixed(2)}
+                            </div>
+                            {item.originalPrice && (
+                              <span className="text-sm text-gray-500 line-through">
+                                ${item.originalPrice.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <svg
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < Math.floor(item.rating)
+                                    ? "text-yellow-400"
+                                    : i === Math.floor(item.rating) &&
+                                      !Number.isInteger(item.rating)
+                                    ? "text-yellow-400"
+                                    : "text-gray-600"
+                                }`}
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            ))}
+                            <span className="text-xs text-gray-400 ml-1">
+                              ({item.reviewCount})
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Product Specs */}
+                        <div className="space-y-3 mb-5">
+                          <div className="flex justify-between py-2 border-b border-gray-700">
+                            <span className="text-gray-400">Availability</span>
+                            <span
+                              className={
+                                item.inStock
+                                  ? "text-green-400 font-medium"
+                                  : "text-red-400 font-medium"
+                              }
+                            >
+                              {item.inStock ? "In Stock" : "Out of Stock"}
+                            </span>
+                          </div>
+
+                          {item.discount && (
+                            <div className="flex justify-between py-2 border-b border-gray-700">
+                              <span className="text-gray-400">Discount</span>
+                              <span className="text-green-400 font-medium">
+                                {item.discount}% Off
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Add more specs as needed - all products will have the same specs for consistency */}
+                          <div className="flex justify-between py-2 border-b border-gray-700">
+                            <span className="text-gray-400">Category</span>
+                            <span className="text-white">
+                              {item.category || "Electronics"}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <button
+                            onClick={() => handleAddToCart(item)}
+                            disabled={!item.inStock}
+                            className={`h-11 rounded-lg flex items-center justify-center transition-all ${
+                              item.inStock
+                                ? "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+                                : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                            }`}
+                          >
+                            <ShoppingCart className="mr-2" fontSize="small" />
+                            Add to Cart
+                          </button>
+
+                          <Link
+                            to={`/products/${item.id}`}
+                            className="h-11 rounded-lg border border-indigo-500 text-indigo-400 hover:bg-indigo-500 hover:text-white transition-colors flex items-center justify-center"
+                          >
+                            <Visibility className="mr-2" fontSize="small" />
+                            Details
+                          </Link>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="sticky bottom-0 bg-[#1e2a3b] p-6 border-t border-gray-700 flex justify-between items-center">
+                <button
+                  onClick={() => dispatch(clearCompare())}
+                  className="px-5 py-2.5 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors flex items-center"
+                >
+                  <DeleteIcon className="mr-2" fontSize="small" />
+                  Clear All
+                </button>
+
+                <button
+                  onClick={closeCompareModal}
+                  className="px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

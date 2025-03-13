@@ -27,6 +27,7 @@ import UserDropdown from "../auth/UserDropdown";
 import { Box, IconButton } from "@mui/material";
 import { motion } from "framer-motion";
 import { Button } from "@mui/material";
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -50,6 +51,9 @@ const Header = () => {
   // Giả lập số lượng giỏ hàng và wishlist
   const cartQuantity = 3;
   const wishlistTotal = 5;
+
+  // Get wishlist items from Redux store
+  const wishlistItems = useSelector((state) => state.wishlist.items);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -293,12 +297,12 @@ const Header = () => {
                       className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300"
                     >
                       <HeartIcon className="h-6 w-6" />
-                      {wishlistTotal > 0 && (
+                      {wishlistItems.length > 0 && (
                         <span
                           className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-pink-500 to-red-500 text-white 
                                        text-xs rounded-full flex items-center justify-center"
                         >
-                          {wishlistTotal}
+                          {wishlistItems.length}
                         </span>
                       )}
                     </Link>
@@ -527,7 +531,7 @@ const Header = () => {
       {drawerOpen && (
         <div className="fixed inset-0 z-40 flex">
           {/* Backdrop */}
-          <div
+          <diva
             className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300"
             onClick={toggleDrawer}
           />
@@ -620,7 +624,7 @@ const Header = () => {
                         <div className="relative mr-4">
                           <HeartIcon className="h-6 w-6 flex-shrink-0 text-indigo-500 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300" />
                           <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full">
-                            {wishlistTotal}
+                            {wishlistItems.length}
                           </span>
                         </div>
                         Wishlist

@@ -2,6 +2,9 @@ import React from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppRouter from "./utils/router";
+import { CompareProvider } from "./context/CompareContext";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const theme = createTheme({
   palette: {
@@ -58,10 +61,28 @@ const theme = createTheme({
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AppRouter />
-    </ThemeProvider>
+    <CompareProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AppRouter />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          toastStyle={{
+            borderRadius: '8px',
+            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
+          }}
+        />
+      </ThemeProvider>
+    </CompareProvider>
   );
 }
 

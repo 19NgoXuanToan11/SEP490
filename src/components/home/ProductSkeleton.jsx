@@ -49,7 +49,7 @@ const ProductSkeleton = () => {
             }}
           />
           <Skeleton
-            variant="text"
+            variant="text"p
             width="100%"
             height={20}
             sx={{

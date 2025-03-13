@@ -50,14 +50,16 @@ const Wishlist = () => {
   // Handle remove from wishlist with toast notification
   const handleRemoveFromWishlist = (product) => {
     dispatch(toggleWishlistItem(product));
-    
+
     // Show toast notification
     toast.success(
       <div className="flex items-center">
         <FavoriteIcon className="mr-2 text-red-500" fontSize="small" />
         <div>
           <p className="font-medium">Removed from Wishlist</p>
-          <p className="text-sm opacity-80">{product.name} has been removed from your wishlist</p>
+          <p className="text-sm opacity-80">
+            {product.name} has been removed from your wishlist
+          </p>
         </div>
       </div>,
       {
@@ -76,14 +78,16 @@ const Wishlist = () => {
   // Handle clear all wishlist items with toast notification
   const handleClearWishlist = () => {
     dispatch(clearWishlist());
-    
+
     // Show toast notification
     toast.info(
       <div className="flex items-center">
         <DeleteIcon className="mr-2 text-red-400" fontSize="small" />
         <div>
           <p className="font-medium">Wishlist Cleared</p>
-          <p className="text-sm opacity-80">All items have been removed from your wishlist</p>
+          <p className="text-sm opacity-80">
+            All items have been removed from your wishlist
+          </p>
         </div>
       </div>,
       {
@@ -222,7 +226,9 @@ const Wishlist = () => {
                           <ProductCard
                             product={product}
                             onAddToCart={handleAddToCart}
-                            onRemoveFromWishlist={() => handleRemoveFromWishlist(product)}
+                            onRemoveFromWishlist={() =>
+                              handleRemoveFromWishlist(product)
+                            }
                           />
                         </motion.div>
                       ))}
@@ -341,7 +347,9 @@ const Wishlist = () => {
 
                                 <div className="flex gap-2">
                                   <button
-                                    onClick={() => handleRemoveFromWishlist(product)}
+                                    onClick={() =>
+                                      handleRemoveFromWishlist(product)
+                                    }
                                     className="h-[42px] px-4 rounded-lg border border-red-500 text-red-400 hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center"
                                   >
                                     <DeleteIcon
@@ -484,7 +492,7 @@ const Wishlist = () => {
           color: "white",
           borderRadius: "8px",
           boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-          border: "1px solid rgba(255, 255, 255, 0.1)"
+          border: "1px solid rgba(255, 255, 255, 0.1)",
         }}
       />
 

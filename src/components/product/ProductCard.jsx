@@ -99,9 +99,64 @@ const ProductCard = ({ product, onAddToCart }) => {
     }
   };
 
-  // Handle compare toggle
-  const handleCompareToggle = () => {
+  // Thêm hàm xử lý so sánh sản phẩm
+  const handleCompareClick = () => {
     dispatch(toggleCompareItem(product));
+
+    // Hiển thị thông báo toast
+    if (isInCompareList) {
+      toast.info(
+        <div className="flex items-center">
+          <div className="mr-3 bg-indigo-100 text-indigo-500 rounded-full p-2">
+            <CompareArrows fontSize="small" />
+          </div>
+          <div>
+            <p className="font-medium">Product Comparison</p>
+            <p className="text-sm opacity-80">
+              {name} has been removed from comparison
+            </p>
+          </div>
+        </div>,
+        {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          className: "bg-white text-gray-800 shadow-lg rounded-lg",
+          bodyClassName: "p-0",
+          toastClassName: "bg-white rounded-lg shadow-lg overflow-hidden",
+        }
+      );
+    } else {
+      toast.info(
+        <div className="flex items-center">
+          <div className="mr-3 bg-indigo-100 text-indigo-500 rounded-full p-2">
+            <CompareArrows fontSize="small" />
+          </div>
+          <div>
+            <p className="font-medium">Product Comparison</p>
+            <p className="text-sm opacity-80">
+              {name} has been added to comparison
+            </p>
+          </div>
+        </div>,
+        {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          className: "bg-white text-gray-800 shadow-lg rounded-lg",
+          bodyClassName: "p-0",
+          toastClassName: "bg-white rounded-lg shadow-lg overflow-hidden",
+        }
+      );
+    }
   };
 
   // Create stars array based on rating
@@ -151,15 +206,16 @@ const ProductCard = ({ product, onAddToCart }) => {
             )}
           </motion.button>
 
+          {/* Nút so sánh sản phẩm - thay đổi màu khi đã được chọn */}
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+            className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors shadow-md ${
               isInCompareList
                 ? "bg-indigo-500 text-white"
                 : "bg-white text-gray-800 hover:bg-indigo-500 hover:text-white"
             }`}
-            onClick={handleCompareToggle}
+            onClick={handleCompareClick}
             aria-label="Compare"
           >
             <CompareArrows fontSize="small" />
@@ -173,6 +229,18 @@ const ProductCard = ({ product, onAddToCart }) => {
             <Visibility fontSize="small" />
           </Link>
         </div>
+
+        {/* Thêm badge hiển thị khi sản phẩm đã được thêm vào so sánh */}
+        {isInCompareList && (
+          <div className="absolute top-3 right-3 z-20 bg-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
+            <CompareArrows
+              fontSize="small"
+              className="mr-1"
+              style={{ fontSize: "14px" }}
+            />
+            COMPARING
+          </div>
+        )}
 
         {/* Product image */}
         <Link to={`/products/${id}`}>

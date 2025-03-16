@@ -1,6 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleCompareItem } from "../../store/compareSlice";
+import CompareArrows from "@mui/icons-material/CompareArrows";
+import { toast } from "react-toastify";
 
 const ProductList = ({ product, onAddToCart, onAddToWishlist }) => {
   const {
@@ -17,6 +21,74 @@ const ProductList = ({ product, onAddToCart, onAddToWishlist }) => {
     isNew,
   } = product;
 
+  const dispatch = useDispatch();
+
+  // Lấy danh sách sản phẩm so sánh từ Redux store
+  const compareItems = useSelector((state) => state.compare.items);
+
+  // Kiểm tra xem sản phẩm đã được thêm vào danh sách so sánh chưa
+  const isInCompareList = compareItems.some((item) => item.id === id);
+
+  // Xử lý khi nhấn nút so sánh
+  const handleCompareClick = () => {
+    dispatch(toggleCompareItem(product));
+
+    // Hiển thị thông báo toast
+    if (isInCompareList) {
+      toast.info(
+        <div className="flex items-center">
+          <div className="mr-3 bg-indigo-100 text-indigo-500 rounded-full p-2">
+            <CompareArrows fontSize="small" />
+          </div>
+          <div>
+            <p className="font-medium">Product Comparison</p>
+            <p className="text-sm opacity-80">
+              {name} has been removed from comparison
+            </p>
+          </div>
+        </div>,
+        {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          className: "bg-white text-gray-800 shadow-lg rounded-lg",
+          bodyClassName: "p-0",
+          toastClassName: "bg-white rounded-lg shadow-lg overflow-hidden",
+        }
+      );
+    } else {
+      toast.info(
+        <div className="flex items-center">
+          <div className="mr-3 bg-indigo-100 text-indigo-500 rounded-full p-2">
+            <CompareArrows fontSize="small" />
+          </div>
+          <div>
+            <p className="font-medium">Product Comparison</p>
+            <p className="text-sm opacity-80">
+              {name} has been added to comparison
+            </p>
+          </div>
+        </div>,
+        {
+          position: "bottom-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          className: "bg-white text-gray-800 shadow-lg rounded-lg",
+          bodyClassName: "p-0",
+          toastClassName: "bg-white rounded-lg shadow-lg overflow-hidden",
+        }
+      );
+    }
+  };
+
   // Tạo mảng sao dựa trên rating
   const stars = Array.from({ length: 5 }, (_, index) => {
     const value = index + 1;
@@ -27,7 +99,7 @@ const ProductList = ({ product, onAddToCart, onAddToWishlist }) => {
   });
 
   return (
-    <div className="bg-[#1e2a3b] rounded-lg overflow-hidden flex flex-col md:flex-row">
+    <div className="bg-[#1e2a3b] rounded-lg overflow-hidden flex flex-col md:flex-row relative">
       {/* Product image container */}
       <div className="relative h-[220px] md:w-[220px] md:min-w-[220px] overflow-hidden">
         {/* Discount badge */}
@@ -44,6 +116,18 @@ const ProductList = ({ product, onAddToCart, onAddToWishlist }) => {
           </div>
         )}
 
+        {/* Badge hiển thị khi sản phẩm đã được thêm vào so sánh */}
+        {isInCompareList && (
+          <div className="absolute top-3 right-3 z-20 bg-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
+            <CompareArrows
+              fontSize="small"
+              className="mr-1"
+              style={{ fontSize: "14px" }}
+            />
+            COMPARING
+          </div>
+        )}
+
         {/* Product image */}
         <Link to={`/products/${id}`}>
           <img
@@ -56,7 +140,7 @@ const ProductList = ({ product, onAddToCart, onAddToWishlist }) => {
 
       {/* Product info */}
       <div className="p-4 flex flex-col flex-grow">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-start">
+        <div className="flex justify-between items-start">
           <div>
             <div className="text-xs text-indigo-400 font-semibold uppercase mb-1">
               {brand}
@@ -66,82 +150,95 @@ const ProductList = ({ product, onAddToCart, onAddToWishlist }) => {
                 {name}
               </h3>
             </Link>
-
-            {/* Rating */}
-            <div className="flex items-center mb-3">
-              <div className="flex mr-1">
-                {stars.map((star, index) => (
-                  <svg
-                    key={index}
-                    className={`w-4 h-4 ${
-                      star.filled
-                        ? "text-yellow-400"
-                        : star.halfFilled
-                        ? "text-yellow-400"
-                        : "text-gray-600"
-                    }`}
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-              <span className="text-xs text-gray-400">({reviewCount})</span>
-            </div>
           </div>
 
-          {/* Price */}
-          <div className="mb-3 md:mb-0">
-            {originalPrice ? (
-              <div className="flex items-center">
-                <span className="text-xl font-bold text-indigo-400">
-                  ${price.toFixed(2)}
-                </span>
-                <span className="text-sm text-gray-500 line-through ml-2">
-                  ${originalPrice.toFixed(2)}
-                </span>
-              </div>
-            ) : (
+          {/* Nút so sánh */}
+          <button
+            onClick={handleCompareClick}
+            className={`ml-2 p-2 rounded-full transition-colors ${
+              isInCompareList
+                ? "bg-indigo-500 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-indigo-500 hover:text-white"
+            }`}
+            aria-label="Compare"
+          >
+            <CompareArrows fontSize="small" />
+          </button>
+        </div>
+
+        {/* Existing content */}
+        <div className="flex items-center mb-3">
+          <div className="flex mr-2">
+            {stars.map((star, index) => (
+              <svg
+                key={index}
+                className={`w-4 h-4 ${
+                  star.filled
+                    ? "text-yellow-400"
+                    : star.halfFilled
+                    ? "text-yellow-400"
+                    : "text-gray-600"
+                }`}
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            ))}
+          </div>
+          <span className="text-xs text-gray-400">({reviewCount} reviews)</span>
+        </div>
+
+        {/* Price */}
+        <div className="mb-3">
+          {originalPrice ? (
+            <div className="flex items-center">
               <span className="text-xl font-bold text-indigo-400">
                 ${price.toFixed(2)}
               </span>
-            )}
-
-            {/* Stock status */}
-            <div className="mt-2">
-              {inStock ? (
-                <div className="flex items-center text-green-400 text-xs">
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span>In Stock</span>
-                </div>
-              ) : (
-                <div className="flex items-center text-red-400 text-xs">
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span>Out of Stock</span>
-                </div>
-              )}
+              <span className="text-sm text-gray-500 line-through ml-2">
+                ${originalPrice.toFixed(2)}
+              </span>
             </div>
+          ) : (
+            <span className="text-xl font-bold text-indigo-400">
+              ${price.toFixed(2)}
+            </span>
+          )}
+
+          {/* Stock status */}
+          <div className="mt-2">
+            {inStock ? (
+              <div className="flex items-center text-green-400 text-xs">
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>In Stock</span>
+              </div>
+            ) : (
+              <div className="flex items-center text-red-400 text-xs">
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>Out of Stock</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -195,25 +292,6 @@ const ProductList = ({ product, onAddToCart, onAddToWishlist }) => {
                   strokeLinejoin="round"
                   strokeWidth="2"
                   d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-            </button>
-
-            <button
-              className="h-[42px] px-4 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors flex items-center justify-center"
-              aria-label="Compare"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
                 />
               </svg>
             </button>

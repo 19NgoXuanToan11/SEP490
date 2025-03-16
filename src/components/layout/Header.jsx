@@ -135,8 +135,8 @@ const Header = () => {
     { text: "Home", path: "/", icon: HomeIcon },
     { text: "Products", path: "/products", icon: Category },
     { text: "Exchange", path: "/exchange", icon: SwitchHorizontalIcon },
-    { text: "About", path: "/about", icon: InformationCircleIcon },
-    { text: "Contact", path: "/contact", icon: SupportIcon },
+    // { text: "About", path: "/about", icon: InformationCircleIcon },
+    // { text: "Contact", path: "/contact", icon: SupportIcon },
   ];
 
   // NavLink Component với animation tinh tế
@@ -188,77 +188,37 @@ const Header = () => {
             : "bg-white dark:bg-gray-900 h-[120px]"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full ml-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
           <div className="flex items-center justify-between h-full">
             {/* Logo và Brand */}
-            <Link
-              to="/"
-              className="flex-shrink-0 flex items-center transition-transform duration-300 hover:opacity-80"
-            >
-              <img
-                className={`transition-all duration-300 ${
-                  scrolled ? "h-14 w-auto" : "h-20 w-auto"
-                }`}
-                src={logo || "https://via.placeholder.com/40?text=RT"}
-                alt="ReTech Logo"
-              />
-              <span
-                className={`ml-2 text-2xl font-bold transition-all duration-300 ${
-                  scrolled
-                    ? "text-gray-800 dark:text-white"
-                    : "text-gray-800 dark:text-white"
-                } hidden sm:block`}
-              >
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
-                  Re
-                </span>
-                <span className="text-gray-800 dark:text-white">Tech</span>
-              </span>
-            </Link>
-
-            {/* Menu trên desktop */}
-            <div className="hidden md:flex items-center justify-center flex-1 px-8">
-              {/* Thanh tìm kiếm */}
-              <form
-                onSubmit={handleSearchSubmit}
-                className="relative mr-8 flex-grow max-w-md"
-              >
-                <div
-                  className={`flex items-center rounded-full transition-all duration-300 ${
-                    searchFocused
-                      ? "ring-2 ring-indigo-500 dark:ring-indigo-400"
-                      : ""
-                  } ${
+            <div className="flex-shrink-0 flex items-center transition-transform duration-300 hover:opacity-80 w-1/4">
+              <Link to="/" className="flex items-center">
+                <img
+                  className={`transition-all duration-300 ${
+                    scrolled ? "h-14 w-auto" : "h-20 w-auto"
+                  }`}
+                  src={logo || "https://via.placeholder.com/40?text=RT"}
+                  alt="ReTech Logo"
+                />
+                <span
+                  className={`ml-2 text-2xl font-bold transition-all duration-300 ${
                     scrolled
-                      ? "bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
-                      : "bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
-                  } px-4 py-2`}
+                      ? "text-gray-800 dark:text-white"
+                      : "text-gray-800 dark:text-white"
+                  } hidden sm:block`}
                 >
-                  <SearchIcon
-                    className={`h-5 w-5 ${
-                      searchFocused
-                        ? "text-indigo-500 dark:text-indigo-400"
-                        : "text-gray-500 dark:text-gray-400"
-                    } transition-colors duration-300`}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    onFocus={() => setSearchFocused(true)}
-                    onBlur={() => setSearchFocused(false)}
-                    className={`ml-2 bg-transparent border-none outline-none flex-grow ${
-                      scrolled
-                        ? "text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                        : "text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                    } transition-colors duration-300`}
-                  />
-                </div>
-              </form>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
+                    Re
+                  </span>
+                  <span className="text-gray-800 dark:text-white">Tech</span>
+                </span>
+              </Link>
+            </div>
 
-              {/* Menu items */}
-              <nav className="flex space-x-6 justify-center">
+            {/* Menu trên desktop - Điều chỉnh để chiếm không gian giữa */}
+            <div className="hidden md:flex items-center justify-center flex-1 w-2/4">
+              {/* Menu items - Điều chỉnh space-x và justify-content */}
+              <nav className="flex space-x-16 justify-center w-full">
                 {menuItems.map((item) => (
                   <NavLink
                     key={item.text}
@@ -285,170 +245,54 @@ const Header = () => {
               </button>
             </div>
 
-            {/* Right section */}
-            <div className="flex items-center space-x-4">
+            {/* Right section - Điều chỉnh để chiếm không gian bên phải */}
+            <div className="flex items-center justify-end space-x-4 w-1/4">
               {isLoggedIn ? (
                 <>
-                  {/* Cart, Wishlist, Notifications icons */}
-                  <div className="hidden sm:flex items-center space-x-4">
-                    {/* Wishlist */}
-                    <Link
-                      to="/wishlist"
-                      className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300"
-                    >
-                      <HeartIcon className="h-6 w-6" />
-                      {wishlistItems.length > 0 && (
-                        <span
-                          className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-pink-500 to-red-500 text-white 
-                                       text-xs rounded-full flex items-center justify-center"
-                        >
-                          {wishlistItems.length}
-                        </span>
-                      )}
-                    </Link>
-
-                    {/* Cart */}
-                    <Link
-                      to="/cart"
-                      className="flex items-center space-x-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700
-                          rounded-lg hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 group"
-                    >
-                      <ShoppingCartIcon className="h-5 w-5 text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300" />
-                      <span className="font-medium text-base whitespace-nowrap group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
-                        Cart
-                      </span>
-                      {cartQuantity > 0 && (
-                        <span
-                          className="flex items-center justify-center w-6 h-6 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400
-                              text-sm font-semibold rounded-full group-hover:bg-indigo-200 dark:group-hover:bg-indigo-800/40 transition-colors duration-300"
-                        >
-                          {cartQuantity}
-                        </span>
-                      )}
-                    </Link>
-
-                    {/* Notifications dropdown */}
-                    <div className="relative">
-                      <button
-                        onClick={toggleNotifications}
-                        className={`p-2 rounded-full relative group ${
-                          scrolled
-                            ? "text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-                            : "text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
-                        } transition-colors duration-300 ${
-                          notificationsOpen
-                            ? "text-indigo-600 dark:text-indigo-400"
-                            : ""
-                        }`}
+                  {/* Wishlist icon */}
+                  <Link
+                    to="/wishlist"
+                    className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300"
+                  >
+                    <HeartIcon className="h-6 w-6" />
+                    {wishlistItems.length > 0 && (
+                      <span
+                        className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-pink-500 to-red-500 text-white 
+                                   text-xs rounded-full flex items-center justify-center"
                       >
-                        <BellIcon className="h-6 w-6" />
-                        <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full group-hover:scale-110 transition-transform duration-300">
-                          7
-                        </span>
-                      </button>
+                        {wishlistItems.length}
+                      </span>
+                    )}
+                  </Link>
 
-                      {notificationsOpen && (
-                        <div className="absolute right-0 z-10 mt-2 w-80 origin-top-right rounded-xl bg-white dark:bg-gray-800 shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden transform transition-all duration-300 ease-out">
-                          <div className="py-1">
-                            <div className="flex justify-between items-center px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500">
-                              <h3 className="text-sm font-semibold text-white">
-                                Notifications
-                              </h3>
-                              <button className="text-xs text-white/80 hover:text-white transition-colors duration-300">
-                                Mark all as read
-                              </button>
-                            </div>
-                            <div className="max-h-60 overflow-y-auto">
-                              {[
-                                {
-                                  id: 1,
-                                  type: "message",
-                                  time: "5 min ago",
-                                  text: "New message from Sarah",
-                                  read: false,
-                                },
-                                {
-                                  id: 2,
-                                  type: "order",
-                                  time: "1 hour ago",
-                                  text: "Your order has been shipped",
-                                  read: false,
-                                },
-                                {
-                                  id: 3,
-                                  type: "system",
-                                  time: "1 day ago",
-                                  text: "System maintenance scheduled",
-                                  read: true,
-                                },
-                              ].map((notification) => (
-                                <div
-                                  key={notification.id}
-                                  className={`px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300 ${
-                                    notification.read
-                                      ? ""
-                                      : "border-l-4 border-indigo-500"
-                                  }`}
-                                >
-                                  <div className="flex items-start">
-                                    <div
-                                      className={`flex-shrink-0 rounded-full p-2 ${
-                                        notification.type === "message"
-                                          ? "bg-gradient-to-br from-indigo-100 to-blue-100 dark:from-indigo-900/40 dark:to-blue-900/40 text-indigo-600 dark:text-indigo-400"
-                                          : notification.type === "order"
-                                          ? "bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/40 dark:to-emerald-900/40 text-green-600 dark:text-green-400"
-                                          : "bg-gradient-to-br from-amber-100 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-900/40 text-amber-600 dark:text-amber-400"
-                                      }`}
-                                    >
-                                      {notification.type === "message" ? (
-                                        <MailIcon className="h-5 w-5" />
-                                      ) : notification.type === "order" ? (
-                                        <ShoppingCartIcon className="h-5 w-5" />
-                                      ) : (
-                                        <InformationCircleIcon className="h-5 w-5" />
-                                      )}
-                                    </div>
-                                    <div className="ml-3 w-0 flex-1">
-                                      <p
-                                        className={`text-sm ${
-                                          notification.read
-                                            ? "text-gray-600 dark:text-gray-400"
-                                            : "font-medium text-gray-900 dark:text-white"
-                                        }`}
-                                      >
-                                        {notification.text}
-                                      </p>
-                                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                                        {notification.time}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                            <div className="border-t border-gray-200 dark:border-gray-700">
-                              <Link
-                                to="/notifications"
-                                className="block text-center px-4 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
-                              >
-                                View all notifications
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  {/* Cart */}
+                  <Link
+                    to="/cart"
+                    className="flex items-center space-x-2 px-3 py-2 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700
+                        rounded-lg hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 group"
+                  >
+                    <ShoppingCartIcon className="h-5 w-5 text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300" />
+                    <span className="font-medium text-sm whitespace-nowrap group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
+                      Cart
+                    </span>
+                    {cartQuantity > 0 && (
+                      <span
+                        className="flex items-center justify-center w-5 h-5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400
+                            text-xs font-semibold rounded-full group-hover:bg-indigo-200 dark:group-hover:bg-indigo-800/40 transition-colors duration-300"
+                      >
+                        {cartQuantity}
+                      </span>
+                    )}
+                  </Link>
 
                   {/* User profile button */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleUserMenuOpen}
-                    className="relative flex items-center space-x-2 p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                    className="relative flex items-center p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center text-white font-medium">
-                      {/* Display first letter of user's name */}
                       {localStorage.getItem("user")
                         ? JSON.parse(
                             localStorage.getItem("user")
@@ -460,14 +304,6 @@ const Header = () => {
                         : "U"}
                     </div>
                   </motion.button>
-
-                  {/* User dropdown menu */}
-                  <UserDropdown
-                    anchorEl={userMenuAnchorEl}
-                    open={userMenuOpen}
-                    onClose={handleUserMenuClose}
-                    onLogout={handleLogout}
-                  />
                 </>
               ) : (
                 <motion.button

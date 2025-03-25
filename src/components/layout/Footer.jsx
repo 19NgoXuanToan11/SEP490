@@ -103,10 +103,7 @@ const Footer = () => {
 
   const socialIcons = [
     { icon: <Facebook />, label: "Facebook", color: "#1877F2" },
-    { icon: <Twitter />, label: "Twitter", color: "#1DA1F2" },
     { icon: <Instagram />, label: "Instagram", color: "#E4405F" },
-    { icon: <LinkedIn />, label: "LinkedIn", color: "#0A66C2" },
-    { icon: <YouTube />, label: "YouTube", color: "#FF0000" },
   ];
 
   const quickLinks = [
@@ -131,24 +128,13 @@ const Footer = () => {
     <Box
       component="footer"
       sx={{
-        background: "#0f172a",
+        background: "#111827",
         color: "white",
         pt: 8,
         pb: 4,
         mt: "auto",
         position: "relative",
         overflow: "hidden",
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: "4px",
-          background: "linear-gradient(90deg, #3f51b5, #9c27b0, #3f51b5)",
-          backgroundSize: "200% 100%",
-          animation: "gradient 3s linear infinite",
-        },
       }}
     >
       {/* Animated background elements */}
@@ -469,139 +455,6 @@ const Footer = () => {
                     },
                   }}
                 >
-                  Stay Updated
-                </Typography>
-              </motion.div>
-
-              <motion.div variants={itemVariants}>
-                <Typography
-                  variant="body2"
-                  sx={{ mb: 2, color: "rgba(255, 255, 255, 0.8)" }}
-                >
-                  Subscribe to our newsletter for the latest products and deals.
-                </Typography>
-              </motion.div>
-
-              <motion.div variants={itemVariants}>
-                <Box
-                  component="form"
-                  onSubmit={handleSubmit}
-                  sx={{
-                    display: "flex",
-                    mb: 3,
-                    position: "relative",
-                    overflow: "hidden",
-                    borderRadius: 2,
-                    transition: "all 0.3s ease",
-                    boxShadow: isEmailFocused
-                      ? "0 0 0 2px #6366f1"
-                      : "0 0 0 1px rgba(255, 255, 255, 0.3)",
-                  }}
-                >
-                  <AnimatePresence>
-                    {isSubmitted ? (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          backgroundColor: "#4caf50",
-                          color: "white",
-                          zIndex: 2,
-                        }}
-                      >
-                        <Typography variant="body2" fontWeight="medium">
-                          Thank you for subscribing!
-                        </Typography>
-                      </motion.div>
-                    ) : null}
-                  </AnimatePresence>
-                  <TextField
-                    variant="outlined"
-                    placeholder="Your Email"
-                    size="small"
-                    fullWidth
-                    value={emailValue}
-                    onChange={handleEmailChange}
-                    onFocus={() => setIsEmailFocused(true)}
-                    onBlur={() => setIsEmailFocused(false)}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: "48px",
-                        "& fieldset": {
-                          border: "none",
-                        },
-                      },
-                      "& .MuiInputBase-input": {
-                        color: "white",
-                        pl: 2,
-                        "&::placeholder": {
-                          color: "rgba(255, 255, 255, 0.6)",
-                          opacity: 1,
-                        },
-                      },
-                      bgcolor: "rgba(255, 255, 255, 0.1)",
-                    }}
-                  />
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{
-                      height: "48px",
-                      minWidth: "48px",
-                      borderRadius: "0 8px 8px 0",
-                      px: 2,
-                      background: "linear-gradient(45deg, #3f51b5, #9c27b0)",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        background: "linear-gradient(45deg, #303f9f, #7b1fa2)",
-                        transform: "translateX(2px)",
-                      },
-                    }}
-                  >
-                    <Send
-                      sx={{
-                        transition: "transform 0.3s ease",
-                        "&:hover": {
-                          transform: "translateX(2px)",
-                        },
-                      }}
-                    />
-                  </Button>
-                </Box>
-              </motion.div>
-
-              <motion.div variants={itemVariants}>
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{
-                    position: "relative",
-                    display: "inline-block",
-                    pb: 1,
-                    "&:after": {
-                      content: '""',
-                      position: "absolute",
-                      width: "60%",
-                      height: "2px",
-                      bottom: 0,
-                      left: 0,
-                      backgroundColor: "#6366f1",
-                      transition: "width 0.3s ease",
-                    },
-                    "&:hover:after": {
-                      width: "100%",
-                    },
-                  }}
-                >
                   Contact Us
                 </Typography>
               </motion.div>
@@ -610,17 +463,17 @@ const Footer = () => {
                 {[
                   {
                     icon: <Phone sx={{ fontSize: 20 }} />,
-                    text: "+1 (555) 123-4567",
+                    text: "0786485999",
                     animation: "wave",
                   },
                   {
                     icon: <Email sx={{ fontSize: 20 }} />,
-                    text: "support@retech.com",
+                    text: "toannxse171297@fpt.edu.vn",
                     animation: "pulse",
                   },
                   {
                     icon: <LocationOn sx={{ fontSize: 20 }} />,
-                    text: "123 Tech Street, San Francisco, CA 94107",
+                    text: "FPT University, HCMC",
                     animation: "bounce",
                   },
                 ].map((item, index) => (
@@ -670,91 +523,6 @@ const Footer = () => {
                   </motion.div>
                 ))}
               </List>
-            </Grid>
-          </Grid>
-        </motion.div>
-
-        <Divider
-          sx={{
-            borderColor: "rgba(255, 255, 255, 0.2)",
-            my: 4,
-            position: "relative",
-            "&::before": {
-              content: '""',
-              position: "absolute",
-              top: 0,
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "50px",
-              height: "3px",
-              background:
-                "linear-gradient(90deg, transparent, #6366f1, transparent)",
-              borderRadius: "3px",
-            },
-          }}
-        />
-
-        {/* Bottom Footer */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          viewport={{ once: true }}
-        >
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <Typography
-                variant="body2"
-                sx={{ color: "rgba(255, 255, 255, 0.7)" }}
-              >
-                © {new Date().getFullYear()} ReTech. All rights reserved.
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  justifyContent: { xs: "flex-start", md: "flex-end" },
-                  gap: { xs: 2, md: 3 },
-                }}
-              >
-                {["Terms of Service", "Privacy Policy", "Cookie Policy"].map(
-                  (text, index) => (
-                    <Link
-                      key={index}
-                      color="inherit"
-                      underline="none"
-                      component={RouterLink}
-                      to={`/${text.toLowerCase().replace(/\s+/g, "-")}`}
-                      sx={{
-                        fontSize: "0.875rem",
-                        color: "rgba(255, 255, 255, 0.7)",
-                        transition: "all 0.2s ease",
-                        position: "relative",
-                        "&:hover": {
-                          color: "#6366f1",
-                        },
-                        "&::after": {
-                          content: '""',
-                          position: "absolute",
-                          width: "0%",
-                          height: "1px",
-                          bottom: -1,
-                          left: 0,
-                          backgroundColor: "#6366f1",
-                          transition: "width 0.3s ease",
-                        },
-                        "&:hover::after": {
-                          width: "100%",
-                        },
-                      }}
-                    >
-                      {text}
-                    </Link>
-                  )
-                )}
-              </Box>
             </Grid>
           </Grid>
         </motion.div>

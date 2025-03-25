@@ -101,20 +101,16 @@ const Profile = () => {
 
   // Mock user data
   const userData = {
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    address: "123 Main St, New York, NY 10001",
+    firstName: "Ngo Xuan",
+    lastName: "Toan",
+    email: "toannxse171297@fpt.edu.vn",
+    phone: "0786485999",
+    address: "FPT University HCMC",
     bio: "Tech enthusiast and gadget collector. I love finding unique items and trading with fellow enthusiasts.",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    website: "https://johndoe.com",
-    facebook: "johndoe",
-    twitter: "johndoe",
-    memberSince: "2021-06-15",
+    avatar:
+      "https://i.pinimg.com/736x/41/06/b3/4106b37e6f8483a756ab76fc1531af16.jpg",
     exchangeCount: 47,
     purchaseCount: 32,
-    reviewCount: 29,
     averageRating: 4.8,
   };
 
@@ -173,528 +169,749 @@ const Profile = () => {
   };
 
   return (
-    <Layout>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          My Profile
-        </Typography>
-
-        <Grid container spacing={3}>
-          {/* Left Column - Profile Card */}
-          <Grid item xs={12} md={4}>
-            <Paper sx={{ p: 3, borderRadius: 2, height: "100%" }}>
-              <Box
+    <Box
+      sx={{
+        bgcolor: "#0f172a",
+        minHeight: "100vh",
+        color: "white",
+        position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: "5%",
+          right: "10%",
+          width: "300px",
+          height: "300px",
+          background:
+            "radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 70%)",
+          filter: "blur(50px)",
+          zIndex: 0,
+        },
+        "&::after": {
+          content: '""',
+          position: "absolute",
+          bottom: "10%",
+          left: "5%",
+          width: "250px",
+          height: "250px",
+          background:
+            "radial-gradient(circle, rgba(147, 51, 234, 0.1) 0%, rgba(147, 51, 234, 0) 70%)",
+          filter: "blur(60px)",
+          zIndex: 0,
+        },
+      }}
+    >
+      <Layout>
+        <Container
+          maxWidth="lg"
+          sx={{ py: 5, position: "relative", zIndex: 1 }}
+        >
+          <Grid container spacing={4}>
+            {/* Left Column - Profile Card */}
+            <Grid item xs={12} md={4}>
+              <Paper
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
+                  p: 4,
+                  borderRadius: 3,
+                  height: "100%",
+                  bgcolor: "rgba(15, 23, 42, 0.7)",
+                  border: "1px solid rgba(99, 102, 241, 0.15)",
+                  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.3)",
+                  backdropFilter: "blur(16px)",
+                  color: "white",
+                  position: "relative",
+                  overflow: "hidden",
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: "120px",
+                    background:
+                      "linear-gradient(90deg, rgba(63, 81, 181, 0.15), rgba(99, 102, 241, 0.2))",
+                    borderRadius: "16px 16px 0 0",
+                    zIndex: 0,
+                  },
                 }}
               >
-                <Avatar
-                  src={userData.avatar}
-                  alt={`${userData.firstName} ${userData.lastName}`}
+                <Box
                   sx={{
-                    width: 120,
-                    height: 120,
-                    border: `4px solid ${theme.palette.background.paper}`,
-                    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    position: "relative",
+                    zIndex: 1,
+                  }}
+                >
+                  <Avatar
+                    src={userData.avatar}
+                    alt={`${userData.firstName} ${userData.lastName}`}
+                    sx={{
+                      width: 130,
+                      height: 130,
+                      border: `4px solid rgba(99, 102, 241, 0.6)`,
+                      boxShadow: "0 0 25px rgba(99, 102, 241, 0.5)",
+                      mt: 1,
+                      mb: 2,
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                        boxShadow: "0 0 35px rgba(99, 102, 241, 0.7)",
+                      },
+                    }}
+                  />
+
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      mt: 1,
+                      fontWeight: 600,
+                      color: "white",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.3)",
+                    }}
+                  >
+                    {userData.firstName} {userData.lastName}
+                  </Typography>
+
+                  <Button
+                    variant="contained"
+                    startIcon={<Edit />}
+                    onClick={handleOpenEditDialog}
+                    sx={{
+                      mt: 3,
+                      mb: 1,
+                      borderRadius: 6,
+                      padding: "10px 24px",
+                      background: "linear-gradient(90deg, #3f51b5, #6366f1)",
+                      boxShadow: "0 4px 15px rgba(99, 102, 241, 0.4)",
+                      textTransform: "none",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        background: "linear-gradient(90deg, #3949ab, #5a5fe6)",
+                        boxShadow: "0 6px 20px rgba(99, 102, 241, 0.6)",
+                        transform: "translateY(-2px)",
+                      },
+                      "&:active": {
+                        transform: "translateY(1px)",
+                      },
+                    }}
+                  >
+                    Edit Profile
+                  </Button>
+                </Box>
+
+                <Divider
+                  sx={{
+                    my: 3,
+                    borderColor: "rgba(99, 102, 241, 0.2)",
+                    opacity: 0.6,
                   }}
                 />
 
-                <Typography variant="h5" sx={{ mt: 2, fontWeight: 600 }}>
-                  {userData.firstName} {userData.lastName}
-                </Typography>
-
-                <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
-                  <Rating
-                    value={userData.averageRating}
-                    precision={0.5}
-                    readOnly
-                    size="small"
-                  />
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ ml: 1 }}
-                  >
-                    ({userData.reviewCount} reviews)
-                  </Typography>
-                </Box>
-
-                <Button
-                  variant="contained"
-                  startIcon={<Edit />}
-                  onClick={handleOpenEditDialog}
-                  sx={{ mt: 2, borderRadius: 2 }}
-                >
-                  Edit Profile
-                </Button>
-              </Box>
-
-              <Divider sx={{ my: 3 }} />
-
-              <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                Contact Information
-              </Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemIcon>
-                    <Email fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary={userData.email} />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <Phone fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary={userData.phone} />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <LocationOn fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary={userData.address} />
-                </ListItem>
-              </List>
-
-              <Divider sx={{ my: 2 }} />
-
-              <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                Stats
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <Paper
-                    sx={{
-                      p: 1.5,
-                      textAlign: "center",
-                      bgcolor: alpha(theme.palette.primary.main, 0.1),
-                    }}
-                  >
-                    <Typography variant="h6" color="primary.main">
-                      {userData.exchangeCount}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Exchanges
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={6}>
-                  <Paper
-                    sx={{
-                      p: 1.5,
-                      textAlign: "center",
-                      bgcolor: alpha(theme.palette.secondary.main, 0.1),
-                    }}
-                  >
-                    <Typography variant="h6" color="secondary.main">
-                      {userData.purchaseCount}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Purchases
-                    </Typography>
-                  </Paper>
-                </Grid>
-              </Grid>
-
-              <Box
-                sx={{
-                  mt: 2,
-                  p: 2,
-                  bgcolor: alpha(theme.palette.background.default, 0.5),
-                  borderRadius: 2,
-                }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  Member since {formatDate(userData.memberSince)}
-                </Typography>
-              </Box>
-            </Paper>
-          </Grid>
-
-          {/* Right Column - Bio and Tabs */}
-          <Grid item xs={12} md={8}>
-            <Paper sx={{ p: 3, borderRadius: 2, mb: 3 }}>
-              <Typography variant="h6" fontWeight={600} gutterBottom>
-                About Me
-              </Typography>
-              <Typography variant="body1" paragraph>
-                {userData.bio}
-              </Typography>
-            </Paper>
-
-            {/* Tabs */}
-            <Paper sx={{ borderRadius: 2, overflow: "hidden" }}>
-              <Tabs
-                value={activeTab}
-                onChange={handleTabChange}
-                variant="scrollable"
-                scrollButtons="auto"
-                sx={{ borderBottom: 1, borderColor: "divider" }}
-              >
-                <Tab icon={<Person />} label="Overview" />
-                <Tab icon={<CompareArrows />} label="Exchanges" />
-                <Tab icon={<ShoppingBag />} label="Purchases" />
-                <Tab icon={<Star />} label="Reviews" />
-                <Tab icon={<Favorite />} label="Favorites" />
-                <Tab icon={<Settings />} label="Settings" />
-              </Tabs>
-
-              <Box sx={{ p: 3 }}>
-                {activeTab === 0 && (
-                  <Typography>
-                    Overview content will be displayed here
-                  </Typography>
-                )}
-                {activeTab === 1 && (
-                  <Typography>
-                    Exchanges content will be displayed here
-                  </Typography>
-                )}
-                {activeTab === 2 && (
-                  <Typography>
-                    Purchases content will be displayed here
-                  </Typography>
-                )}
-                {activeTab === 3 && (
-                  <Typography>
-                    Reviews content will be displayed here
-                  </Typography>
-                )}
-                {activeTab === 4 && (
-                  <Typography>
-                    Favorites content will be displayed here
-                  </Typography>
-                )}
-                {activeTab === 5 && (
-                  <Box>
-                    <Typography variant="h6" fontWeight={600} gutterBottom>
-                      Account Settings
-                    </Typography>
-
-                    <Grid container spacing={3}>
-                      <Grid item xs={12}>
-                        <Paper sx={{ p: 3, borderRadius: 2 }}>
-                          <Typography
-                            variant="subtitle1"
-                            fontWeight={600}
-                            gutterBottom
-                          >
-                            <Security sx={{ mr: 1, verticalAlign: "middle" }} />
-                            Security Settings
-                          </Typography>
-
-                          <List>
-                            <ListItem>
-                              <ListItemText
-                                primary="Two-Factor Authentication"
-                                secondary="Add an extra layer of security to your account"
-                              />
-                              <FormControlLabel
-                                control={
-                                  <Switch
-                                    checked={formData.twoFactorEnabled}
-                                    onChange={handleSwitchChange}
-                                    name="twoFactorEnabled"
-                                    color="primary"
-                                  />
-                                }
-                                label=""
-                              />
-                            </ListItem>
-                          </List>
-                        </Paper>
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <Paper sx={{ p: 3, borderRadius: 2 }}>
-                          <Typography
-                            variant="subtitle1"
-                            fontWeight={600}
-                            gutterBottom
-                          >
-                            <Notifications
-                              sx={{ mr: 1, verticalAlign: "middle" }}
-                            />
-                            Notification Settings
-                          </Typography>
-
-                          <List>
-                            <ListItem>
-                              <ListItemText
-                                primary="Email Notifications"
-                                secondary="Receive updates and alerts via email"
-                              />
-                              <FormControlLabel
-                                control={
-                                  <Switch
-                                    checked={formData.notificationsEnabled}
-                                    onChange={handleSwitchChange}
-                                    name="notificationsEnabled"
-                                    color="primary"
-                                  />
-                                }
-                                label=""
-                              />
-                            </ListItem>
-                          </List>
-                        </Paper>
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <Paper sx={{ p: 3, borderRadius: 2 }}>
-                          <Typography
-                            variant="subtitle1"
-                            fontWeight={600}
-                            gutterBottom
-                          >
-                            <Palette sx={{ mr: 1, verticalAlign: "middle" }} />
-                            Appearance
-                          </Typography>
-
-                          <List>
-                            <ListItem>
-                              <ListItemText
-                                primary="Dark Mode"
-                                secondary="Switch between light and dark themes"
-                              />
-                              <FormControlLabel
-                                control={
-                                  <Switch
-                                    checked={formData.darkModeEnabled}
-                                    onChange={handleSwitchChange}
-                                    name="darkModeEnabled"
-                                    color="primary"
-                                  />
-                                }
-                                label=""
-                              />
-                            </ListItem>
-                          </List>
-                        </Paper>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                )}
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
-
-      {/* Edit Profile Dialog */}
-      <Dialog
-        open={editDialogOpen}
-        onClose={handleCloseEditDialog}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            Edit Profile
-            <IconButton onClick={handleCloseEditDialog}>
-              <Close />
-            </IconButton>
-          </Box>
-        </DialogTitle>
-
-        <DialogContent dividers>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={4} sx={{ textAlign: "center" }}>
-              <Avatar
-                src={userData.avatar}
-                alt={`${userData.firstName} ${userData.lastName}`}
-                sx={{
-                  width: 150,
-                  height: 150,
-                  mx: "auto",
-                  mb: 2,
-                  border: `4px solid ${theme.palette.background.paper}`,
-                  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-                }}
-              />
-              <Button variant="outlined" startIcon={<PhotoCamera />}>
-                Change Photo
-              </Button>
-
-              <Box sx={{ mt: 4 }}>
                 <Typography
                   variant="subtitle1"
                   fontWeight={600}
                   gutterBottom
-                  align="left"
+                  sx={{
+                    color: "white",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
                 >
-                  Social Media Profiles
+                  <Box
+                    component="span"
+                    sx={{
+                      width: 4,
+                      height: 20,
+                      backgroundColor: "#6366f1",
+                      display: "inline-block",
+                      mr: 1.5,
+                      borderRadius: 4,
+                    }}
+                  />
+                  Contact Information
                 </Typography>
 
-                <TextField
-                  fullWidth
-                  label="Website"
-                  name="website"
-                  value={formData.website}
-                  onChange={handleInputChange}
-                  margin="normal"
+                <List dense sx={{ mt: 1 }}>
+                  <ListItem
+                    sx={{
+                      py: 1.2,
+                      px: 1,
+                      transition: "all 0.2s ease",
+                      borderRadius: 2,
+                      "&:hover": {
+                        backgroundColor: "rgba(99, 102, 241, 0.08)",
+                      },
+                    }}
+                  >
+                    <ListItemIcon>
+                      <Email
+                        fontSize="small"
+                        sx={{
+                          color: "#6366f1",
+                          filter:
+                            "drop-shadow(0 0 3px rgba(99, 102, 241, 0.3))",
+                        }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={userData.email}
+                      primaryTypographyProps={{
+                        sx: {
+                          color: "white",
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                        },
+                      }}
+                    />
+                  </ListItem>
+
+                  <ListItem
+                    sx={{
+                      py: 1.2,
+                      px: 1,
+                      transition: "all 0.2s ease",
+                      borderRadius: 2,
+                      "&:hover": {
+                        backgroundColor: "rgba(99, 102, 241, 0.08)",
+                      },
+                    }}
+                  >
+                    <ListItemIcon>
+                      <Phone
+                        fontSize="small"
+                        sx={{
+                          color: "#6366f1",
+                          filter:
+                            "drop-shadow(0 0 3px rgba(99, 102, 241, 0.3))",
+                        }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={userData.phone}
+                      primaryTypographyProps={{
+                        sx: {
+                          color: "white",
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                        },
+                      }}
+                    />
+                  </ListItem>
+
+                  <ListItem
+                    sx={{
+                      py: 1.2,
+                      px: 1,
+                      transition: "all 0.2s ease",
+                      borderRadius: 2,
+                      "&:hover": {
+                        backgroundColor: "rgba(99, 102, 241, 0.08)",
+                      },
+                    }}
+                  >
+                    <ListItemIcon>
+                      <LocationOn
+                        fontSize="small"
+                        sx={{
+                          color: "#6366f1",
+                          filter:
+                            "drop-shadow(0 0 3px rgba(99, 102, 241, 0.3))",
+                        }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={userData.address}
+                      primaryTypographyProps={{
+                        sx: {
+                          color: "white",
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                        },
+                      }}
+                    />
+                  </ListItem>
+                </List>
+
+                <Divider
+                  sx={{
+                    my: 2.5,
+                    borderColor: "rgba(99, 102, 241, 0.2)",
+                    opacity: 0.6,
+                  }}
                 />
 
-                <TextField
-                  fullWidth
-                  label="Facebook"
-                  name="facebook"
-                  value={formData.facebook}
-                  onChange={handleInputChange}
-                  margin="normal"
-                />
+                <Typography
+                  variant="subtitle1"
+                  fontWeight={600}
+                  gutterBottom
+                  sx={{
+                    color: "white",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      width: 4,
+                      height: 20,
+                      backgroundColor: "#6366f1",
+                      display: "inline-block",
+                      mr: 1.5,
+                      borderRadius: 4,
+                    }}
+                  />
+                  Stats
+                </Typography>
 
-                <TextField
-                  fullWidth
-                  label="Twitter"
-                  name="twitter"
-                  value={formData.twitter}
-                  onChange={handleInputChange}
-                  margin="normal"
-                />
-              </Box>
+                <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                  <Grid item xs={6}>
+                    <Paper
+                      sx={{
+                        p: 2,
+                        textAlign: "center",
+                        bgcolor: "rgba(30, 41, 59, 0.6)",
+                        border: "1px solid rgba(99, 102, 241, 0.2)",
+                        borderRadius: 3,
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          transform: "translateY(-3px)",
+                          boxShadow: "0 5px 15px rgba(99, 102, 241, 0.2)",
+                        },
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          background:
+                            "linear-gradient(90deg, #6366f1, #a78bfa)",
+                          backgroundClip: "text",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          fontWeight: 700,
+                          fontSize: "1.5rem",
+                        }}
+                      >
+                        {userData.exchangeCount}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "rgba(255, 255, 255, 0.7)",
+                          fontWeight: 500,
+                          mt: 0.5,
+                        }}
+                      >
+                        Exchanges
+                      </Typography>
+                    </Paper>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Paper
+                      sx={{
+                        p: 2,
+                        textAlign: "center",
+                        bgcolor: "rgba(30, 41, 59, 0.6)",
+                        border: "1px solid rgba(99, 102, 241, 0.2)",
+                        borderRadius: 3,
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          transform: "translateY(-3px)",
+                          boxShadow: "0 5px 15px rgba(99, 102, 241, 0.2)",
+                        },
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          background:
+                            "linear-gradient(90deg, #6366f1, #a78bfa)",
+                          backgroundClip: "text",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          fontWeight: 700,
+                          fontSize: "1.5rem",
+                        }}
+                      >
+                        {userData.purchaseCount}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "rgba(255, 255, 255, 0.7)",
+                          fontWeight: 500,
+                          mt: 0.5,
+                        }}
+                      >
+                        Purchases
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </Paper>
             </Grid>
 
+            {/* Right Column - Bio and Tabs */}
             <Grid item xs={12} md={8}>
-              <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                Personal Information
-              </Typography>
-
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="First Name"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    margin="normal"
-                    required
+              <Paper
+                sx={{
+                  p: 4,
+                  borderRadius: 3,
+                  mb: 4,
+                  bgcolor: "rgba(15, 23, 42, 0.7)",
+                  border: "1px solid rgba(99, 102, 241, 0.15)",
+                  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",
+                  backdropFilter: "blur(16px)",
+                  color: "white",
+                  position: "relative",
+                  overflow: "hidden",
+                  "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "5px",
+                    background:
+                      "linear-gradient(90deg, #3f51b5, #6366f1, #a78bfa)",
+                    borderRadius: "3px 3px 0 0",
+                  },
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  fontWeight={600}
+                  gutterBottom
+                  sx={{
+                    color: "white",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      width: 4,
+                      height: 22,
+                      backgroundColor: "#6366f1",
+                      display: "inline-block",
+                      mr: 1.5,
+                      borderRadius: 4,
+                    }}
                   />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Last Name"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    margin="normal"
-                    required
-                  />
-                </Grid>
-              </Grid>
-
-              <TextField
-                fullWidth
-                label="Email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                margin="normal"
-                required
-              />
-
-              <TextField
-                fullWidth
-                label="Phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                margin="normal"
-              />
-
-              <TextField
-                fullWidth
-                label="Address"
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                margin="normal"
-              />
-
-              <TextField
-                fullWidth
-                label="Bio"
-                name="bio"
-                multiline
-                rows={4}
-                value={formData.bio}
-                onChange={handleInputChange}
-                margin="normal"
-                placeholder="Tell others about yourself..."
-              />
-
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                  Preferences
+                  About Me
                 </Typography>
-
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.notificationsEnabled}
-                      onChange={handleSwitchChange}
-                      name="notificationsEnabled"
-                      color="primary"
-                    />
-                  }
-                  label="Enable email notifications"
-                />
-
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.darkModeEnabled}
-                      onChange={handleSwitchChange}
-                      name="darkModeEnabled"
-                      color="primary"
-                    />
-                  }
-                  label="Enable dark mode"
-                />
-              </Box>
+                <Typography
+                  variant="body1"
+                  paragraph
+                  sx={{
+                    color: "rgba(255, 255, 255, 0.9)",
+                    lineHeight: 1.7,
+                    pl: 2.5,
+                    mt: 2,
+                  }}
+                >
+                  {userData.bio}
+                </Typography>
+              </Paper>
             </Grid>
           </Grid>
-        </DialogContent>
+        </Container>
 
-        <DialogActions>
-          <Button onClick={handleCloseEditDialog}>Cancel</Button>
-          <Button
-            onClick={handleSaveProfile}
-            variant="contained"
-            color="primary"
-            startIcon={<Save />}
-          >
-            Save Changes
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
+        {/* Edit Profile Dialog */}
+        <Dialog
+          open={editDialogOpen}
+          onClose={handleCloseEditDialog}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            style: {
+              backgroundColor: "#0f172a",
+              color: "white",
+              border: "1px solid rgba(99, 102, 241, 0.2)",
+              borderRadius: "16px",
+              boxShadow: "0 25px 50px rgba(0, 0, 0, 0.25)",
+            },
+          }}
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Layout>
+          <DialogTitle>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                color: "white",
+                p: 1,
+              }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                Edit Profile
+              </Typography>
+              <IconButton
+                onClick={handleCloseEditDialog}
+                sx={{
+                  color: "white",
+                  backgroundColor: "rgba(99, 102, 241, 0.1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(99, 102, 241, 0.2)",
+                  },
+                }}
+              >
+                <Close />
+              </IconButton>
+            </Box>
+          </DialogTitle>
+
+          <DialogContent
+            dividers
+            sx={{
+              borderColor: "rgba(99, 102, 241, 0.2)",
+              px: 3,
+              py: 2,
+            }}
+          >
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={4} sx={{ textAlign: "center" }}>
+                <Avatar
+                  src={userData.avatar}
+                  alt={`${userData.firstName} ${userData.lastName}`}
+                  sx={{
+                    width: 150,
+                    height: 150,
+                    mx: "auto",
+                    mb: 2,
+                    border: `4px solid ${theme.palette.background.paper}`,
+                    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                  }}
+                />
+                <Button variant="outlined" startIcon={<PhotoCamera />}>
+                  Change Photo
+                </Button>
+
+                <Box sx={{ mt: 4 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    gutterBottom
+                    align="left"
+                    sx={{ color: "white" }}
+                  >
+                    Social Media Profiles
+                  </Typography>
+
+                  <TextField
+                    fullWidth
+                    label="Website"
+                    name="website"
+                    value={formData.website}
+                    onChange={handleInputChange}
+                    margin="normal"
+                    sx={{ color: "white" }}
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="Facebook"
+                    name="facebook"
+                    value={formData.facebook}
+                    onChange={handleInputChange}
+                    margin="normal"
+                    sx={{ color: "white" }}
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="Twitter"
+                    name="twitter"
+                    value={formData.twitter}
+                    onChange={handleInputChange}
+                    margin="normal"
+                    sx={{ color: "white" }}
+                  />
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} md={8}>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight={600}
+                  gutterBottom
+                  sx={{ color: "white" }}
+                >
+                  Personal Information
+                </Typography>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="First Name"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      margin="normal"
+                      required
+                      sx={{ color: "white" }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Last Name"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      margin="normal"
+                      required
+                      sx={{ color: "white" }}
+                    />
+                  </Grid>
+                </Grid>
+
+                <TextField
+                  fullWidth
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  margin="normal"
+                  required
+                  sx={{ color: "white" }}
+                />
+
+                <TextField
+                  fullWidth
+                  label="Phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  margin="normal"
+                  sx={{ color: "white" }}
+                />
+
+                <TextField
+                  fullWidth
+                  label="Address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  margin="normal"
+                  sx={{ color: "white" }}
+                />
+
+                <TextField
+                  fullWidth
+                  label="Bio"
+                  name="bio"
+                  multiline
+                  rows={4}
+                  value={formData.bio}
+                  onChange={handleInputChange}
+                  margin="normal"
+                  placeholder="Tell others about yourself..."
+                  sx={{ color: "white" }}
+                />
+
+                <Box sx={{ mt: 3 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={600}
+                    gutterBottom
+                    sx={{ color: "white" }}
+                  >
+                    Preferences
+                  </Typography>
+
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData.notificationsEnabled}
+                        onChange={handleSwitchChange}
+                        name="notificationsEnabled"
+                        color="primary"
+                      />
+                    }
+                    label="Enable email notifications"
+                    sx={{ color: "white" }}
+                  />
+
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData.darkModeEnabled}
+                        onChange={handleSwitchChange}
+                        name="darkModeEnabled"
+                        color="primary"
+                      />
+                    }
+                    label="Enable dark mode"
+                    sx={{ color: "white" }}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
+          </DialogContent>
+
+          <DialogActions sx={{ p: 2.5 }}>
+            <Button
+              onClick={handleCloseEditDialog}
+              sx={{
+                color: "white",
+                borderRadius: 6,
+                px: 3,
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.08)",
+                },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveProfile}
+              variant="contained"
+              sx={{
+                background: "linear-gradient(90deg, #3f51b5, #6366f1)",
+                borderRadius: 6,
+                px: 3,
+                py: 1,
+                fontWeight: 600,
+                textTransform: "none",
+                "&:hover": {
+                  background: "linear-gradient(90deg, #3949ab, #5a5fe6)",
+                  boxShadow: "0 4px 15px rgba(99, 102, 241, 0.4)",
+                },
+              }}
+              startIcon={<Save />}
+            >
+              Save Changes
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbarSeverity}
+            sx={{ width: "100%", backgroundColor: "#0f172a", color: "white" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Layout>
+    </Box>
   );
 };
 

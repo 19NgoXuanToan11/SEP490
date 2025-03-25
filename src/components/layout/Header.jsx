@@ -21,6 +21,7 @@ import {
   Category,
   Favorite as HeartIcon,
   Person as UserOutlined,
+  Badge,
 } from "@mui/icons-material";
 import logo from "../../assets/pictures/logo/original.png";
 import UserDropdown from "../auth/UserDropdown";
@@ -28,6 +29,7 @@ import { Box, IconButton } from "@mui/material";
 import { motion } from "framer-motion";
 import { Button } from "@mui/material";
 import { useSelector } from "react-redux";
+import { useChat } from "../../context/ChatContext";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -43,6 +45,7 @@ const Header = () => {
   const [searchFocused, setSearchFocused] = useState(false);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
   const userMenuOpen = Boolean(userMenuAnchorEl);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   // Thay thế bằng trạng thái xác thực thực tế
   const isLoggedIn = true;
@@ -54,6 +57,8 @@ const Header = () => {
 
   // Get wishlist items from Redux store
   const wishlistItems = useSelector((state) => state.wishlist.items);
+
+  const { unreadCount } = useChat();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -131,10 +136,19 @@ const Header = () => {
     setUserMenuAnchorEl(null);
   };
 
+  const toggleUserDropdown = () => {
+    setUserDropdownOpen(!userDropdownOpen);
+  };
+
+  const closeUserDropdown = () => {
+    setUserDropdownOpen(false);
+  };
+
   const menuItems = [
     { text: "Home", path: "/", icon: HomeIcon },
     { text: "Products", path: "/products", icon: Category },
     { text: "Exchange", path: "/exchange", icon: SwitchHorizontalIcon },
+    { text: "Messages", path: "/messages", icon: MailIcon },
     // { text: "About", path: "/about", icon: InformationCircleIcon },
     // { text: "Contact", path: "/contact", icon: SupportIcon },
   ];
@@ -285,11 +299,11 @@ const Header = () => {
                     )}
                   </Link>
 
-                  {/* User profile button */}
+                  {/* User profile button - Thay đổi để mở UserDropdown */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={handleUserMenuOpen}
+                    onClick={toggleUserDropdown}
                     className="relative flex items-center p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center text-white font-medium">
@@ -304,6 +318,12 @@ const Header = () => {
                         : "U"}
                     </div>
                   </motion.button>
+
+                  {/* UserDropdown component */}
+                  <UserDropdown
+                    open={userDropdownOpen}
+                    onClose={closeUserDropdown}
+                  />
                 </>
               ) : (
                 <motion.button
@@ -470,10 +490,9 @@ const Header = () => {
                         className="flex items-center px-3 py-3 text-base font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 group transition-colors duration-300"
                       >
                         <div className="relative mr-4">
-                          <MailIcon className="h-6 w-6 flex-shrink-0 text-indigo-500 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300" />
-                          <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full">
-                            5
-                          </span>
+                          <Badge badgeContent={unreadCount} color="error">
+                            <MailIcon className="h-6 w-6 flex-shrink-0 text-indigo-500 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300" />
+                          </Badge>
                         </div>
                         Messages
                       </Link>

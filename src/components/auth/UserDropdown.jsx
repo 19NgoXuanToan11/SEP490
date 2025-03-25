@@ -7,15 +7,20 @@ import {
   ShoppingBag as ShoppingOutlined,
   Favorite as HeartOutlined,
   Settings as SettingOutlined,
+  Dashboard as ViewGridIcon,
+  History as HistoryOutlined,
 } from "@mui/icons-material";
 
-const UserDropdown = ({ anchorEl, open, onClose, onLogout }) => {
+const UserDropdown = ({ open, onClose }) => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState({
     name: "User",
     email: "user@example.com",
     avatar: null,
   });
+
+  // Kiểm tra vai trò admin
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Fetch user info from localStorage on mount
   useEffect(() => {
@@ -28,6 +33,9 @@ const UserDropdown = ({ anchorEl, open, onClose, onLogout }) => {
           email: userData.email || "user@example.com",
           avatar: userData.avatar || null,
         });
+
+        // Kiểm tra vai trò admin
+        setIsAdmin(userData.isAdmin || false);
       } catch (error) {
         console.error("Error parsing user data from localStorage:", error);
       }
@@ -37,7 +45,7 @@ const UserDropdown = ({ anchorEl, open, onClose, onLogout }) => {
   // Listen for localStorage changes
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === "user" || e.key === null) {
+      if (e.key === "user" || e.key === "logout_event" || e.key === null) {
         const userStr = localStorage.getItem("user");
         if (userStr) {
           try {
@@ -47,6 +55,7 @@ const UserDropdown = ({ anchorEl, open, onClose, onLogout }) => {
               email: userData.email || "user@example.com",
               avatar: userData.avatar || null,
             });
+            setIsAdmin(userData.isAdmin || false);
           } catch (error) {
             console.error("Error parsing user data from localStorage:", error);
           }
@@ -65,25 +74,29 @@ const UserDropdown = ({ anchorEl, open, onClose, onLogout }) => {
   const menuItems = [
     {
       icon: <UserOutlined />,
-      label: "Hồ sơ của tôi",
+      label: "Profile",
       path: "/profile",
     },
     {
       icon: <ShoppingOutlined />,
-      label: "Đơn hàng của tôi",
+      label: "Orders",
       path: "/orders",
     },
     {
-      icon: <HeartOutlined />,
-      label: "Danh sách yêu thích",
-      path: "/wishlist",
-    },
-    {
-      icon: <SettingOutlined />,
-      label: "Cài đặt",
-      path: "/settings",
+      icon: <HistoryOutlined />,
+      label: "Exchange History",
+      path: "/exchange-history",
     },
   ];
+
+  // Thêm tùy chọn Admin Dashboard nếu là admin
+  if (isAdmin) {
+    menuItems.push({
+      icon: <ViewGridIcon />,
+      label: "Admin Dashboard",
+      path: "/admin",
+    });
+  }
 
   const handleLogout = () => {
     // Clear user data from localStorage
@@ -93,12 +106,7 @@ const UserDropdown = ({ anchorEl, open, onClose, onLogout }) => {
     const logoutEvent = new Date().getTime();
     localStorage.setItem("logout_event", logoutEvent);
 
-    // Call the onLogout callback
-    if (onLogout) {
-      onLogout();
-    }
-
-    onClose();
+    onClose && onClose();
     navigate("/");
   };
 
@@ -154,7 +162,7 @@ const UserDropdown = ({ anchorEl, open, onClose, onLogout }) => {
                     <button
                       onClick={() => {
                         navigate(item.path);
-                        onClose();
+                        onClose && onClose();
                       }}
                       className="flex items-center w-full px-4 py-3 text-gray-700 dark:text-gray-200 
                         hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"

@@ -127,30 +127,6 @@ const Wishlist = () => {
 
       <main className="bg-[#0f172a] pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Wishlist header */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center">
-              <FavoriteIcon className="text-red-500 mr-3" fontSize="large" />
-              <div>
-                <h1 className="text-2xl font-bold text-white">My Wishlist</h1>
-                <p className="text-gray-400">
-                  {wishlistItems.length}{" "}
-                  {wishlistItems.length === 1 ? "item" : "items"} saved
-                </p>
-              </div>
-            </div>
-
-            {wishlistItems.length > 0 && (
-              <button
-                onClick={handleClearWishlist}
-                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center"
-              >
-                <DeleteIcon className="mr-1" fontSize="small" />
-                Clear All
-              </button>
-            )}
-          </div>
-
           {wishlistItems.length > 0 ? (
             <>
               {/* Controls bar */}

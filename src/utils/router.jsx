@@ -12,6 +12,7 @@ import Terms from "../pages/Terms";
 import Privacy from "../pages/Privacy";
 import Wishlist from "../pages/Wishlist";
 import Compare from "../pages/Compare";
+import OrderHistory from "../pages/OrderHistory";
 
 // Auth Pages
 import Login from "../pages/auth/Login";
@@ -25,6 +26,7 @@ import Message from "../pages/Message";
 import Cart from "../pages/Cart";
 import Exchange from "../pages/Exchange";
 import Settings from "../pages/Settings";
+import ExchangeHistory from "../pages/ExchangeHistory";
 
 // Admin Pages
 import AdminLayout from "../components/admin/AdminLayout";
@@ -123,7 +125,23 @@ const AppRouter = () => {
         path="/settings"
         element={
           <ProtectedRoute>
-            <Settings />
+          <Settings />
+        </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <ProtectedRoute>
+            <OrderHistory />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/exchange-history"
+        element={
+          <ProtectedRoute>
+            <ExchangeHistory />
           </ProtectedRoute>
         }
       />

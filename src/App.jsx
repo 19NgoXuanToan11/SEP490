@@ -3,8 +3,9 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppRouter from "./utils/router";
 import { CompareProvider } from "./context/CompareContext";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ChatProvider } from "./context/ChatContext";
 
 const theme = createTheme({
   palette: {
@@ -61,9 +62,10 @@ const theme = createTheme({
 
 function App() {
   return (
-    <CompareProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+    <ChatProvider>
+      <CompareProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
         <AppRouter />
         <ToastContainer
           position="bottom-right"
@@ -77,12 +79,13 @@ function App() {
           pauseOnHover
           theme="light"
           toastStyle={{
-            borderRadius: '8px',
-            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
+            borderRadius: "8px",
+            boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
           }}
         />
-      </ThemeProvider>
-    </CompareProvider>
+        </ThemeProvider>
+      </CompareProvider>
+    </ChatProvider>
   );
 }
 

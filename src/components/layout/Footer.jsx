@@ -110,9 +110,6 @@ const Footer = () => {
     { text: "Home", path: "/" },
     { text: "Products", path: "/products" },
     { text: "Exchange", path: "/exchange" },
-    { text: "About Us", path: "/about" },
-    { text: "Contact", path: "/contact" },
-    { text: "FAQ", path: "/faq" },
   ];
 
   const categories = [

@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Paper, Typography, Button, Box, Chip } from "@mui/material";
+import { Grid, Typography, Button, Box, Chip } from "@mui/material";
 import { TrendingUp, Refresh, ErrorOutline } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import ProductCard from "./ProductCard";
@@ -27,22 +27,10 @@ const TrendingProducts = ({
   };
 
   return (
-    <MotionBox
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      sx={{ position: "relative", overflow: "hidden", py: 2 }}
-    >
+    <div>
       {/* Section Header */}
       <Box sx={{ mb: 4, display: "flex", alignItems: "center" }}>
-        <MotionBox
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{
-            type: "spring",
-            stiffness: 260,
-            damping: 20,
-          }}
+        <Box
           sx={{
             display: "flex",
             alignItems: "center",
@@ -50,63 +38,54 @@ const TrendingProducts = ({
             width: 50,
             height: 50,
             borderRadius: "14px",
-            background: "linear-gradient(135deg, #FF6B6B, #FF8E53)",
-            boxShadow: "0 10px 25px rgba(255, 107, 107, 0.5)",
+            background: "linear-gradient(135deg, #4F46E5, #6366F1)",
             mr: 2,
           }}
         >
           <TrendingUp sx={{ fontSize: 30, color: "white" }} />
-        </MotionBox>
+        </Box>
 
         <Box>
-          <MotionTypography
+          <Typography
             variant="overline"
             sx={{
               fontWeight: 600,
-              color: "#FF6B6B",
+              color: "#6366F1",
               letterSpacing: 1.5,
               display: "block",
               mb: 0.5,
             }}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
           >
             HOT RIGHT NOW
-          </MotionTypography>
+          </Typography>
 
-          <MotionTypography
+          <Typography
             variant="h4"
             component="h2"
             sx={{
               fontWeight: 800,
-              background: "linear-gradient(90deg, #FF6B6B, #FF8E53)",
+              background: "linear-gradient(90deg, #4F46E5, #6366F1)",
               backgroundClip: "text",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               textFillColor: "transparent",
               position: "relative",
             }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
           >
             Trending Products
-            {/* Underline animation */}
-            <MotionBox
+            {/* Underline */}
+            <Box
               sx={{
                 position: "absolute",
                 bottom: -5,
                 left: 0,
                 height: 3,
-                background: "linear-gradient(90deg, #FF6B6B, transparent)",
+                width: "100%",
+                background: "linear-gradient(90deg, #6366F1, transparent)",
                 borderRadius: "2px",
               }}
-              initial={{ width: 0 }}
-              animate={{ width: "100%" }}
-              transition={{ delay: 0.5, duration: 0.8 }}
             />
-          </MotionTypography>
+          </Typography>
         </Box>
 
         {!loading && !error && products && products.length > 0 && (
@@ -114,8 +93,8 @@ const TrendingProducts = ({
             label={`${products.length} Products`}
             sx={{
               ml: "auto",
-              background: "rgba(255, 107, 107, 0.1)",
-              color: "#FF6B6B",
+              background: "rgba(99, 102, 241, 0.1)",
+              color: "#6366F1",
               fontWeight: 600,
               borderRadius: "12px",
               px: 1,
@@ -123,22 +102,6 @@ const TrendingProducts = ({
           />
         )}
       </Box>
-
-      {/* Background gradient */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: "20%",
-          right: "-10%",
-          width: "40%",
-          height: "60%",
-          background:
-            "radial-gradient(circle, rgba(255, 107, 107, 0.1) 0%, rgba(255, 107, 107, 0) 70%)",
-          filter: "blur(60px)",
-          zIndex: 0,
-          pointerEvents: "none",
-        }}
-      />
 
       {/* Content */}
       {loading ? (
@@ -148,28 +111,23 @@ const TrendingProducts = ({
           ))}
         </Grid>
       ) : error ? (
-        <Paper
+        <Box
           sx={{
             textAlign: "center",
             py: 6,
             px: 4,
-            borderRadius: "24px",
-            background: "rgba(255, 255, 255, 0.8)",
-            backdropFilter: "blur(10px)",
-            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.1)",
+            backgroundColor: "#1e2a3b",
+            borderRadius: "12px",
           }}
-          component={motion.div}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
         >
-          <ErrorOutline sx={{ fontSize: 60, color: "#FF6B6B", mb: 2 }} />
+          <ErrorOutline sx={{ fontSize: 60, color: "#6366F1", mb: 2 }} />
           <Typography
             variant="h5"
-            sx={{ fontWeight: 700, color: "#1e293b", mb: 2 }}
+            sx={{ fontWeight: 700, color: "#e2e8f0", mb: 2 }}
           >
             Oops! Something went wrong
           </Typography>
-          <Typography sx={{ color: "#64748b", mb: 3 }}>
+          <Typography sx={{ color: "#94a3b8", mb: 3 }}>
             We couldn't load the trending products. Please try again later.
           </Typography>
           <Button
@@ -177,58 +135,34 @@ const TrendingProducts = ({
             startIcon={<Refresh />}
             sx={{
               borderRadius: "14px",
-              background: "linear-gradient(135deg, #FF6B6B, #FF8E53)",
+              background: "linear-gradient(135deg, #4F46E5, #6366F1)",
               fontWeight: 600,
               px: 4,
               py: 1.5,
-              boxShadow: "0 10px 20px rgba(255, 107, 107, 0.3)",
               "&:hover": {
-                background: "linear-gradient(135deg, #FF8E53, #FF6B6B)",
+                background: "linear-gradient(135deg, #6366F1, #4F46E5)",
               },
             }}
             onClick={() => window.location.reload()}
           >
             Try Again
           </Button>
-        </Paper>
+        </Box>
       ) : (
-        <Grid
-          container
-          spacing={3}
-          component={motion.div}
-          variants={containerVariants}
-        >
+        <Grid container spacing={3}>
           {products.map((product, index) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              key={product.id}
-              component={motion.div}
-              variants={{
-                hidden: { opacity: 0, y: 50 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    delay: index * 0.1,
-                    duration: 0.5,
-                    ease: "easeOut",
-                  },
-                },
-              }}
-            >
+            <Grid item xs={12} sm={6} md={4} key={product.id}>
               <ProductCard
                 product={product}
                 toggleFavorite={toggleFavorite}
                 favorites={favorites}
+                darkMode={true}
               />
             </Grid>
           ))}
         </Grid>
       )}
-    </MotionBox>
+    </div>
   );
 };
 

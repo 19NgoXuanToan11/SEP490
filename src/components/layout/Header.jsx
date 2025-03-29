@@ -61,17 +61,28 @@ const Header = () => {
   const { unreadCount } = useChat();
 
   useEffect(() => {
+    // Debounce scroll handler để tránh gọi quá nhiều lần
+    let timeoutId = null;
     const handleScroll = () => {
-      const offset = window.scrollY;
-      if (offset > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
+
+      timeoutId = setTimeout(() => {
+        const offset = window.scrollY;
+        if (offset > 20) {
+          setScrolled(true);
+        } else {
+          setScrolled(false);
+        }
+      }, 50); // Chỉ cập nhật sau 50ms kể từ lần scroll cuối cùng
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   useEffect(() => {

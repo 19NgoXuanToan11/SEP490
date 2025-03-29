@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 const useProductFilter = (products) => {
   // State cho các bộ lọc
@@ -10,6 +10,9 @@ const useProductFilter = (products) => {
     searchQuery: "",
     sortBy: "newest",
   });
+
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 12;
 
   // Hàm cập nhật bộ lọc
   const updateFilter = (filterType, value) => {
@@ -128,6 +131,21 @@ const useProductFilter = (products) => {
       });
   }, [products, filters]);
 
+  // Tính toán sản phẩm cần hiển thị cho trang hiện tại
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (page - 1) * itemsPerPage;
+    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredProducts, page, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+  const goToPage = useCallback(
+    (newPage) => {
+      setPage(Math.max(1, Math.min(newPage, totalPages)));
+    },
+    [totalPages]
+  );
+
   return {
     filters,
     updateFilter,
@@ -135,7 +153,15 @@ const useProductFilter = (products) => {
     handleConditionChange,
     handleBrandChange,
     handleSortChange,
-    filteredProducts,
+    filteredProducts: paginatedProducts,
+    pagination: {
+      page,
+      totalPages,
+      goToPage,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+    },
+    totalProducts: filteredProducts.length,
   };
 };
 

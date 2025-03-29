@@ -96,40 +96,6 @@ const HeroSection = () => {
             </motion.button>
           </Link>
         </motion.div>
-
-        {/* Stats counter */}
-        <motion.div
-          className="flex flex-wrap justify-center gap-8 md:gap-16 mt-16"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1 }}
-        >
-          {[
-            { value: "10K+", label: "Products" },
-            { value: "5K+", label: "Users", highlight: true },
-            { value: "8K+", label: "Transactions" },
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              className="text-center px-4"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1 + index * 0.2 }}
-            >
-              <motion.h3
-                className={`text-4xl font-bold mb-1 ${
-                  stat.highlight ? "text-indigo-400" : "text-white"
-                }`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 1.2 + index * 0.2 }}
-              >
-                {stat.value}
-              </motion.h3>
-              <p className="text-white/70">{stat.label}</p>
-            </motion.div>
-          ))}
-        </motion.div>
       </div>
 
       {/* Scroll down indicator */}

@@ -1,4 +1,11 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useMemo,
+  useCallback,
+} from "react";
 import ChatService from "../services/ChatService";
 import WebSocketService from "../services/WebSocketService";
 
@@ -10,11 +17,37 @@ export const useChat = () => useContext(ChatContext);
 
 // Provider component
 export const ChatProvider = ({ children }) => {
-  const [conversations, setConversations] = useState([]);
-  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [conversationsMap, setConversationsMap] = useState({});
+  const [conversationIds, setConversationIds] = useState([]);
+  const [selectedConversationId, setSelectedConversationId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Tạo danh sách cuộc trò chuyện từ map và ids
+  const conversations = useMemo(() => {
+    return conversationIds.map((id) => conversationsMap[id]);
+  }, [conversationIds, conversationsMap]);
+
+  // Lấy cuộc trò chuyện được chọn từ id
+  const selectedConversation = useMemo(() => {
+    return selectedConversationId
+      ? conversationsMap[selectedConversationId]
+      : null;
+  }, [selectedConversationId, conversationsMap]);
+
+  // Tối ưu việc cập nhật cuộc trò chuyện
+  const updateConversation = useCallback((conversationId, updater) => {
+    setConversationsMap((prev) => {
+      const conversation = prev[conversationId];
+      if (!conversation) return prev;
+
+      return {
+        ...prev,
+        [conversationId]: updater(conversation),
+      };
+    });
+  }, []);
 
   // Tải dữ liệu cuộc trò chuyện ban đầu
   useEffect(() => {
@@ -73,7 +106,13 @@ export const ChatProvider = ({ children }) => {
     try {
       setLoading(true);
       const data = await ChatService.getConversations();
-      setConversations(data);
+      setConversationsMap(
+        data.reduce((acc, conv) => {
+          acc[conv.id] = conv;
+          return acc;
+        }, {})
+      );
+      setConversationIds(Object.keys(data));
       setLoading(false);
     } catch (err) {
       setError("Failed to load conversations");
@@ -83,7 +122,7 @@ export const ChatProvider = ({ children }) => {
 
   // Chọn một cuộc trò chuyện
   const selectConversation = async (conversation) => {
-    setSelectedConversation(conversation);
+    setSelectedConversationId(conversation.id);
 
     // Đánh dấu tin nhắn là đã đọc
     if (conversation) {
@@ -100,70 +139,42 @@ export const ChatProvider = ({ children }) => {
         return conv;
       });
 
-      setConversations(updatedConversations);
+      setConversationsMap((prev) => ({
+        ...prev,
+        [conversation.id]: { ...conversation, messages: updatedMessages },
+      }));
     }
   };
 
-  // Xử lý tin nhắn mới từ WebSocket
-  const handleNewMessage = (data) => {
-    const { conversationId, message } = data;
+  // Xử lý tin nhắn mới từ WebSocket với hiệu suất tốt hơn
+  const handleNewMessage = useCallback(
+    (data) => {
+      const { conversationId, message } = data;
 
-    // Kiểm tra xem cuộc trò chuyện đã tồn tại chưa
-    const existingConversation = conversations.find(
-      (conv) => conv.id === conversationId
-    );
+      updateConversation(conversationId, (conversation) => {
+        // Kiểm tra tin nhắn đã tồn tại chưa để tránh trùng lặp
+        const messageExists = conversation.messages.some(
+          (msg) => msg.id === message.id
+        );
 
-    if (existingConversation) {
-      // Cập nhật cuộc trò chuyện hiện tại với tin nhắn mới
-      const updatedConversations = conversations.map((conv) => {
-        if (conv.id === conversationId) {
-          const updatedMessages = [...conv.messages, message];
-
-          // Đánh dấu tin nhắn là đã đọc nếu người dùng đang xem cuộc trò chuyện này
-          const isRead = selectedConversation?.id === conversationId;
-
-          return {
-            ...conv,
-            messages: updatedMessages,
-            lastMessage: {
-              text: message.text,
-              timestamp: message.timestamp,
-              sender: message.sender,
-              read: isRead,
-            },
-            unreadCount: isRead ? 0 : (conv.unreadCount || 0) + 1,
-            isTyping: false, // Reset trạng thái typing
-          };
+        if (messageExists) {
+          return conversation;
         }
-        return conv;
+
+        // Xác định xem tin nhắn đã đọc chưa (đã đọc nếu cuộc trò chuyện đang được chọn)
+        const isRead = selectedConversationId === conversationId;
+        const newMessage = { ...message, read: isRead };
+
+        return {
+          ...conversation,
+          messages: [...conversation.messages, newMessage],
+          lastMessage: newMessage,
+          unreadCount: isRead ? 0 : conversation.unreadCount + 1,
+        };
       });
-
-      // Đưa cuộc trò chuyện có tin nhắn mới lên đầu danh sách
-      const sortedConversations = [...updatedConversations].sort((a, b) => {
-        if (a.id === conversationId) return -1;
-        if (b.id === conversationId) return 1;
-        return (
-          new Date(b.lastMessage.timestamp) - new Date(a.lastMessage.timestamp)
-        );
-      });
-
-      setConversations(sortedConversations);
-
-      // Cập nhật selectedConversation nếu người dùng đang xem cuộc trò chuyện này
-      if (selectedConversation?.id === conversationId) {
-        const updatedSelectedConversation = sortedConversations.find(
-          (conv) => conv.id === conversationId
-        );
-        setSelectedConversation(updatedSelectedConversation);
-
-        // Đánh dấu tin nhắn là đã đọc
-        ChatService.markMessagesAsRead(conversationId);
-      }
-    } else {
-      // Nếu là cuộc trò chuyện mới, cần fetch thông tin
-      fetchConversations();
-    }
-  };
+    },
+    [selectedConversationId, updateConversation]
+  );
 
   // Xử lý trạng thái typing từ WebSocket
   const handleTypingStatus = (data) => {
@@ -177,14 +188,20 @@ export const ChatProvider = ({ children }) => {
       return conv;
     });
 
-    setConversations(updatedConversations);
+    setConversationsMap((prev) => ({
+      ...prev,
+      [conversationId]: { ...conversationsMap[conversationId], isTyping },
+    }));
 
     // Cập nhật selectedConversation nếu người dùng đang xem cuộc trò chuyện này
     if (selectedConversation?.id === conversationId) {
       const updatedSelectedConversation = updatedConversations.find(
         (conv) => conv.id === conversationId
       );
-      setSelectedConversation(updatedSelectedConversation);
+      setConversationsMap((prev) => ({
+        ...prev,
+        [conversationId]: updatedSelectedConversation,
+      }));
     }
   };
 
@@ -207,14 +224,23 @@ export const ChatProvider = ({ children }) => {
       return conv;
     });
 
-    setConversations(updatedConversations);
+    setConversationsMap((prev) => ({
+      ...prev,
+      ...updatedConversations.reduce((acc, conv) => {
+        acc[conv.id] = conv;
+        return acc;
+      }, {}),
+    }));
 
     // Cập nhật selectedConversation nếu người dùng đang xem cuộc trò chuyện với người này
     if (selectedConversation?.user.id === userId) {
       const updatedSelectedConversation = updatedConversations.find(
         (conv) => conv.user.id === userId
       );
-      setSelectedConversation(updatedSelectedConversation);
+      setConversationsMap((prev) => ({
+        ...prev,
+        [selectedConversation.id]: updatedSelectedConversation,
+      }));
     }
   };
 
@@ -262,8 +288,10 @@ export const ChatProvider = ({ children }) => {
         ),
       ];
 
-      setConversations(reorderedConversations);
-      setSelectedConversation(updatedConversation);
+      setConversationsMap((prev) => ({
+        ...prev,
+        [selectedConversation.id]: updatedConversation,
+      }));
 
       // Gửi qua WebSocket nếu có kết nối
       const sentViaWs = WebSocketService.sendMessage(
@@ -322,8 +350,10 @@ export const ChatProvider = ({ children }) => {
         conv.id === selectedConversation.id ? finalConversation : conv
       );
 
-      setConversations(finalConversations);
-      setSelectedConversation(finalConversation);
+      setConversationsMap((prev) => ({
+        ...prev,
+        [selectedConversation.id]: finalConversation,
+      }));
 
       return finalMessage;
     } catch (err) {
@@ -339,8 +369,10 @@ export const ChatProvider = ({ children }) => {
         conv.id === selectedConversation.id ? failedConversation : conv
       );
 
-      setConversations(failedConversations);
-      setSelectedConversation(failedConversation);
+      setConversationsMap((prev) => ({
+        ...prev,
+        [selectedConversation.id]: failedConversation,
+      }));
 
       throw err;
     }
@@ -350,7 +382,11 @@ export const ChatProvider = ({ children }) => {
   const createConversation = async (userId) => {
     try {
       const newConversation = await ChatService.createConversation(userId);
-      setConversations([newConversation, ...conversations]);
+      setConversationsMap((prev) => ({
+        ...prev,
+        [newConversation.id]: newConversation,
+      }));
+      setConversationIds((prev) => [...prev, newConversation.id]);
       return newConversation;
     } catch (err) {
       setError("Failed to create conversation");

@@ -98,7 +98,7 @@ const CategorySection = () => {
   };
 
   return (
-    <section className="py-16 px-4 bg-gray-50">
+    <section className="py-16 px-4 bg-[#0a0f23]">
       {/* Animated particles/dots background */}
       <div className="absolute inset-0 overflow-hidden z-0">
         {[...Array(15)].map((_, index) => (
@@ -140,25 +140,84 @@ const CategorySection = () => {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
             viewport={{ once: true, amount: 0.1 }}
             className="inline-block"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 relative inline-block text-gray-900">
-              Browse by Category
-              <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-indigo-600 rounded-full"></span>
+            <h2 className="text-5xl md:text-6xl font-bold mb-4 relative inline-block">
+              <span
+                className="relative text-white uppercase tracking-wider"
+                style={{
+                  textShadow:
+                    "0 4px 20px rgba(101, 119, 255, 0.5), 0 2px 5px rgba(255, 255, 255, 0.2)",
+                  fontWeight: 900,
+                  letterSpacing: "0.08em",
+                  position: "relative",
+                  transform: "perspective(500px)",
+                }}
+              >
+                Browse by
+              </span>{" "}
+              <span
+                className="bg-gradient-to-r from-indigo-400 via-blue-500 to-purple-600 text-transparent bg-clip-text uppercase"
+                style={{
+                  fontWeight: 900,
+                  letterSpacing: "0.08em",
+                  textShadow: "0 5px 20px rgba(125, 93, 255, 0.6)",
+                  transform: "translateZ(20px)",
+                }}
+              >
+                Category
+              </span>
+              {/* 3D glow effect under text */}
+              <motion.div
+                className="absolute left-0 right-0 bottom-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 rounded-full"
+                initial={{ width: 0, opacity: 0 }}
+                whileInView={{ width: "100%", opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                viewport={{ once: true }}
+                style={{ boxShadow: "0 0 15px 2px rgba(99, 102, 241, 0.8)" }}
+              />
+              {/* Enhanced 3D glow effect under text */}
+              <div
+                className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-4/5 h-10 bg-indigo-600/30 filter blur-xl rounded-full"
+                style={{ zIndex: -1 }}
+              ></div>
+              <div
+                className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-3/5 h-6 bg-purple-600/20 filter blur-lg rounded-full"
+                style={{ zIndex: -1 }}
+              ></div>
             </h2>
           </motion.div>
+
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
             viewport={{ once: true, amount: 0.1 }}
-            className="text-gray-600 max-w-2xl mx-auto mt-6 text-lg"
+            className="text-gray-300 max-w-2xl mx-auto mt-10 text-lg font-light"
+            style={{
+              letterSpacing: "0.5px",
+              textShadow: "0 2px 10px rgba(0, 0, 0, 0.3)",
+              backdropFilter: "blur(5px)",
+            }}
           >
-            Explore our wide range of categories and find exactly what you're
-            looking for
+            Experience the future of electronics trading with our innovative
+            platform
           </motion.p>
+
+          {/* Enhanced 3D underline */}
+          <motion.div
+            className="h-1.5 w-24 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 mx-auto mt-6 rounded-full"
+            initial={{ width: 0, opacity: 0 }}
+            whileInView={{ width: "6rem", opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            viewport={{ once: true }}
+            style={{
+              boxShadow: "0 0 15px 2px rgba(99, 102, 241, 0.6)",
+              transform: "translateZ(5px)",
+            }}
+          />
         </div>
 
         <motion.div
@@ -202,7 +261,7 @@ const CategorySection = () => {
                   <div className="absolute inset-0 p-8 flex flex-col justify-between">
                     <div className="flex items-center">
                       {/* Icon container with glass effect */}
-                      <div className="w-14 h-14 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-white mb-4 transform group-hover:scale-110 transition-all duration-300 shadow-lg border border-white/40">
+                      <div className="w-14 h-14 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white mb-4 transform group-hover:scale-110 transition-all duration-300 shadow-lg border border-white/20">
                         <motion.div
                           initial={{ opacity: 1 }}
                           whileHover={{ opacity: 0, rotateY: 90 }}
@@ -233,7 +292,7 @@ const CategorySection = () => {
 
                       {/* Animated arrow that appears on hover */}
                       <div className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                        <span className="text-white text-sm font-medium flex items-center bg-white/20 backdrop-blur-sm py-2 px-4 rounded-full w-fit">
+                        <span className="text-white text-sm font-medium flex items-center bg-black/30 backdrop-blur-sm py-2 px-4 rounded-full w-fit">
                           Explore
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -263,14 +322,14 @@ const CategorySection = () => {
         <div className="hidden md:block">
           <motion.div
             initial={{ opacity: 0 }}
-            whileInView={{ opacity: 0.5 }}
+            whileInView={{ opacity: 0.3 }}
             transition={{ duration: 1, delay: 0.5 }}
             viewport={{ once: true }}
             className="absolute -left-16 top-1/2 w-64 h-64 bg-indigo-500 rounded-full filter blur-3xl opacity-20 z-0"
           ></motion.div>
           <motion.div
             initial={{ opacity: 0 }}
-            whileInView={{ opacity: 0.5 }}
+            whileInView={{ opacity: 0.3 }}
             transition={{ duration: 1, delay: 0.7 }}
             viewport={{ once: true }}
             className="absolute -right-16 bottom-1/4 w-64 h-64 bg-purple-500 rounded-full filter blur-3xl opacity-20 z-0"

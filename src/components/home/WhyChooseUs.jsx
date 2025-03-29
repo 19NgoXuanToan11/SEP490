@@ -105,61 +105,6 @@ const WhyChooseUs = () => {
       transition={{ duration: 0.5 }}
       viewport={{ once: true, amount: 0.1 }}
     >
-      {/* 3D rotating cube in the background */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: { xs: "300px", md: "500px" },
-          height: { xs: "300px", md: "500px" },
-          perspective: "1000px",
-          zIndex: 0,
-          opacity: 0.07,
-          display: { xs: "none", md: "block" },
-        }}
-      >
-        <motion.div
-          style={{
-            width: "100%",
-            height: "100%",
-            position: "relative",
-            transformStyle: "preserve-3d",
-          }}
-          animate={{
-            rotateY: [0, 360],
-            rotateX: [0, 360],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        >
-          {[...Array(6)].map((_, index) => (
-            <Box
-              key={index}
-              sx={{
-                position: "absolute",
-                width: "100%",
-                height: "100%",
-                background: "rgba(99, 102, 241, 0.1)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-                transform: [
-                  "rotateY(0deg) translateZ(250px)",
-                  "rotateY(90deg) translateZ(250px)",
-                  "rotateY(180deg) translateZ(250px)",
-                  "rotateY(-90deg) translateZ(250px)",
-                  "rotateX(90deg) translateZ(250px)",
-                  "rotateX(-90deg) translateZ(250px)",
-                ][index],
-              }}
-            />
-          ))}
-        </motion.div>
-      </Box>
-
       {/* Glowing lines */}
       <Box
         sx={{

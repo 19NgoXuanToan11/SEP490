@@ -337,37 +337,51 @@ const Home = () => {
   };
 
   return (
-    <Box sx={{ 
-      width: '100%', 
-      overflowX: 'hidden' // Thêm thuộc tính này để ngăn cuộn ngang
-    }}>
+    <Box
+      sx={{
+        width: "100%",
+        overflowX: "hidden",
+        backgroundColor: "#0a0f23",
+        color: "#fff",
+      }}
+    >
       <Header scrolled={scrolled} />
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        style={{ width: '100%', overflowX: 'hidden' }} // Thêm style này cho motion.div
+        style={{
+          width: "100%",
+          overflowX: "hidden",
+          backgroundColor: "#0a0f23",
+        }}
       >
-        {/* Hero Section */}
-        <HeroSection />
-
-        {/* Main Content */}
-        <Container 
-          maxWidth="lg" 
-          sx={{ 
-            mt: 10,
-            px: { xs: 2, sm: 3, md: 4 }, // Padding responsive
-            width: '100%',
-            boxSizing: 'border-box', // Đảm bảo padding không làm tăng chiều rộng
-            overflow: 'hidden' // Ngăn cuộn ngang trong container
+        <Box
+          sx={{
+            background: "linear-gradient(135deg, #111827 0%, #1e2a3b 100%)",
+            color: "#fff",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          {/* Categories Section */}
+          <HeroSection />
+        </Box>
+
+        <Container
+          maxWidth="lg"
+          sx={{
+            mt: 10,
+            px: { xs: 2, sm: 3, md: 4 },
+            width: "100%",
+            boxSizing: "border-box",
+            overflow: "hidden",
+            backgroundColor: "#0a0f23",
+          }}
+        >
           <CategorySection />
 
-          {/* Featured Products */}
-          <Box sx={{ width: '100%', overflow: 'hidden' }}>
+          <Box mt={15}>
             <FeaturedProducts
               products={featuredProducts}
               loading={loading}
@@ -377,11 +391,7 @@ const Home = () => {
             />
           </Box>
 
-          {/* Why Choose Us */}
-          <WhyChooseUs />
-
-          {/* Trending Products & Recent Exchanges Tabs */}
-          <Box sx={{ width: '100%', overflow: 'hidden' }}>
+          <Box mt={15}>
             <TabSection
               trendingProducts={trendingProducts}
               recentExchanges={recentExchanges}
@@ -394,9 +404,14 @@ const Home = () => {
             />
           </Box>
 
-          {/* Call to Action */}
-          <CallToAction />
+          <Box mt={15}>
+            <WhyChooseUs />
+          </Box>
         </Container>
+
+        <Box mt={15}>
+          <CallToAction />
+        </Box>
       </motion.div>
 
       <Footer />

@@ -12,6 +12,16 @@ class WebSocketService {
     this.maxReconnectAttempts = 5;
     this.reconnectTimeout = null;
     this.isConnecting = false;
+    this.lastTypingSent = null;
+    this.messageQueue = [];
+    this.isProcessingQueue = false;
+    this.rateLimitMap = new Map(); // Track rate limits for different message types
+    this.reconnectStrategy = {
+      attempts: 0,
+      maxAttempts: 10,
+      baseDelay: 1000,
+      factor: 1.5, // Exponential backoff factor
+    };
   }
 
   connect(userId, token) {
@@ -153,6 +163,115 @@ class WebSocketService {
     if (this.callbacks[event]) {
       this.callbacks[event].forEach((callback) => callback(data));
     }
+  }
+
+  _sendMessage(type, data) {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      console.warn("WebSocket not connected. Cannot send message.");
+      return false;
+    }
+
+    // Throttle các message không quan trọng (ví dụ: typing status)
+    if (type === "typing") {
+      if (this.lastTypingSent && Date.now() - this.lastTypingSent < 500) {
+        return false;
+      }
+      this.lastTypingSent = Date.now();
+    }
+
+    try {
+      this.socket.send(JSON.stringify({ type, data }));
+      return true;
+    } catch (error) {
+      console.error("Error sending WebSocket message:", error);
+      return false;
+    }
+  }
+
+  // Thêm tin nhắn vào queue
+  queueMessage(type, data, priority = 1) {
+    this.messageQueue.push({ type, data, priority, timestamp: Date.now() });
+    this.messageQueue.sort((a, b) => b.priority - a.priority); // Sort by priority
+
+    if (!this.isProcessingQueue) {
+      this.processMessageQueue();
+    }
+
+    return true;
+  }
+
+  // Xử lý queue tin nhắn
+  async processMessageQueue() {
+    if (this.messageQueue.length === 0 || this.isProcessingQueue) {
+      this.isProcessingQueue = false;
+      return;
+    }
+
+    this.isProcessingQueue = true;
+    const message = this.messageQueue.shift();
+
+    // Kiểm tra rate limit
+    const canSend = this._checkRateLimit(message.type);
+
+    if (canSend && this.socket && this.socket.readyState === WebSocket.OPEN) {
+      try {
+        await this._sendMessageImmediate(message.type, message.data);
+      } catch (error) {
+        console.error("Error sending message:", error);
+
+        // Đưa tin nhắn quay lại queue nếu thất bại vì lý do kết nối
+        if (error.name === "NetworkError") {
+          this.messageQueue.unshift(message);
+        }
+      }
+    } else if (!canSend) {
+      // Đợi một chút rồi thêm lại tin nhắn vào queue
+      setTimeout(() => {
+        this.messageQueue.push(message);
+      }, 500);
+    }
+
+    // Xử lý tin nhắn tiếp theo
+    setTimeout(() => {
+      this.isProcessingQueue = false;
+      this.processMessageQueue();
+    }, 50);
+  }
+
+  _checkRateLimit(type) {
+    const now = Date.now();
+    const limits = {
+      typing: { interval: 500, count: 1 },
+      message: { interval: 200, count: 5 },
+      default: { interval: 100, count: 10 },
+    };
+
+    const limit = limits[type] || limits.default;
+    const key = `${type}_${Math.floor(now / limit.interval)}`;
+
+    const current = this.rateLimitMap.get(key) || 0;
+    if (current >= limit.count) {
+      return false;
+    }
+
+    this.rateLimitMap.set(key, current + 1);
+    return true;
+  }
+
+  _sendMessageImmediate(type, data) {
+    return new Promise((resolve, reject) => {
+      if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+        reject(new Error("WebSocket not connected"));
+        return;
+      }
+
+      try {
+        this.socket.send(JSON.stringify({ type, data }));
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
 }
 
